@@ -1,3 +1,5 @@
 node_modules
 .vscode
-yarn.lock
+yarn-error.log
+*.js
+*.d.ts

@@ -1,0 +1,133 @@
+{
+  "name": "",
+  "paths": {
+    "default": "",
+    "en": "root"
+  },
+  "children": [
+    {
+      "name": "about",
+      "paths": {
+        "default": "about",
+        "fr": "a-propos",
+        "es": "acerca-de-nosotros"
+      }
+    },
+    {
+      "name": "auth",
+      "paths": {
+        "default": "auth"
+      },
+      "children": [
+        {
+          "name": "social",
+          "paths": {
+            "default": "social"
+          },
+          "children": [
+            {
+              "name": "index",
+              "paths": {
+                "default": "index"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "communities",
+      "paths": {
+        "default": "communities",
+        "fr": "communautes",
+        "es": "comunidades",
+        "pt": "comunidades"
+      },
+      "children": [
+        {
+          "name": "[[...tagSlug]]",
+          "paths": {
+            "default": ":tagSlug*"
+          }
+        }
+      ]
+    },
+    {
+      "name": "community",
+      "paths": {
+        "default": "community",
+        "fr": "communaute",
+        "es": "comunidad",
+        "pt": "comunidade"
+      },
+      "children": [
+        {
+          "name": "[communityId]",
+          "paths": {
+            "default": "."
+          },
+          "children": [
+            {
+              "name": "[communitySlug]",
+              "paths": {
+                "default": ":communityId(\\d+){-:communitySlug}"
+              },
+              "children": [
+                {
+                  "name": "index",
+                  "paths": {
+                    "default": "index"
+                  }
+                },
+                {
+                  "name": "statistics",
+                  "paths": {
+                    "default": "statistics",
+                    "fr": "statistiques",
+                    "es": "estadisticas",
+                    "pt": "estatisticas"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "contact",
+      "paths": {
+        "default": "contact"
+      }
+    },
+    {
+      "name": "faq",
+      "paths": {
+        "default": "FAQ"
+      }
+    },
+    {
+      "name": "feast-days",
+      "paths": {
+        "default": "feast-days",
+        "fr": "fetes",
+        "es": "fiestas",
+        "pt": "festas"
+      },
+      "children": [
+        {
+          "name": "[[...path]]",
+          "paths": {
+            "default": ":path*"
+          }
+        }
+      ]
+    },
+    {
+      "name": "index",
+      "paths": {
+        "default": "index"
+      }
+    }
+  ]
+}

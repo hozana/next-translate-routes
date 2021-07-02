@@ -1,0 +1,11 @@
+node_modules
+coverage
+test
+src
+tsconfig.json
+.vscode
+.github
+.prettierrc
+.eslintrc
+yarn-error.log
+TODO

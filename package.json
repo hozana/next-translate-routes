@@ -3,28 +3,58 @@
   "version": "1.0.0",
   "description": "Flexible and translated routes for Next.js without custom server",
   "main": "index.js",
-  "repository": "https://github.com/hozana",
+  "repository": "https://github.com/hozana/next-translate-routes",
   "author": "cvolant",
   "license": "MIT",
+  "keywords": [
+    "next",
+    "next.js",
+    "routes",
+    "router",
+    "routing",
+    "react",
+    "intl",
+    "i18n",
+    "dynamic"
+  ],
   "scripts": {
-    "build": "yarn run lint && tsc",
-    "lint": "eslint --ignore-path .gitignore . --ext ts",
+    "build": "yarn run lint && npx tsc",
+    "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "next": "^11.0.1",
+    "path-to-regexp": "^6.2.0",
+    "querystring": "^0.2.1",
+    "react": "^17.0.2"
+  },
   "files": [
-    "dist"
+    "index.js",
+    "index.d.ts",
+    "plugin.js",
+    "plugin.d.ts",
+    "types.d.ts"
   ],
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^17.0.11",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "babel-jest": "^27.0.5",
     "eslint": "^7.29.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
     "husky": "^6.0.0",
     "jest": "^27.0.5",
     "prettier": "^2.3.2",
     "semantic-release": "^17.4.4",
+    "ts-jest": "^27.0.3",
     "typescript": "^4.3.4"
   },
   "commitlint": {

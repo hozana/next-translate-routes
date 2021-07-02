@@ -1,0 +1,66 @@
+{
+  "locales": ["en", "fr"],
+  "defaultLocale": "en",
+  "routeSegments": [
+    {
+      "name": "first",
+      "paths": {
+        "default": "firstPart",
+        "en": "1st",
+        "fr": "premier"
+      }
+    },
+    {
+      "name": "[secondPart]",
+      "paths": {
+        "default": ":secondPart(\\d+)"
+      }
+    },
+    {
+      "name": "thirdPart",
+      "paths": {
+        "default": "thirdPart",
+        "fr": "troisieme"
+      }
+    }
+  ],
+  "reRoutes": {
+    "redirects": [
+      {
+          "source": "/(en)?/premier/:secondPart(\\d+)/troisieme",
+          "destination": "/1st/:secondPart/thirdPart",
+          "locale": false,
+          "permanent": true
+      },
+      {
+          "source": "/(en)?/firstPart/:secondPart(\\d+)/thirdPart",
+          "destination": "/1st/:secondPart/thirdPart",
+          "locale": false,
+          "permanent": true
+      },
+      {
+          "source": "/(fr)/1st/:secondPart(\\d+)/thirdPart",
+          "destination": "/fr/premier/:secondPart/troisieme",
+          "locale": false,
+          "permanent": true
+      },
+      {
+          "source": "/(fr)/firstPart/:secondPart(\\d+)/thirdPart",
+          "destination": "/fr/premier/:secondPart/troisieme",
+          "locale": false,
+          "permanent": true
+      }
+  ],
+    "rewrites": [
+      {
+        "source": "/1st/:secondPart(\\d+)/thirdPart",
+        "destination": "/first/:secondPart/thirdPart"
+      },
+      {
+        "source": "/(fr)/premier/:secondPart(\\d+)/troisieme",
+        "destination": "/first/:secondPart/thirdPart",
+        "locale": false
+      }
+    ]
+  }
+}

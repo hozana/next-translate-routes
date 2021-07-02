@@ -1,0 +1,10 @@
+[] validate custom pagesTree
+[] improve comments and doc
+[] trow helpful errors
+[] dig around client side redirects and rewrites
+[] compact redirects:
+  - `source: '/(en)/(french|spanish)/path'` instead of `/(en)/french/path` and `/(en)/spanish/path`
+  - `source: '/(en)/french/:path*'
+[] create a function `getRouteSegments(filePath: string): TRouteSegment[]`
+  - return the whole path as is if not found and not dynamic file path
+  - export a routeExist function

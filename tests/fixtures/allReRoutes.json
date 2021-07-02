@@ -1,0 +1,442 @@
+{
+  "redirects": [
+    {
+      "source": "/(en)/a-propos",
+      "destination": "/en/root/about",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/acerca-de-nosotros",
+      "destination": "/en/root/about",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/about",
+      "destination": "/en/root/about",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/about",
+      "destination": "/a-propos",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/acerca-de-nosotros",
+      "destination": "/a-propos",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/about",
+      "destination": "/a-propos",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/about",
+      "destination": "/es/acerca-de-nosotros",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/a-propos",
+      "destination": "/es/acerca-de-nosotros",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/about",
+      "destination": "/es/acerca-de-nosotros",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/auth/social",
+      "destination": "/en/root/auth/social",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/auth/social",
+      "destination": "/auth/social",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/auth/social",
+      "destination": "/es/auth/social",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/communautes/:tagSlug*",
+      "destination": "/en/root/communities/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/comunidades/:tagSlug*",
+      "destination": "/en/root/communities/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/communities/:tagSlug*",
+      "destination": "/en/root/communities/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/communities/:tagSlug*",
+      "destination": "/communautes/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/comunidades/:tagSlug*",
+      "destination": "/communautes/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/communities/:tagSlug*",
+      "destination": "/communautes/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/communities/:tagSlug*",
+      "destination": "/es/comunidades/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/communautes/:tagSlug*",
+      "destination": "/es/comunidades/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/communities/:tagSlug*",
+      "destination": "/es/comunidades/:tagSlug*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/communaute/:communityId(\\d+){-:communitySlug}",
+      "destination": "/en/root/community/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/comunidad/:communityId(\\d+){-:communitySlug}",
+      "destination": "/en/root/community/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/en/root/community/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/communaute/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/comunidad/:communityId(\\d+){-:communitySlug}",
+      "destination": "/communaute/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/communaute/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/es/comunidad/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/communaute/:communityId(\\d+){-:communitySlug}",
+      "destination": "/es/comunidad/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/es/comunidad/:communityId-:communitySlug",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/communaute/:communityId(\\d+){-:communitySlug}/statistiques",
+      "destination": "/en/root/community/:communityId-:communitySlug/statistics",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/comunidad/:communityId(\\d+){-:communitySlug}/estadisticas",
+      "destination": "/en/root/community/:communityId-:communitySlug/statistics",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/en/root/community/:communityId-:communitySlug/statistics",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/communaute/:communityId-:communitySlug/statistiques",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/comunidad/:communityId(\\d+){-:communitySlug}/estadisticas",
+      "destination": "/communaute/:communityId-:communitySlug/statistiques",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/communaute/:communityId-:communitySlug/statistiques",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/communaute/:communityId(\\d+){-:communitySlug}/statistiques",
+      "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/contact",
+      "destination": "/en/root/contact",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/contact",
+      "destination": "/contact",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/contact",
+      "destination": "/es/contact",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/FAQ",
+      "destination": "/en/root/FAQ",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/FAQ",
+      "destination": "/FAQ",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/FAQ",
+      "destination": "/es/FAQ",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/fetes/:path*",
+      "destination": "/en/root/feast-days/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/fiestas/:path*",
+      "destination": "/en/root/feast-days/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/feast-days/:path*",
+      "destination": "/en/root/feast-days/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root/feast-days/:path*",
+      "destination": "/fetes/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/fiestas/:path*",
+      "destination": "/fetes/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/feast-days/:path*",
+      "destination": "/fetes/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root/feast-days/:path*",
+      "destination": "/es/fiestas/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/fetes/:path*",
+      "destination": "/es/fiestas/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/feast-days/:path*",
+      "destination": "/es/fiestas/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(en)/",
+      "destination": "/en/root",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(fr)?/root",
+      "destination": "/",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/(es)/root",
+      "destination": "/es/",
+      "locale": false,
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(en)/root/about",
+      "destination": "/about",
+      "locale": false
+    },
+    {
+      "source": "/a-propos",
+      "destination": "/about"
+    },
+    {
+      "source": "/(es)/acerca-de-nosotros",
+      "destination": "/about",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/auth/social",
+      "destination": "/auth/social",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/communities/:tagSlug*",
+      "destination": "/communities/:tagSlug*",
+      "locale": false
+    },
+    {
+      "source": "/communautes/:tagSlug*",
+      "destination": "/communities/:tagSlug*"
+    },
+    {
+      "source": "/(es)/comunidades/:tagSlug*",
+      "destination": "/communities/:tagSlug*",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/community/:communityId(\\d+){-:communitySlug}",
+      "destination": "/community/:communityId/:communitySlug",
+      "locale": false
+    },
+    {
+      "source": "/communaute/:communityId(\\d+){-:communitySlug}",
+      "destination": "/community/:communityId/:communitySlug"
+    },
+    {
+      "source": "/(es)/comunidad/:communityId(\\d+){-:communitySlug}",
+      "destination": "/community/:communityId/:communitySlug",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/community/:communityId(\\d+){-:communitySlug}/statistics",
+      "destination": "/community/:communityId/:communitySlug/statistics",
+      "locale": false
+    },
+    {
+      "source": "/communaute/:communityId(\\d+){-:communitySlug}/statistiques",
+      "destination": "/community/:communityId/:communitySlug/statistics"
+    },
+    {
+      "source": "/(es)/comunidad/:communityId(\\d+){-:communitySlug}/estadisticas",
+      "destination": "/community/:communityId/:communitySlug/statistics",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/contact",
+      "destination": "/contact",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root/FAQ",
+      "destination": "/faq",
+      "locale": false
+    },
+    {
+      "source": "/FAQ",
+      "destination": "/faq"
+    },
+    {
+      "source": "/(en)/root/feast-days/:path*",
+      "destination": "/feast-days/:path*",
+      "locale": false
+    },
+    {
+      "source": "/fetes/:path*",
+      "destination": "/feast-days/:path*"
+    },
+    {
+      "source": "/(es)/fiestas/:path*",
+      "destination": "/feast-days/:path*",
+      "locale": false
+    },
+    {
+      "source": "/(en)/root",
+      "destination": "/",
+      "locale": false
+    }
+  ]
+}
