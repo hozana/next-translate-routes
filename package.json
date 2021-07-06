@@ -20,7 +20,8 @@
   "scripts": {
     "build": "yarn run lint && npx tsc",
     "lint": "npx eslint --ignore-path .gitignore .",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "yarn run build"
   },
   "dependencies": {
     "next": "^11.0.1",

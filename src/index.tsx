@@ -120,7 +120,7 @@ const translatePathParts = ({
 export type TGenerateUrlProps = UrlObject & {
   pathname: string
   lang: string
-  options: TOptions
+  options?: TOptions
 }
 
 export const generateUrl = ({
@@ -128,7 +128,7 @@ export const generateUrl = ({
   lang,
   query,
   hash,
-  options: { routes = routesTree },
+  options: { routes = routesTree } = {},
 }: TGenerateUrlProps): string => {
   const pathParts = pathname.replace(/^\//, '').split('/')
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
