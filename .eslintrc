@@ -12,7 +12,7 @@
       "version": "detect"
     }
   },
-  "ignorePatterns": ["./node_modules", "./*.js", "./*.d.ts"],
+  "ignorePatterns": ["node_modules", "*.js", "*.d.ts"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",

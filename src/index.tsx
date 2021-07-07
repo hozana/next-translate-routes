@@ -130,6 +130,9 @@ export const generateUrl = ({
   hash,
   options: { routes = routesTree } = {},
 }: TGenerateUrlProps): string => {
+  if (!routes) {
+    throw new Error('No routes tree defined. next-translate-routes plugin is probably missing from next.config.js')
+  }
   const pathParts = pathname.replace(/^\//, '').split('/')
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
     lang,

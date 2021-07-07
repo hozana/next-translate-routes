@@ -42,7 +42,7 @@ module.exports = withTranslateRoutes({
 #### 2. Define your routes
 
 In the `pages` folder, and in each of its subfolders, add a `routes.json` file with the following:  
-```json  
+```js
 // `/pages/section/routes.json`
 {
   "/": {
@@ -106,7 +106,7 @@ const ComponentWithWithRouter = withRouter(({ lang, router }) => {
 
 ### Constrained dynamic paths segments
 
-```json
+```js
 // `/pages/blog/[id]/routes.json`
 {
   "/": ":id(\\d+)", // Constrain a dynamic folder segment (to be a number here)
@@ -118,7 +118,7 @@ For a catch all route: `"[...path]": ":path*"`.
 ### Ignoring a path part
 
 This will ignore the `blog` path segment:
-```json
+```js
 // `/pages/blog/routes.json`
 {
   "/": "."
@@ -127,7 +127,7 @@ This will ignore the `blog` path segment:
 
 ### Complex paths segments
 
-```json
+```js
 // `/pages/blog/[id]/routes.json`
 {
   "/": "article{-:id}?-view", // Add prefix, optional prefix, suffix
@@ -137,7 +137,7 @@ This will ignore the `blog` path segment:
 It is also possible to create a path segment with 2 dynamic parameters. Ex: `/articles/:id{-:slug}?`.  
 First, create a path segment for each dynamic parameter: `/articles/[id]/[slug].
 Then:
-```json
+```js
 // `/articles/[id]/routes.json`
 {
   "/": ".", // Ignore the [id] segment

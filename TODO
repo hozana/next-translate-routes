@@ -1,6 +1,6 @@
 [] validate custom pagesTree
-[] improve comments and doc
-[] trow helpful errors
+[] improve comments, documentation, readme (motivations, use case)
+[] trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
 [] dig around client side redirects and rewrites
 [] compact redirects:
   - `source: '/(en)/(french|spanish)/path'` instead of `/(en)/french/path` and `/(en)/spanish/path`
