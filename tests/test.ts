@@ -4,7 +4,16 @@ import path from 'path'
 import routesTree from './fixtures/routesTree.json'
 import reRoutesData from './fixtures/reRoutesData.json'
 import allReRoutes from './fixtures/allReRoutes.json'
+import type { NEXT_DATA } from 'next/dist/next-server/lib/utils'
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface Global {
+      __NEXT_DATA__: Partial<NEXT_DATA>
+    }
+  }
+}
 test('parsePagesTree.', () => {
   const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
   const parsedPagesTree = parsePagesTree(pagesPath, true)
@@ -33,11 +42,16 @@ test('translateHref.', () => {
         query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
         hash: 'section',
       },
-      expected: '/communaute/300-three-hundred/statistiques?baz=3#section',
+      expected: {
+        pathname: '/communaute/300-three-hundred/statistiques',
+        query: { baz: 3 },
+        hash: 'section',
+      },
     },
     {
       href: '/community/300/three-hundred/statistics?baz=3#section',
-      expected: '/communaute/300-three-hundred/statistiques?baz=3#section',
+      locale: 'en',
+      expected: '/en/root/community/300-three-hundred/statistics?baz=3#section',
     },
     {
       href: '/feast-days?baz=3#section',
@@ -55,7 +69,7 @@ test('translateHref.', () => {
       href: '/?baz=3#section',
       expected: '/?baz=3#section',
     },
-  ].forEach(({ href, expected }) => {
-    expect(translateUrl('fr', href, { routes: routesTree })).toEqual(expected)
+  ].forEach(({ href, locale = 'fr', expected }) => {
+    expect(translateUrl(href, locale || 'fr', { routes: routesTree, defaultLocale: 'fr' })).toEqual(expected)
   })
 })

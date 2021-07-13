@@ -3,18 +3,35 @@ import NextLink, { LinkProps } from 'next/link'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { compile, parse as parsePath, Key } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
-import { format as formatUrl, UrlObject } from 'url'
+import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 
 import type { TRouteBranch } from './types'
 import type { PrefetchOptions } from 'next/dist/next-server/lib/router/router'
 
-type TOptions = {
-  /** For testing: this is not needed for regular use. */
+type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
+  format?: F
+  /** For testing only: do not use this option in production */
   routes?: TRouteBranch
+  /** For testing only: do not use this option in production */
+  defaultLocale?: string
 }
+
 type Url = UrlObject | string
 
-const routesTree = process.env.NEXT_PUBLIC_ROUTES as TRouteBranch
+export type Router = Omit<NextRouter, 'push' | 'replace' | 'prefetch'> & {
+  push: NextRouter['push']
+  replace: NextRouter['replace']
+  prefetch: NextRouter['prefetch']
+}
+
+interface TransitionOptions {
+  shallow?: boolean
+  locale?: string | false
+  scroll?: boolean
+}
+
+const routesTree = JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
+const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
 /** Get children + (grand)children of children whose path must be ignord (path === '.') */
 const getAllCandidates = (lang: string, children?: TRouteBranch[]): TRouteBranch[] =>
@@ -33,12 +50,12 @@ const getSpreadDynamicPathPartName = (pathPartName: string) =>
  * Recursively translate paths from file path, and extract parameters
  */
 const translatePathParts = ({
-  lang,
+  locale,
   pathParts,
   routeBranch,
   query,
 }: {
-  lang: string
+  locale: string
   /** Can be a bare name or a dynamic value */
   pathParts: string[]
   routeBranch: TRouteBranch
@@ -58,10 +75,10 @@ const translatePathParts = ({
   const nextPathParts = pathParts.slice(1)
 
   if (!pathPart) {
-    return translatePathParts({ lang, pathParts: nextPathParts, routeBranch, query })
+    return translatePathParts({ locale, pathParts: nextPathParts, routeBranch, query })
   }
 
-  const candidates = getAllCandidates(lang, children).filter((child) =>
+  const candidates = getAllCandidates(locale, children).filter((child) =>
     pathParts.length === 1 // Last path part
       ? !child.children ||
         child.children.some((grandChild) => grandChild.name === 'index' || /\[\[\.{3}\w+\]\]/.exec(grandChild.name))
@@ -92,7 +109,7 @@ const translatePathParts = ({
           [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
         }
         return {
-          translatedPathParts: [childRouteBranch.paths[lang] || childRouteBranch.paths.default],
+          translatedPathParts: [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
           augmentedQuery: currentQuery,
         }
       }
@@ -103,10 +120,10 @@ const translatePathParts = ({
 
   // Get the descendants translated path parts and query values
   const { augmentedQuery, translatedPathParts: nextTranslatedPathsParts } = childRouteBranch?.children
-    ? translatePathParts({ lang, pathParts: nextPathParts, routeBranch: childRouteBranch, query: currentQuery })
+    ? translatePathParts({ locale, pathParts: nextPathParts, routeBranch: childRouteBranch, query: currentQuery })
     : { augmentedQuery: currentQuery, translatedPathParts: [] }
 
-  const translatedPathPart = childRouteBranch.paths[lang] || childRouteBranch.paths.default
+  const translatedPathPart = childRouteBranch.paths[locale] || childRouteBranch.paths.default
 
   return {
     translatedPathParts: [
@@ -117,57 +134,81 @@ const translatePathParts = ({
   }
 }
 
-export type TGenerateUrlProps = UrlObject & {
-  pathname: string
-  lang: string
-  options?: TOptions
-}
+/**
+ * Translate url into option.locale locale, or if not defined, in current locale
+ *
+ * @param url string url or UrlObject
+ * @param locale string
+ * @param options (optional)
+ * @param options.format `'string'` or `'object'`
+ * @return string if `options.format === 'string'`,
+ * UrlObject if `options.format === 'object'`,
+ * same type as url if options.format is not defined
+ */
+export function translateUrl<U extends string | UrlObject, F extends 'string' | 'object'>(
+  url: U,
+  locale: string,
+  options?: Options<F>,
+): 'string' | 'object' extends F
+  ? U extends string
+    ? string
+    : U extends UrlObject
+    ? UrlObject
+    : Url
+  : F extends 'string'
+  ? string
+  : UrlObject
 
-export const generateUrl = ({
-  pathname,
-  lang,
-  query,
-  hash,
-  options: { routes = routesTree } = {},
-}: TGenerateUrlProps): string => {
-  if (!routes) {
-    throw new Error('No routes tree defined. next-translate-routes plugin is probably missing from next.config.js')
+export function translateUrl(
+  url: Url,
+  locale: string,
+  { format, routes = routesTree, defaultLocale: tuDefaultLocale = defaultLocale }: Options = {},
+): Url {
+  const returnFormat = format || typeof url
+  const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
+  const { pathname, query } = urlObject
+
+  if (!pathname || !locale) {
+    return returnFormat === 'object' ? url : formatUrl(url)
   }
+
+  if (!routes) {
+    throw new Error(
+      '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
+    )
+  }
+
   const pathParts = pathname.replace(/^\//, '').split('/')
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
-    lang,
+    locale,
     pathParts,
     query: parseQuery(typeof query === 'string' ? query : stringifyQuery(query || {})),
     routeBranch: routes,
   })
   const path = translatedPathParts.join('/')
-  const compiledPath = compile(path)(augmentedQuery)
+  const compiledPath = compile(path, { validate: false })(augmentedQuery)
   const paramsNames = (parsePath(path).filter((token) => typeof token === 'object') as Key[]).map((token) => token.name)
-  const remainingQuery = Object.entries(augmentedQuery).reduce(
-    (acc, [key, value]) => ({
+  const remainingQuery = Object.keys(augmentedQuery).reduce(
+    (acc, key) => ({
       ...acc,
-      ...(paramsNames.includes(key) ? {} : { [key]: value }),
+      ...(paramsNames.includes(key)
+        ? {}
+        : { [key]: (typeof query === 'object' && query?.[key]) || augmentedQuery[key] }),
     }),
     {},
   )
-  const stringQuery = stringifyQuery(remainingQuery)
-  return `/${compiledPath}${stringQuery ? `?${stringQuery}` : ''}${hash ? `#${hash}` : ''}`
-}
 
-export const translateUrl = (lang: string, href: Url | string[], options?: TOptions): Url => {
-  const to = Array.isArray(href) ? `/${href.join('/')}` : href
+  const fullPathname = `${locale !== tuDefaultLocale ? `/${locale}` : ''}${
+    routes.paths[locale] ? `/${routes.paths[locale]}` : ''
+  }/${compiledPath}`
 
-  if (typeof to === 'object' && to.pathname) {
-    return generateUrl({ ...to, lang, options } as TGenerateUrlProps)
+  const translatedUrlObject = {
+    ...urlObject,
+    pathname: fullPathname,
+    query: remainingQuery,
   }
 
-  if (typeof to === 'string' && !/^https?:\/\/|^www\./.exec(to)) {
-    const [pathname, query, hash] = to.split(/[?#]/)
-    const url = generateUrl({ pathname, query, hash, lang, options })
-    return url
-  }
-
-  return to
+  return returnFormat === 'object' ? translatedUrlObject : formatUrl(translatedUrlObject)
 }
 
 /**
@@ -197,45 +238,32 @@ const removeEmptyCatchAll = (url: Url): Url => {
   return url
 }
 
-export const Link: React.FC<LinkProps & { lang?: string }> = ({ href, lang, ...props }) => {
-  const { locale, defaultLocale, locales } = useNextRouter()
-  const language = lang || locale || defaultLocale || locales?.[0]
+export const Link: React.FC<LinkProps> = ({ href, locale, ...props }) => {
+  const { locale: routerLocale } = useNextRouter()
+  const language = locale || routerLocale || defaultLocale
 
-  if (!language) {
-    throw new Error('No locale in router')
-  }
-
-  return <NextLink href={removeEmptyCatchAll(href)} as={translateUrl(language, href)} {...props} />
-}
-
-export type Router = Omit<NextRouter, 'push' | 'replace' | 'prefetch'> & {
-  push: NextRouter['push']
-  replace: NextRouter['replace']
-  prefetch: NextRouter['prefetch']
-}
-interface TransitionOptions {
-  shallow?: boolean
-  locale?: string | false
-  scroll?: boolean
+  return <NextLink href={removeEmptyCatchAll(href)} as={translateUrl(href, language)} locale={locale} {...props} />
 }
 
 export const useRouter = (): Router => {
   const { push, replace, prefetch, ...otherRouterProps } = useNextRouter()
-  const currentLang = otherRouterProps.locale || otherRouterProps.defaultLocale || otherRouterProps.locales?.[0]
+  const currentLang = otherRouterProps.locale || defaultLocale
 
-  if (!currentLang) {
-    throw new Error('No locale in router')
+  if (!otherRouterProps.locale) {
+    console.error('> next-translate-routes - No locale prop in Router: fallback to defaultLocale.')
   }
 
   return {
     push: (url: Url, as?: Url, options?: TransitionOptions) =>
-      push(removeEmptyCatchAll(url), as || translateUrl(options?.locale || currentLang, url), options),
+      push(removeEmptyCatchAll(url), as || translateUrl(url, options?.locale || currentLang), options),
     replace: (url: Url, as?: Url, options?: TransitionOptions) =>
-      replace(removeEmptyCatchAll(url), as || translateUrl(options?.locale || currentLang, url), options),
-    prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-      const newAsPath = asPath || translateUrl(options?.locale || currentLang, inputUrl)
-      return prefetch(inputUrl, typeof newAsPath === 'object' ? formatUrl(newAsPath) : newAsPath, options)
-    },
+      replace(removeEmptyCatchAll(url), as || translateUrl(url, options?.locale || currentLang), options),
+    prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) =>
+      prefetch(
+        inputUrl,
+        asPath || translateUrl(inputUrl, options?.locale || currentLang, { format: 'string' }),
+        options,
+      ),
     ...otherRouterProps,
   }
 }

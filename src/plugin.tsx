@@ -34,7 +34,7 @@ import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRoute
 const ROUTES_DATA_FILE_NAME = 'routes.json'
 
 /** Transform Next file-system synthax to path-to-regexp synthax */
-export const fileNameToPath = (fileName: string) =>
+const fileNameToPath = (fileName: string) =>
   fileName
     .replace(/\[\[\.\.\.(\S+)\]\]/g, ':$1*')
     .replace(/\[\.\.\.(\S+)\]/g, ':$1')
@@ -75,7 +75,10 @@ export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk
     const pageMatch = item.match(/(.+)\.[jt]sx?$/)
     const pageName = !isDirectory ? pageMatch?.[1] : undefined
 
-    if ((isTrunk || !directoryPath) && ['_app', '_document', '_error', '404', '500'].includes(pageName || '')) {
+    if (
+      (isTrunk || !directoryPath) &&
+      (['_app', '_document', '_error', '404', '500'].includes(pageName || '') || item === 'api')
+    ) {
       return acc
     }
 
@@ -247,13 +250,11 @@ const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
   const { redirects, rewrites } = getRouteBranchReRoutes({ locales, defaultLocale, routeBranch: routesTree })
   // TODO: validateRoutesTree(routesTree)
 
+  process.env.NEXT_PUBLIC_ROUTES = JSON.stringify(routesTree)
+  process.env.NEXT_PUBLIC_DEFAULT_LOCALE = nextConfig.i18n?.defaultLocale || ''
+
   return {
     ...nextConfig,
-
-    env: {
-      ...nextConfig.env,
-      NEXT_PUBLIC_ROUTES: routesTree,
-    },
 
     async redirects() {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
