@@ -1,7 +1,11 @@
 [] validate custom pagesTree
-[] improve comments, documentation, readme (motivations, use case)
+[] handle translated urls with locale prefix
+[] example folder based on next.js/example/with-i18n
+[] verify that automatic redirects/rewrites can be overwritten
+[] improve comments, documentation
 [] trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
 [] dig around client side redirects and rewrites
+[] getRouteList: (locale?: string) => (? Record<string, string[]> ? string[] ? string[][] ?)
 [] compact redirects:
   - `source: '/(en)/(french|spanish)/path'` instead of `/(en)/french/path` and `/(en)/spanish/path`
   - `source: '/(en)/french/:path*'

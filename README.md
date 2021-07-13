@@ -4,17 +4,30 @@ _Back to Next file-base routing system while remaining free from its limits_
 
 ## Features
 
+- __Translated paths segments__  
+  Ex: `/contact-us` and `/fr/contactez-nous`.
 - __Complex paths segments__ (path-to-regexp synthax)  
   Ex: `/:id{-:slug}?/`
 - __Constrained dynamic paths segments__ (path-to-regexp synthax)  
   Ex: `/:id(\\d+)/`
 - __No duplicated content (SEO)__  
   Simple rewrites would make a page accessible with 2 different urls which is bad for SEO.
-- __Auto-redirection to correct locale__  
-  Ex: `/fr/english/path` redirects to `/en/english/path`
+- __Auto-redirection to correct translated path__  
+  Ex: `/fr/english/path` redirects to `/fr/french/path`
 - __Enhanced Link component to accept a lang prop__
 - __No custom server needed!__  
   Next automatic static optimization remains available.
+
+## Motivation
+
+To build a fully internationalized website, one need to translate url segments: it is crucial for UX and SEO.
+For now, Next only ship with locale prefixes ([see Next.js internationalized routing doc](https://nextjs.org/docs/advanced-features/i18n-routing)).
+
+The [next-routes](https://github.com/fridays/next-routes) package allow fully internationalized routing but it is no longer maintained, and it is designed without the latest Next api, such as internationalized routing, new data fetching methods, automatic static optimization.  
+To be able to use theses, a new approach is needed. Next.js provides it with [Redirects](https://nextjs.org/docs/api-reference/next.config.js/redirects) and [Rewrites](https://nextjs.org/docs/api-reference/next.config.js/rewrites), but:
+
+- the main problem is that writing the rewrites and redirects to translate all the routes by hand is long, boring, error-prone, and hard to maintain.
+- an other problem is that by default, the file path works with all the locale prefixes: it creates 2 urls for the same content, which is not good for SEO. This problem can be worked around by creating redirects from `/${localePrefix}/$(filePath)` to `/${localePrefix}/$(localePath)`, but it creates a lot more complexity to write by hand and maintain.
 
 ## How to
 
@@ -57,9 +70,9 @@ In the `pages` folder, and in each of its subfolders, add a `routes.json` file w
 ```  
 The "/" section define the folder paths, each other section define the paths of a page file in this folder.
 
-#### 3. Use the next-translate-routes utils
+#### 3. Use the next-translate-routes Link, useRouter, and withRouter
 
-next-translate-routes extends Next Link, useRouter, withRouter, to translate routes automatically.
+next-translate-routes extends Next Link, useRouter, withRouter, to translate routes automatically: import them from 'next-translate-route' instead of 'next/link' and 'next/router', and use them as you ever did.
 
 ```jsx
 import React, { useEffect, useState } from 'react'
@@ -69,12 +82,13 @@ import { Link, useRouter, withRouter } from 'next-translate-routes'
 const MyLinks = () => {
   const { locales } = useRouter()
 
-  return locale.map((locale) => (
+  return (
     <>
-      <Link href={{ pathname: '/file/path/to/page', locale }} />
-      <Link href={{ pathname: '/file/path/with/dynamic/[param]', query: { param: 'paramValue' }, locale }} />
-      <Link href={{ pathname: '/file/path/with/optional/catch/all/[[...route]]', locale }} />
-    <>
+      <Link href={{ pathname: '/file/path/to/page'}}>Current locale</Link>
+      {locale.map((locale) => (
+        <Link href={{ pathname: '/file/path/to/page'}} locale={locale} key={locale}>{locale}</Link>
+      )}
+    </>
   )
 }
 
@@ -179,3 +193,7 @@ type TRouteBranch<Locale extends string> = {
   children?: TRouteBranch[]
 }
 ```
+
+### Warning
+
+The router prop received by the App component in `pages/_app.js` is a bare Next router: if you want to use next-translate-routes router, you need to inject it with useRouter or withRouter.
