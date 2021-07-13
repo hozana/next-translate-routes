@@ -1,5 +1,5 @@
 node_modules
 .vscode
 yarn-error.log
-*.js
-*.d.ts
+/*.js
+/*.d.ts

@@ -21,10 +21,12 @@
     "build": "yarn run lint && npx tsc",
     "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest",
-    "prepare": "yarn run build"
+    "prepare": "yarn run build",
+    "release": "npx np"
   },
   "dependencies": {
     "next": "^11.0.1",
+    "np": "^7.5.0",
     "path-to-regexp": "^6.2.0",
     "querystring": "^0.2.1",
     "react": "^17.0.2"
@@ -37,10 +39,6 @@
     "types.d.ts"
   ],
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/git": "^9.0.0",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
@@ -51,30 +49,9 @@
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
-    "husky": "^6.0.0",
     "jest": "^27.0.5",
     "prettier": "^2.3.2",
-    "semantic-release": "^17.4.4",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.4"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "release": {
-    "plugins": [
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/changelog",
-      "@semantic-release/npm",
-      "@semantic-release/git",
-      "@semantic-release/github"
-    ]
   }
 }
