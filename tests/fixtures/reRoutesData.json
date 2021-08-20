@@ -1,5 +1,8 @@
 {
-  "locales": ["en", "fr"],
+  "locales": [
+    "en",
+    "fr"
+  ],
   "defaultLocale": "en",
   "routeSegments": [
     {
@@ -27,39 +30,34 @@
   "reRoutes": {
     "redirects": [
       {
-          "source": "/(en)?/premier/:secondPart(\\d+)/troisieme",
-          "destination": "/1st/:secondPart/thirdPart",
-          "locale": false,
-          "permanent": true
+        "source": "/en/premier/:secondPart(\\d+)/troisieme",
+        "destination": "/en/1st/:secondPart/thirdPart",
+        "locale": false,
+        "permanent": true
       },
       {
-          "source": "/(en)?/firstPart/:secondPart(\\d+)/thirdPart",
-          "destination": "/1st/:secondPart/thirdPart",
-          "locale": false,
-          "permanent": true
+        "source": "/en/first/{:secondPart}/thirdPart",
+        "destination": "/en/1st/:secondPart/thirdPart",
+        "locale": false,
+        "permanent": true
       },
       {
-          "source": "/(fr)/1st/:secondPart(\\d+)/thirdPart",
-          "destination": "/fr/premier/:secondPart/troisieme",
-          "locale": false,
-          "permanent": true
+        "source": "/fr/1st/:secondPart(\\d+)/thirdPart",
+        "destination": "/fr/premier/:secondPart/troisieme",
+        "locale": false,
+        "permanent": true
       },
       {
-          "source": "/(fr)/firstPart/:secondPart(\\d+)/thirdPart",
-          "destination": "/fr/premier/:secondPart/troisieme",
-          "locale": false,
-          "permanent": true
+        "source": "/fr/first/{:secondPart}/thirdPart",
+        "destination": "/fr/premier/:secondPart/troisieme",
+        "locale": false,
+        "permanent": true
       }
-  ],
+    ],
     "rewrites": [
       {
-        "source": "/1st/:secondPart(\\d+)/thirdPart",
+        "source": "/(1st|premier)/:secondPart(\\d+)/(thirdPart|troisieme)",
         "destination": "/first/:secondPart/thirdPart"
-      },
-      {
-        "source": "/(fr)/premier/:secondPart(\\d+)/troisieme",
-        "destination": "/first/:secondPart/thirdPart",
-        "locale": false
       }
     ]
   }

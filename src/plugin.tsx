@@ -4,9 +4,10 @@
  * Paths:
  * - path: path in path-to-regexp syntax
  * - file path: path in the Next.js file system syntax
+ * - base path: file path in path-to-regexp syntax
  * - translated path: file path translated in path-to-regexp syntax
  * - translated file path: translated file path
- * - default path: path of user specified default values or, when empty, from file names translated into path-to-regexp syntax
+ * - default path: path of user specified default path values or, when empty, from file names translated into path-to-regexp syntax
  * - default locale path: translated path for default locale
  *
  * Routes:
@@ -32,6 +33,10 @@ import type { NextConfig } from 'next/dist/next-server/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
 
 const ROUTES_DATA_FILE_NAME = 'routes.json'
+
+const countPathRegexps = (path: string): number => [...(path.match(/:[\w_]+\(/g) || [])].length
+const countPathSegments = (path: string): number => path.split('/').length - 1
+const staticSegmentRegex = /^[\w_]+$|^\([\w_|]+\)$/
 
 /** Transform Next file-system synthax to path-to-regexp synthax */
 const fileNameToPath = (fileName: string) =>
@@ -73,11 +78,11 @@ export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk
   const children = directoryItems.reduce((acc, item) => {
     const isDirectory = fs.statSync(pathUtils.join(dirPath, item)).isDirectory()
     const pageMatch = item.match(/(.+)\.[jt]sx?$/)
-    const pageName = !isDirectory ? pageMatch?.[1] : undefined
+    const pageName = (!isDirectory && pageMatch?.[1]) || ''
 
     if (
       (isTrunk || !directoryPath) &&
-      (['_app', '_document', '_error', '404', '500'].includes(pageName || '') || item === 'api')
+      (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')
     ) {
       return acc
     }
@@ -108,11 +113,9 @@ const sourceToDestination = (sourcePath: string) =>
  */
 export const getPageReRoutes = <L extends string>({
   locales,
-  defaultLocale,
   routeSegments,
 }: {
   locales: L[]
-  defaultLocale?: L
   routeSegments: TRouteSegment<L>[]
 }): TReRoutes => {
   /** If there is only one path possible: it is common to all locales and to files. No redirection nor rewrite is needed. */
@@ -136,36 +139,39 @@ export const getPageReRoutes = <L extends string>({
   /**
    * ```
    * [
-   *   { locales: ['default'], path: '/default/path' }, // Will often be common with the english or default locale path
    *   { locales: ['en'], path: '/english/path/without/locale/prefix' },
-   *   { locales: ['fr'], path: '/chemin/francais/sans/prefixe/de/locale' },
+   *   { locales: ['fr'], path: '/french/path/without/locale/prefix' },
    *   { locales: ['es', 'pt'], path: '/path/common/to/several/locales' },
    * ]
    * ```
+   * Each locale cannot appear more than once. Item is ignored if its path would be the same as basePath.
    */
-  const pathList = [...locales, 'default' as const].reduce((acc, locale) => {
-    const path = getPath(locale)
-    const { pathLocales: existingPathLocales = [] } = acc.find((pathItem) => pathItem.path === path) || {}
-    return [
-      ...acc.filter((pathItem) => pathItem.path !== path),
-      { path, pathLocales: [...existingPathLocales, locale] },
-    ]
-  }, [] as { pathLocales: (L | 'default')[]; path: string }[])
-
-  const redirects = locales.reduce((acc, locale) => {
-    if (locale === 'default') {
+  const sourceList = locales.reduce((acc, locale) => {
+    const source = getPath(locale)
+    if (source === basePath) {
       return acc
     }
+    const { sourceLocales = [] } = acc.find((sourceItem) => sourceItem.source === source) || {}
+    return [
+      ...acc.filter((sourceItem) => sourceItem.source !== source),
+      { source, sourceLocales: [...sourceLocales, locale] },
+    ]
+  }, [] as { sourceLocales: L[]; source: string }[])
+
+  const redirects = locales.reduce((acc, locale) => {
+    const localePath = getPath(locale)
 
     return [
       ...acc,
-      ...pathList
-        .filter((pathListItem) => !pathListItem.pathLocales.includes(locale))
+      ...sourceList
+        .filter(({ sourceLocales }) => !sourceLocales.includes(locale))
+        // Redirect from base path so that it does not display the page but only the translated path does
+        .concat(...(localePath === basePath ? [] : [{ sourceLocales: [], source: basePath }]))
         .map(
-          (pathListItem) =>
+          ({ source }) =>
             ({
-              source: `/(${locale})${locale === defaultLocale ? '?' : ''}${pathListItem.path}`,
-              destination: `${locale === defaultLocale ? '' : `/${locale}`}${sourceToDestination(getPath(locale))}`,
+              source: `/${locale}${source}`,
+              destination: `/${locale}${sourceToDestination(localePath)}`,
               locale: false,
               permanent: true,
             } as Redirect),
@@ -173,18 +179,48 @@ export const getPageReRoutes = <L extends string>({
     ]
   }, [] as Redirect[])
 
-  const rewrites: Rewrite[] = pathList.reduce((acc, { path, pathLocales }) => {
-    const nonDefaultPathLocales = pathLocales.filter((pathLocale) => pathLocale !== 'default')
-    const localePrefix =
-      defaultLocale && pathLocales.includes(defaultLocale)
-        ? ''
-        : `/(${nonDefaultPathLocales.join('|')})${defaultLocale && pathLocales.includes(defaultLocale) ? '?' : ''}`
+  const destination = sourceToDestination(basePath)
 
-    const source = `${localePrefix}${path}`
-    const destination = sourceToDestination(basePath)
-
-    if (nonDefaultPathLocales.length === 0 || source === destination) {
+  const rewrites: Rewrite[] = sourceList.reduce((acc, { source }) => {
+    if (source === destination) {
       return acc
+    }
+
+    // Merge similar rewrites
+    const sourceSegments = source.split('/')
+    const sourceSegmentsCount = sourceSegments.length
+
+    const similarIndex = acc.findIndex(({ source: otherSource }) => {
+      const otherSourceSegments = otherSource.split('/')
+      return (
+        otherSourceSegments.length === sourceSegmentsCount &&
+        sourceSegments.every((sourceSegment, index) => {
+          const correspondingSegment = otherSourceSegments[index]
+          return (
+            sourceSegment === correspondingSegment ||
+            (staticSegmentRegex.test(sourceSegment) && staticSegmentRegex.test(correspondingSegment))
+          )
+        })
+      )
+    })
+
+    if (similarIndex >= 0) {
+      const similar = acc[similarIndex]
+      return [
+        ...acc.slice(0, similarIndex),
+        {
+          ...similar,
+          source: similar.source
+            .split('/')
+            .map((similarSegment, index) =>
+              similarSegment === sourceSegments[index]
+                ? similarSegment
+                : `(${similarSegment.replace(/\(|\)/g, '').split('|').concat(sourceSegments[index]).join('|')})`,
+            )
+            .join('/'),
+        },
+        ...acc.slice(similarIndex + 1),
+      ]
     }
 
     return [
@@ -192,7 +228,6 @@ export const getPageReRoutes = <L extends string>({
       {
         source,
         destination,
-        ...(defaultLocale && pathLocales.includes(defaultLocale) ? {} : { locale: false }),
       },
     ]
   }, [] as Rewrite[])
@@ -205,17 +240,13 @@ export const getPageReRoutes = <L extends string>({
  */
 export const getRouteBranchReRoutes = <L extends string>({
   locales,
-  defaultLocale,
-  routeBranch,
-  routeBranch: { children },
+  routeBranch: { children, ...routeSegment },
   previousRouteSegments = [],
 }: {
   locales: L[]
-  defaultLocale?: L
   routeBranch: TRouteBranch<L>
   previousRouteSegments?: TRouteSegment<L>[]
 }): TReRoutes => {
-  const { children: _unused, ...routeSegment } = routeBranch
   const routeSegments = [...previousRouteSegments, routeSegment]
 
   return children
@@ -223,10 +254,9 @@ export const getRouteBranchReRoutes = <L extends string>({
         (acc, child) => {
           const childReRoutes =
             child.name === 'index'
-              ? getPageReRoutes({ locales, defaultLocale, routeSegments })
+              ? getPageReRoutes({ locales, routeSegments })
               : getRouteBranchReRoutes({
                   locales,
-                  defaultLocale,
                   routeBranch: child,
                   previousRouteSegments: routeSegments,
                 })
@@ -237,8 +267,19 @@ export const getRouteBranchReRoutes = <L extends string>({
         },
         { redirects: [], rewrites: [] } as TReRoutes,
       )
-    : getPageReRoutes({ locales, defaultLocale, routeSegments })
+    : getPageReRoutes({ locales, routeSegments })
 }
+
+/**
+ * Sort redirects and rewrites by descending specificity:
+ * - first by descending number of regexp in source
+ * - then by descending number of path segments
+ */
+const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
+  rArray.sort((a, b) => {
+    const regexpNbDiff = countPathRegexps(b.source) - countPathRegexps(a.source)
+    return regexpNbDiff !== 0 ? regexpNbDiff : countPathSegments(b.source) - countPathSegments(a.source)
+  })
 
 /**
  * Inject translated routes
@@ -247,10 +288,11 @@ const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
   const { locales = [], defaultLocale } = nextConfig.i18n || {}
   const existingRoutesTree = nextConfig?.env?.NEXT_PUBLIC_ROUTES
   const routesTree = existingRoutesTree ? JSON.parse(existingRoutesTree) : parsePagesTree()
-  const { redirects, rewrites } = getRouteBranchReRoutes({ locales, defaultLocale, routeBranch: routesTree })
+  const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree })
   // TODO: validateRoutesTree(routesTree)
 
   process.env.NEXT_PUBLIC_ROUTES = JSON.stringify(routesTree)
+  process.env.NEXT_PUBLIC_LOCALES = nextConfig.i18n?.locales?.join(',') || ''
   process.env.NEXT_PUBLIC_DEFAULT_LOCALE = nextConfig.i18n?.defaultLocale || ''
 
   return {
@@ -260,7 +302,7 @@ const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
       return [
         ...existingRedirects,
-        ...redirects,
+        ...sortBySpecificity(redirects),
         {
           source: `/${defaultLocale}/:path*`,
           destination: '/:path*',
@@ -276,7 +318,7 @@ const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
       }
       return {
         ...existingRewrites,
-        beforeFiles: [...(existingRewrites.beforeFiles || []), ...rewrites],
+        beforeFiles: [...(existingRewrites.beforeFiles || []), ...sortBySpecificity(rewrites)],
       }
     },
   } as NextConfig

@@ -24,13 +24,11 @@ test('parsePagesTree.', () => {
 test('getPageReRoutes.', () => {
   const { reRoutes, ...getPageReRoutesProps } = reRoutesData
   const pageReRoutes = getPageReRoutes(getPageReRoutesProps)
-  // console.log('From test, getPageReRoutes:', JSON.stringify(pageReRoutes, null, 4))
   expect(pageReRoutes).toEqual(reRoutes)
 })
 
 test('getRouteBranchReRoutes.', () => {
-  const reRoutes = getRouteBranchReRoutes({ locales: ['en', 'fr', 'es'], defaultLocale: 'fr', routeBranch: routesTree })
-  // console.log('From test, getRouteBranchReRoutes:', JSON.stringify(reRoutes, null, 4))
+  const reRoutes = getRouteBranchReRoutes({ locales: ['en', 'fr', 'es'], routeBranch: routesTree })
   expect(reRoutes).toEqual(allReRoutes)
 })
 
@@ -46,6 +44,16 @@ test('translateHref.', () => {
         pathname: '/communaute/300-three-hundred/statistiques',
         query: { baz: 3 },
         hash: 'section',
+      },
+    },
+    {
+      href: {
+        pathname: '/communities/[[...tagSlug]]',
+        query: { baz: 3 },
+      },
+      expected: {
+        pathname: '/communautes',
+        query: { baz: 3 },
       },
     },
     {
