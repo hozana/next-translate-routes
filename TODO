@@ -1,7 +1,12 @@
+[] fix parseTree for Window
+[] export plugin properly to avoid `const { default: withTranslateRoutes } = require('next-translate-routes/plugin')`
+[] ensure Link href prop works with translated url in non default locale
 [] validate custom pagesTree
+[] add a debug parameter to print pagesTree
 [] handle translated urls with locale prefix
 [] example folder based on next.js/example/with-i18n
 [] verify that automatic redirects/rewrites can be overwritten
+[] check if and where special characters should be escaped (https://nextjs.org/docs/api-reference/next.config.js/rewrites#regex-path-matching)
 [] improve comments, documentation
 [] trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
 [] dig around client side redirects and rewrites

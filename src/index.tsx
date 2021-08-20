@@ -31,6 +31,7 @@ interface TransitionOptions {
 }
 
 const routesTree = JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
+const locales = (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
 const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
 /** Get children + (grand)children of children whose path must be ignord (path === '.') */
@@ -109,7 +110,7 @@ const translatePathParts = ({
           [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
         }
         return {
-          translatedPathParts: [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
+          translatedPathParts: [childRouteBranch.name], // [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
           augmentedQuery: currentQuery,
         }
       }
@@ -211,59 +212,43 @@ export function translateUrl(
   return returnFormat === 'object' ? translatedUrlObject : formatUrl(translatedUrlObject)
 }
 
-/**
- * If url.pathname is an optional catch all filePath, but url.query does not contain the corresponding key,
- * remove the last part of url.pathname this configuration to avoid the following error:
- * ```
- * Error: The provided `as` value (/path) is incompatible with the `href` value (/path/[[...optionalCatchAllParam]]).
- * Read more: https://nextjs.org/docs/messages/incompatible-href-as
- * ```
- */
-const removeEmptyCatchAll = (url: Url): Url => {
-  if (typeof url === 'object' && url.pathname) {
-    const query = typeof url.query === 'string' ? parseQuery(url.query) : url.query || {}
-    const pathParts = url.pathname.split('/')
-    const lastPathPart = pathParts.slice(-1)[0]
-    const catchAllParamName = getSpreadDynamicPathPartName(lastPathPart)
-    const catchAllQueryValue = catchAllParamName && query[catchAllParamName]
-
-    if (
-      catchAllParamName &&
-      (!catchAllQueryValue || (Array.isArray(catchAllQueryValue) && catchAllQueryValue.length === 0))
-    ) {
-      return { ...url, pathname: pathParts.slice(0, pathParts.length - 1).join('/') }
-    }
-  }
-
-  return url
-}
-
 export const Link: React.FC<LinkProps> = ({ href, locale, ...props }) => {
   const { locale: routerLocale } = useNextRouter()
-  const language = locale || routerLocale || defaultLocale
+  const language = locale || routerLocale || defaultLocale || locales[0]
 
-  return <NextLink href={removeEmptyCatchAll(href)} as={translateUrl(href, language)} locale={locale} {...props} />
+  if (!locale && !routerLocale) {
+    console.error(`> next-translate-routes - No locale prop in Router: fallback to ${language}. Link props:`, {
+      href,
+      ...props,
+    })
+  }
+
+  return <NextLink href={translateUrl(href, language)} locale={locale} {...props} />
+}
+
+function translateUrlIfLang(url: Url, locale: string | undefined, options?: Options) {
+  return locale ? translateUrl(url, locale, options) : url
 }
 
 export const useRouter = (): Router => {
-  const { push, replace, prefetch, ...otherRouterProps } = useNextRouter()
-  const currentLang = otherRouterProps.locale || defaultLocale
+  const { push, replace, prefetch, locale, ...otherRouterProps } = useNextRouter()
 
-  if (!otherRouterProps.locale) {
-    console.error('> next-translate-routes - No locale prop in Router: fallback to defaultLocale.')
+  if (!locale) {
+    console.error("> next-translate-routes - No locale prop in Router: url won't be automatically translated.")
   }
 
   return {
     push: (url: Url, as?: Url, options?: TransitionOptions) =>
-      push(removeEmptyCatchAll(url), as || translateUrl(url, options?.locale || currentLang), options),
+      push(translateUrlIfLang(url, options?.locale || locale), as, options),
     replace: (url: Url, as?: Url, options?: TransitionOptions) =>
-      replace(removeEmptyCatchAll(url), as || translateUrl(url, options?.locale || currentLang), options),
+      replace(translateUrlIfLang(url, options?.locale || locale), as, options),
     prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) =>
       prefetch(
-        inputUrl,
-        asPath || translateUrl(inputUrl, options?.locale || currentLang, { format: 'string' }),
+        translateUrlIfLang(inputUrl, options?.locale || locale, { format: 'string' }) as string,
+        asPath,
         options,
       ),
+    locale,
     ...otherRouterProps,
   }
 }

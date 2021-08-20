@@ -14,13 +14,12 @@ _Back to Next file-base routing system while remaining free from its limits_
   Simple rewrites would make a page accessible with 2 different urls which is bad for SEO.
 - __Auto-redirection to correct translated path__  
   Ex: `/fr/english/path` redirects to `/fr/french/path`
-- __Enhanced Link component to accept a lang prop__
 - __No custom server needed!__  
   Next automatic static optimization remains available.
 
 ## Motivation
 
-To build a fully internationalized website, one need to translate url segments: it is crucial for UX and SEO.
+To build a fully internationalized website, one need to translate url segments: it is important for UX and SEO.
 For now, Next only ship with locale prefixes ([see Next.js internationalized routing doc](https://nextjs.org/docs/advanced-features/i18n-routing)).
 
 The [next-routes](https://github.com/fridays/next-routes) package allow fully internationalized routing but it is no longer maintained, and it is designed without the latest Next api, such as internationalized routing, new data fetching methods, automatic static optimization.  
@@ -54,7 +53,7 @@ module.exports = withTranslateRoutes({
 
 #### 2. Define your routes
 
-In the `pages` folder, and in each of its subfolders, add a `routes.json` file with the following:  
+You can add a `routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:  
 ```js
 // `/pages/section/routes.json`
 {
@@ -196,4 +195,4 @@ type TRouteBranch<Locale extends string> = {
 
 ### Warning
 
-The router prop received by the App component in `pages/_app.js` is a bare Next router: if you want to use next-translate-routes router, you need to inject it with useRouter or withRouter.
+The router prop received by the App and Pages components is a bare Next router: if you want to use next-translate-routes router, you need to inject it with useRouter or withRouter.
