@@ -12,7 +12,9 @@ import type { PrefetchOptions } from 'next/dist/next-server/lib/router/router'
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
   format?: F
   /** For testing only: do not use this option in production */
-  routes?: TRouteBranch
+  routesTree?: TRouteBranch
+  /** For testing only: do not use this option in production */
+  locales?: string[]
   /** For testing only: do not use this option in production */
   defaultLocale?: string
 }
@@ -26,6 +28,7 @@ interface TransitionOptions {
 }
 
 const routesTree = JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
+const locales = (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
 const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
 /** Get children + (grand)children of children whose path must be ignord (path === '.') */
@@ -129,6 +132,38 @@ const translatePathParts = ({
   }
 }
 
+const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] => {
+  const {
+    routesTree: optionsRoutesTree = routesTree,
+    locales: optionsLocales = locales,
+    defaultLocale: optionsDefaultLocale = defaultLocale,
+  } = options
+
+  const getLangRoot = (lang: string) => optionsRoutesTree.paths[lang] || optionsRoutesTree.paths.default
+
+  const hasLangPrefix = optionsLocales.includes(pathParts[0])
+  const defaultLocaleRoot = getLangRoot(optionsDefaultLocale)
+  const hasDefaultLocalePrefix = !hasLangPrefix && !!defaultLocaleRoot && pathParts[0] === defaultLocaleRoot
+
+  const locale = hasLangPrefix ? pathParts[0] : hasDefaultLocalePrefix ? optionsDefaultLocale : undefined
+
+  console.log('From index, removeLangPrefix.', {
+    pathParts,
+    hasLangPrefix,
+    defaultLocaleRoot,
+    hasDefaultLocalePrefix,
+    locale,
+  })
+
+  if (!locale) {
+    return pathParts
+  }
+
+  const nbPathPartsToRemove = (locale === optionsDefaultLocale ? 0 : 1) + getLangRoot(locale).split('/').length
+
+  return pathParts.slice(nbPathPartsToRemove)
+}
+
 /**
  * Translate url into option.locale locale, or if not defined, in current locale
  *
@@ -154,11 +189,12 @@ export function translateUrl<U extends string | UrlObject, F extends 'string' | 
   ? string
   : UrlObject
 
-export function translateUrl(
-  url: Url,
-  locale: string,
-  { format, routes = routesTree, defaultLocale: tuDefaultLocale = defaultLocale }: Options = {},
-): Url {
+export function translateUrl(url: Url, locale: string, options: Options = {}): Url {
+  const {
+    format,
+    routesTree: optionsRoutesTree = routesTree,
+    defaultLocale: optionsDefaultLocale = defaultLocale,
+  } = options
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
   const { pathname, query } = urlObject
@@ -167,18 +203,20 @@ export function translateUrl(
     return returnFormat === 'object' ? url : formatUrl(url)
   }
 
-  if (!routes) {
+  if (!optionsRoutesTree) {
     throw new Error(
       '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
     )
   }
 
-  const pathParts = pathname.replace(/^\//, '').split('/')
+  const rawPathParts = pathname.replace(/^\//, '').split('/')
+  const pathParts = removeLangPrefix(rawPathParts, options)
+
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
     locale,
     pathParts,
     query: parseQuery(typeof query === 'string' ? query : stringifyQuery(query || {})),
-    routeBranch: routes,
+    routeBranch: optionsRoutesTree,
   })
   const path = translatedPathParts.join('/')
   const compiledPath = compile(path, { validate: false })(augmentedQuery)
@@ -193,8 +231,8 @@ export function translateUrl(
     {},
   )
 
-  const fullPathname = `${locale !== tuDefaultLocale ? `/${locale}` : ''}${
-    routes.paths[locale] ? `/${routes.paths[locale]}` : ''
+  const fullPathname = `${locale !== optionsDefaultLocale ? `/${locale}` : ''}${
+    optionsRoutesTree.paths[locale] ? `/${optionsRoutesTree.paths[locale]}` : ''
   }/${compiledPath}`
 
   const translatedUrlObject = {

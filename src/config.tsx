@@ -292,6 +292,7 @@ export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig
   // TODO: validateRoutesTree(routesTree)
 
   process.env.NEXT_PUBLIC_ROUTES = JSON.stringify(routesTree)
+  process.env.NEXT_PUBLIC_LOCALES = nextConfig.i18n?.locales?.join(',') || ''
   process.env.NEXT_PUBLIC_DEFAULT_LOCALE = nextConfig.i18n?.defaultLocale || ''
 
   return {
