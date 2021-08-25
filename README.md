@@ -4,17 +4,17 @@ _Back to Next file-base routing system while remaining free from its limits_
 
 ## Features
 
-- __Translated paths segments__  
+- **Translated paths segments**  
   Ex: `/contact-us` and `/fr/contactez-nous`.
-- __Complex paths segments__ (path-to-regexp synthax)  
+- **Complex paths segments** (path-to-regexp synthax)  
   Ex: `/:id{-:slug}?/`
-- __Constrained dynamic paths segments__ (path-to-regexp synthax)  
+- **Constrained dynamic paths segments** (path-to-regexp synthax)  
   Ex: `/:id(\\d+)/`
-- __No duplicated content (SEO)__  
+- **No duplicated content (SEO)**  
   Simple rewrites would make a page accessible with 2 different urls which is bad for SEO.
-- __Auto-redirection to correct translated path__  
+- **Auto-redirection to correct translated path**  
   Ex: `/fr/english/path` redirects to `/fr/french/path`
-- __No custom server needed!__  
+- **No custom server needed!**  
   Next automatic static optimization remains available.
 
 ## Motivation
@@ -53,7 +53,8 @@ module.exports = withTranslateRoutes({
 
 #### 2. Define your routes
 
-You can add a `routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:  
+You can add a `routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:
+
 ```js
 // `/pages/section/routes.json`
 {
@@ -66,17 +67,41 @@ You can add a `routes.json` file in the `pages` folder, and in the every subfold
   },
   "page2": "definition", // Overwrite the page path for all language
 }
-```  
+```
+
 The "/" section define the folder paths, each other section define the paths of a page file in this folder.
 
-#### 3. Use the next-translate-routes Link, useRouter, and withRouter
+#### 3. Wrap you \_app component with the withTranslateRoutes hoc
 
-next-translate-routes extends Next Link, useRouter, withRouter, to translate routes automatically: import them from 'next-translate-route' instead of 'next/link' and 'next/router', and use them as you ever did.
+```js
+// `/pages/_app.js`
+import { App } from 'next/app'
+import { withTranslateRoutes } from 'next-translate-routes'
+
+export default withTranslateRoutes(App)
+```
+Or:
+```js
+// `/pages/_app.js`
+import { withTranslateRoutes } from 'next-translate-routes'
+
+const App = ({ Component, pageProps, router }) => {
+  // Custom code...
+
+  return <Component {...pageProps} />
+}
+
+export default withTranslateRoutes(App)
+```
+
+#### 4. Use the next-translate-routes Link
+
+next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes' instead of 'next/link' and use as you ever did.
 
 ```jsx
 import React, { useEffect, useState } from 'react'
 
-import { Link, useRouter, withRouter } from 'next-translate-routes'
+import { Link } from 'next-translate-routes'
 
 const MyLinks = () => {
   const { locales } = useRouter()
@@ -91,30 +116,6 @@ const MyLinks = () => {
   )
 }
 
-const ComponentWithUseRouter = ({ lang }) => {
-  const router = useRouter()
-
-  useEffect(() => {
-    if (router.locale !== lang) {
-      router.push({ pathname: '/' }, { locale: lang })
-    }
-  })
-
-  return <MyLinks />
-}
-
-const ComponentWithWithRouter = withRouter(({ lang, router }) => {
-  const [, setPrefetched] = useState(false)
-  useEffect(() => {
-    setPrefetched((previousPrefetched) => {
-      router.prefetch({ pathname: '/page/to/prefetch' }, { locale: lang })
-    })
-  }, [lang, router])
-
-  return <MyLinks />
-})
-
-
 ```
 
 ### Constrained dynamic paths segments
@@ -126,11 +127,13 @@ const ComponentWithWithRouter = withRouter(({ lang, router }) => {
   "[slug]": ":slug(\\w+)", // Constrain a dynamic page segment (to be letters here)
 }
 ```
+
 For a catch all route: `"[...path]": ":path*"`.
 
 ### Ignoring a path part
 
 This will ignore the `blog` path segment:
+
 ```js
 // `/pages/blog/routes.json`
 {
@@ -150,6 +153,7 @@ This will ignore the `blog` path segment:
 It is also possible to create a path segment with 2 dynamic parameters. Ex: `/articles/:id{-:slug}?`.  
 First, create a path segment for each dynamic parameter: `/articles/[id]/[slug].
 Then:
+
 ```js
 // `/articles/[id]/routes.json`
 {
@@ -184,7 +188,9 @@ module.exports = withTranslateRoutes({
   // ...Remaining next config
 })
 ```
+
 `routesTree` must be of type `TRouteBranch`:
+
 ```typescript
 type TRouteBranch<Locale extends string> = {
   name: string
@@ -192,7 +198,3 @@ type TRouteBranch<Locale extends string> = {
   children?: TRouteBranch[]
 }
 ```
-
-### Warning
-
-The router prop received by the App and Pages components is a bare Next router: if you want to use next-translate-routes router, you need to inject it with useRouter or withRouter.

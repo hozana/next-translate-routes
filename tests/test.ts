@@ -1,4 +1,4 @@
-import { getPageReRoutes, getRouteBranchReRoutes, parsePagesTree } from '../src/plugin'
+import { getPageReRoutes, getRouteBranchReRoutes, parsePagesTree } from '../src/config'
 import { translateUrl } from '../src'
 import path from 'path'
 import routesTree from './fixtures/routesTree.json'
