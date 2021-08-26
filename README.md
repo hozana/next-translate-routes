@@ -1,6 +1,6 @@
 # Next-translate-routes
 
-_Back to Next file-base routing system while remaining free from its limits_
+_Translated routing and more for Next using Next regular file-base routing system_
 
 ## Features
 
@@ -69,7 +69,7 @@ You can add a `routes.json` file in the `pages` folder, and in the every subfold
 }
 ```
 
-The "/" section define the folder paths, each other section define the paths of a page file in this folder.
+The `"/"` section define the folder paths, each other section define the paths of a page file in this folder.
 
 #### 3. Wrap you \_app component with the withTranslateRoutes hoc
 
@@ -92,30 +92,6 @@ const App = ({ Component, pageProps, router }) => {
 }
 
 export default withTranslateRoutes(App)
-```
-
-#### 4. Use the next-translate-routes Link
-
-next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes' instead of 'next/link' and use as you ever did.
-
-```jsx
-import React, { useEffect, useState } from 'react'
-
-import { Link } from 'next-translate-routes'
-
-const MyLinks = () => {
-  const { locales } = useRouter()
-
-  return (
-    <>
-      <Link href={{ pathname: '/file/path/to/page'}}>Current locale</Link>
-      {locale.map((locale) => (
-        <Link href={{ pathname: '/file/path/to/page'}} locale={locale} key={locale}>{locale}</Link>
-      )}
-    </>
-  )
-}
-
 ```
 
 ### Constrained dynamic paths segments
