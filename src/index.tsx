@@ -1,4 +1,4 @@
-import React, { ComponentProps, ComponentType } from 'react'
+import React, { ComponentType } from 'react'
 import NextLink, { LinkProps } from 'next/link'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { RouterContext } from 'next/dist/next-server/lib/router-context'
@@ -151,7 +151,8 @@ const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] 
     return pathParts
   }
 
-  const nbPathPartsToRemove = (locale === optionsDefaultLocale ? 0 : 1) + getLangRoot(locale).split('/').length
+  const nbPathPartsToRemove =
+    (locale === optionsDefaultLocale ? 0 : 1) + getLangRoot(locale) ? getLangRoot(locale).split('/').length : 0
 
   return pathParts.slice(nbPathPartsToRemove)
 }
@@ -212,11 +213,11 @@ export function translateUrl(url: Url, locale: string, options: Options = {}): U
   })
   const path = translatedPathParts.join('/')
   const compiledPath = compile(path, { validate: false })(augmentedQuery)
-  const paramsNames = (parsePath(path).filter((token) => typeof token === 'object') as Key[]).map((token) => token.name)
+  const paramNames = (parsePath(path).filter((token) => typeof token === 'object') as Key[]).map((token) => token.name)
   const remainingQuery = Object.keys(augmentedQuery).reduce(
     (acc, key) => ({
       ...acc,
-      ...(paramsNames.includes(key)
+      ...(paramNames.includes(key)
         ? {}
         : { [key]: (typeof query === 'object' && query?.[key]) || augmentedQuery[key] }),
     }),
@@ -237,12 +238,9 @@ export function translateUrl(url: Url, locale: string, options: Options = {}): U
 }
 
 /**
- * Link with route translation capabilities
- *
- * @deprecated since version 1.3.0
- * Use withTranslateRoutes in _app instead, then use Next Link (`next/link`)
+ * Link component that handle route translations
  */
-export const Link: React.FC<LinkProps> = ({ href, locale, ...props }) => {
+export const Link: React.FC<LinkProps> = ({ href, as, locale, ...props }) => {
   const { locale: routerLocale } = useNextRouter()
   const language = locale || routerLocale
 
@@ -253,12 +251,35 @@ export const Link: React.FC<LinkProps> = ({ href, locale, ...props }) => {
     })
   }
 
-  return <NextLink href={language ? translateUrl(href, language) : href} locale={locale} {...props} />
+  const translatedUrl = language ? translateUrl(as || href, language) : ''
+
+  return <NextLink href={translatedUrl || href} as={translatedUrl || as} locale={locale} {...props} />
 }
 
-function translateUrlIfLang(url: Url, locale: string | undefined, options?: Options) {
-  return locale ? translateUrl(url, locale, options) : url
-}
+const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProps }: NextRouter): NextRouter => ({
+  push: (url: Url, as?: Url, options?: TransitionOptions) => {
+    const translatedUrl =
+      options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
+    console.log('From wTR, push.', { url, as, options, translatedUrl, locale })
+    return push(url, as || translatedUrl, options)
+  },
+  replace: (url: Url, as?: Url, options?: TransitionOptions) => {
+    const translatedUrl =
+      options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
+    console.log('From wTR, replace.', { url, as, options, translatedUrl, locale })
+    return replace(url, as || translatedUrl, options)
+  },
+  prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
+    const translatedUrl =
+      options?.locale || locale
+        ? (translateUrl(asPath || inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
+        : inputUrl
+    // console.log('From wTR, prefetch.', { inputUrl, asPath, options, translatedUrl, locale })
+    return prefetch(inputUrl, asPath || translatedUrl, options)
+  },
+  locale,
+  ...otherRouterProps,
+})
 
 /**
  * Get router with route translation capabilities
@@ -267,26 +288,8 @@ function translateUrlIfLang(url: Url, locale: string | undefined, options?: Opti
  * Use withTranslateRoutes in _app instead, then use Next useRouter (`next/router`)
  */
 export const useRouter = (): NextRouter => {
-  const { push, replace, prefetch, locale, ...otherRouterProps } = useNextRouter()
-
-  if (!locale) {
-    console.error("> next-translate-routes - No locale prop in Router: url won't be automatically translated.")
-  }
-
-  return {
-    push: (url: Url, as?: Url, options?: TransitionOptions) =>
-      push(translateUrlIfLang(url, options?.locale || locale), as, options),
-    replace: (url: Url, as?: Url, options?: TransitionOptions) =>
-      replace(translateUrlIfLang(url, options?.locale || locale), as, options),
-    prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) =>
-      prefetch(
-        translateUrlIfLang(inputUrl, options?.locale || locale, { format: 'string' }) as string,
-        asPath,
-        options,
-      ),
-    locale,
-    ...otherRouterProps,
-  }
+  const nextRouter = useNextRouter()
+  return enhanceNextRouter(nextRouter)
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -312,28 +315,9 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
  */
 export const withTranslateRoutes = <A extends ComponentType<any>>(AppComponent: A) =>
   Object.assign(
-    (props: ComponentProps<A>) => {
-      const { push, replace, prefetch, locale, ...otherRouterProps } = useNextRouter()
-
-      const router = {
-        push: (url: Url, as?: Url, options?: TransitionOptions) => {
-          const translatedUrl = options?.locale && options?.locale !== locale ? translateUrl(url, options?.locale) : url
-          return push(translatedUrl, as || translatedUrl, options)
-        },
-        replace: (url: Url, as?: Url, options?: TransitionOptions) => {
-          const translatedUrl = options?.locale && options?.locale !== locale ? translateUrl(url, options?.locale) : url
-          return replace(translatedUrl, as || translatedUrl, options)
-        },
-        prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-          const translatedUrl =
-            options?.locale && options?.locale !== locale
-              ? (translateUrl(inputUrl, options?.locale, { format: 'string' }) as string)
-              : inputUrl
-          return prefetch(translatedUrl, asPath || translatedUrl, options)
-        },
-        locale,
-        ...otherRouterProps,
-      }
+    (props: any) => {
+      const nextRouter = useNextRouter()
+      const router = enhanceNextRouter(nextRouter)
 
       return (
         <RouterContext.Provider value={router}>

@@ -41,9 +41,9 @@ const staticSegmentRegex = /^[\w_]+$|^\([\w_|]+\)$/
 /** Transform Next file-system synthax to path-to-regexp synthax */
 const fileNameToPath = (fileName: string) =>
   fileName
-    .replace(/\[\[\.\.\.(\S+)\]\]/g, ':$1*')
-    .replace(/\[\.\.\.(\S+)\]/g, ':$1')
-    .replace(/([^[]*)\[([\w\d]+?)\]/g, '{$1:$2}')
+    .replace(/\[\[\.\.\.(\S+)\]\]/g, ':$1*') // [[...param]]
+    .replace(/\[\.\.\.(\S+)\]/g, ':$1') // [...param]
+    .replace(/\[(\S+)\]/g, ':$1') // [param]
 
 /** Get path and path translations from name and all translations */
 const getRouteSegment = <L extends string>(
@@ -175,14 +175,15 @@ export const getPageReRoutes = <L extends string>({
               locale: false,
               permanent: true,
             } as Redirect),
-        ),
+        )
+        .filter(({ source, destination }) => sourceToDestination(source) !== destination),
     ]
   }, [] as Redirect[])
 
   const destination = sourceToDestination(basePath)
 
   const rewrites: Rewrite[] = sourceList.reduce((acc, { source }) => {
-    if (source === destination) {
+    if (sourceToDestination(source) === destination) {
       return acc
     }
 

@@ -80,7 +80,9 @@ import { withTranslateRoutes } from 'next-translate-routes'
 
 export default withTranslateRoutes(App)
 ```
+
 Or:
+
 ```js
 // `/pages/_app.js`
 import { withTranslateRoutes } from 'next-translate-routes'
@@ -92,6 +94,36 @@ const App = ({ Component, pageProps, router }) => {
 }
 
 export default withTranslateRoutes(App)
+```
+
+#### 4. Use the next-translate-routes Link
+
+next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes' instead of 'next/link' and use as you ever did.
+
+```jsx
+import React, { useEffect, useState } from 'react'
+
+import { Link } from 'next-translate-routes'
+
+const MyLinks = (props) => {
+  const { locales } = useRouter()
+
+  return (
+    <>
+      <Link href="/file/path/to/page">Current locale</Link>
+      {locale.map((locale) => (
+        <Link
+          href={{ pathname: '/file/path/to/[dynamic]/page', query: { dynamic: props.param, otherQueryParam: 'foo' } }}
+          locale={locale}
+          key={locale}
+        >
+          {locale}
+        </Link>
+      )}
+    </>
+  )
+}
+
 ```
 
 ### Constrained dynamic paths segments
