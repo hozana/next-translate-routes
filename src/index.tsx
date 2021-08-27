@@ -260,13 +260,11 @@ const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProp
   push: (url: Url, as?: Url, options?: TransitionOptions) => {
     const translatedUrl =
       options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
-    console.log('From wTR, push.', { url, as, options, translatedUrl, locale })
     return push(url, as || translatedUrl, options)
   },
   replace: (url: Url, as?: Url, options?: TransitionOptions) => {
     const translatedUrl =
       options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
-    console.log('From wTR, replace.', { url, as, options, translatedUrl, locale })
     return replace(url, as || translatedUrl, options)
   },
   prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
@@ -274,7 +272,6 @@ const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProp
       options?.locale || locale
         ? (translateUrl(asPath || inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
         : inputUrl
-    // console.log('From wTR, prefetch.', { inputUrl, asPath, options, translatedUrl, locale })
     return prefetch(inputUrl, asPath || translatedUrl, options)
   },
   locale,
