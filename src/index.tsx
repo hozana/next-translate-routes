@@ -243,7 +243,7 @@ export function translateUrl(url: Url, locale: string, options: Options = {}): U
  */
 export const Link: React.FC<LinkProps> = ({ href, as, locale, ...props }) => {
   const { locale: routerLocale } = useNextRouter()
-  const language = locale || routerLocale
+  const language = locale || routerLocale || defaultLocale
 
   if (!locale && !routerLocale) {
     console.error(`> next-translate-routes - No locale prop in Router: fallback to ${language}. Link props:`, {
