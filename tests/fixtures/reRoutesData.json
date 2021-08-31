@@ -36,7 +36,7 @@
         "permanent": true
       },
       {
-        "source": "/en/first/{:secondPart}/thirdPart",
+        "source": "/en/first/:secondPart/thirdPart",
         "destination": "/en/1st/:secondPart/thirdPart",
         "locale": false,
         "permanent": true
@@ -48,7 +48,7 @@
         "permanent": true
       },
       {
-        "source": "/fr/first/{:secondPart}/thirdPart",
+        "source": "/fr/first/:secondPart/thirdPart",
         "destination": "/fr/premier/:secondPart/troisieme",
         "locale": false,
         "permanent": true

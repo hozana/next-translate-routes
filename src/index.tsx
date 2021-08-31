@@ -1,13 +1,14 @@
 import React, { ComponentType } from 'react'
 import NextLink, { LinkProps } from 'next/link'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
-import { RouterContext } from 'next/dist/next-server/lib/router-context'
-import { compile, parse as parsePath, Key } from 'path-to-regexp'
+import { RouterContext } from 'next/dist/shared/lib/router-context'
+import { compile, parse as parsePath } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 
+import type { Key } from 'path-to-regexp'
 import type { TRouteBranch } from './types'
-import type { PrefetchOptions } from 'next/dist/next-server/lib/router/router'
+import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
   format?: F
@@ -152,7 +153,7 @@ const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] 
   }
 
   const nbPathPartsToRemove =
-    (locale === optionsDefaultLocale ? 0 : 1) + getLangRoot(locale) ? getLangRoot(locale).split('/').length : 0
+    (locale === optionsDefaultLocale ? 0 : 1) + (getLangRoot(locale) ? getLangRoot(locale).split('/').length : 0)
 
   return pathParts.slice(nbPathPartsToRemove)
 }

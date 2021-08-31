@@ -29,7 +29,7 @@ import fs from 'fs'
 import pathUtils from 'path'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
-import type { NextConfig } from 'next/dist/next-server/server/config-shared'
+import type { NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
 
 const ROUTES_DATA_FILE_NAME = 'routes.json'
@@ -286,7 +286,7 @@ const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
  * Inject translated routes
  */
 export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
-  const { locales = [], defaultLocale } = nextConfig.i18n || {}
+  const { locales = [] } = nextConfig.i18n || {}
   const existingRoutesTree = nextConfig?.env?.NEXT_PUBLIC_ROUTES
   const routesTree = existingRoutesTree ? JSON.parse(existingRoutesTree) : parsePagesTree()
   const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree })
@@ -301,15 +301,7 @@ export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig
 
     async redirects() {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
-      return [
-        ...existingRedirects,
-        ...sortBySpecificity(redirects),
-        {
-          source: `/${defaultLocale}/:path*`,
-          destination: '/:path*',
-          permanent: true,
-        },
-      ]
+      return [...existingRedirects, ...sortBySpecificity(redirects)]
     },
 
     async rewrites() {

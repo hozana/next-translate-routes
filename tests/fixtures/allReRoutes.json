@@ -139,7 +139,7 @@
           "permanent": true
       },
       {
-          "source": "/en/community/{:communityId}/{:communitySlug}",
+          "source": "/en/community/:communityId/:communitySlug",
           "destination": "/en/root/community/:communityId-:communitySlug",
           "locale": false,
           "permanent": true
@@ -157,7 +157,7 @@
           "permanent": true
       },
       {
-          "source": "/fr/community/{:communityId}/{:communitySlug}",
+          "source": "/fr/community/:communityId/:communitySlug",
           "destination": "/fr/communaute/:communityId-:communitySlug",
           "locale": false,
           "permanent": true
@@ -175,7 +175,7 @@
           "permanent": true
       },
       {
-          "source": "/es/community/{:communityId}/{:communitySlug}",
+          "source": "/es/community/:communityId/:communitySlug",
           "destination": "/es/comunidad/:communityId-:communitySlug",
           "locale": false,
           "permanent": true
@@ -193,7 +193,7 @@
           "permanent": true
       },
       {
-          "source": "/en/community/{:communityId}/{:communitySlug}/statistics",
+          "source": "/en/community/:communityId/:communitySlug/statistics",
           "destination": "/en/root/community/:communityId-:communitySlug/statistics",
           "locale": false,
           "permanent": true
@@ -211,7 +211,7 @@
           "permanent": true
       },
       {
-          "source": "/fr/community/{:communityId}/{:communitySlug}/statistics",
+          "source": "/fr/community/:communityId/:communitySlug/statistics",
           "destination": "/fr/communaute/:communityId-:communitySlug/statistiques",
           "locale": false,
           "permanent": true
@@ -229,7 +229,7 @@
           "permanent": true
       },
       {
-          "source": "/es/community/{:communityId}/{:communitySlug}/statistics",
+          "source": "/es/community/:communityId/:communitySlug/statistics",
           "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
           "locale": false,
           "permanent": true

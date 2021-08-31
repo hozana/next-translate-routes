@@ -4,7 +4,7 @@ import path from 'path'
 import routesTree from './fixtures/routesTree.json'
 import reRoutesData from './fixtures/reRoutesData.json'
 import allReRoutes from './fixtures/allReRoutes.json'
-import type { NEXT_DATA } from 'next/dist/next-server/lib/utils'
+import type { NEXT_DATA } from 'next/dist/shared/lib/utils'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
