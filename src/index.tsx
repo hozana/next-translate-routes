@@ -169,7 +169,7 @@ const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] 
  * UrlObject if `options.format === 'object'`,
  * same type as url if options.format is not defined
  */
-export function translateUrl<U extends string | UrlObject, F extends 'string' | 'object'>(
+export function translatePath<U extends string | UrlObject, F extends 'string' | 'object'>(
   url: U,
   locale: string,
   options?: Options<F>,
@@ -183,15 +183,11 @@ export function translateUrl<U extends string | UrlObject, F extends 'string' | 
   ? string
   : UrlObject
 
-export function translateUrl(url: Url, locale: string, options: Options = {}): Url {
-  const {
-    format,
-    routesTree: optionsRoutesTree = routesTree,
-    defaultLocale: optionsDefaultLocale = defaultLocale,
-  } = options
+export function translatePath(url: Url, locale: string, options: Options = {}): Url {
+  const { format, routesTree: optionsRoutesTree = routesTree } = options
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
-  const { pathname, query } = urlObject
+  const { pathname, query, hash } = urlObject
 
   if (!pathname || !locale) {
     return returnFormat === 'object' ? url : formatUrl(url)
@@ -225,18 +221,32 @@ export function translateUrl(url: Url, locale: string, options: Options = {}): U
     {},
   )
 
-  const fullPathname = `${locale !== optionsDefaultLocale ? `/${locale}` : ''}${
+  const translatedPathname = `${
     optionsRoutesTree.paths[locale] ? `/${optionsRoutesTree.paths[locale]}` : ''
   }/${compiledPath}`
 
   const translatedUrlObject = {
-    ...urlObject,
-    pathname: fullPathname,
+    hash,
+    pathname: translatedPathname,
     query: remainingQuery,
   }
 
   return returnFormat === 'object' ? translatedUrlObject : formatUrl(translatedUrlObject)
 }
+
+export const translateUrl = ((url, locale, options) => {
+  const { defaultLocale: optionsDefaultLocale = defaultLocale } = options || {}
+  const translatedPath = translatePath(url, locale, options)
+  const prefix = locale === optionsDefaultLocale ? '' : `/${locale}`
+
+  if (typeof translatedPath === 'object') {
+    return {
+      ...(translatedPath as UrlObject),
+      pathname: prefix + translatedPath.pathname,
+    }
+  }
+  return prefix + translatedPath
+}) as typeof translatePath
 
 /**
  * Link component that handle route translations
@@ -252,28 +262,43 @@ export const Link: React.FC<LinkProps> = ({ href, as, locale, ...props }) => {
     })
   }
 
-  const translatedUrl = language ? translateUrl(as || href, language) : ''
+  const translatedPath = language ? translatePath(as || href, language) : ''
 
-  return <NextLink href={translatedUrl || href} as={translatedUrl || as} locale={locale} {...props} />
+  return <NextLink href={translatedPath || href} as={translatedPath || as} locale={locale} {...props} />
 }
 
 const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProps }: NextRouter): NextRouter => ({
   push: (url: Url, as?: Url, options?: TransitionOptions) => {
-    const translatedUrl =
-      options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
-    return push(url, as || translatedUrl, options)
+    const translatedPath =
+      options?.locale || locale
+        ? translatePath(as || url, options?.locale || (locale as string), { format: 'object' })
+        : url
+    console.log('From enhanceNextRouter, push.', {
+      url,
+      as,
+      options,
+      locale,
+      translatedPath,
+      otherRouterProps,
+      translatePath,
+      removeLangPrefix,
+    })
+    return push(translatedPath, as || translatedPath, options)
   },
   replace: (url: Url, as?: Url, options?: TransitionOptions) => {
-    const translatedUrl =
-      options?.locale || locale ? translateUrl(as || url, options?.locale || (locale as string)) : url
-    return replace(url, as || translatedUrl, options)
+    const translatedPath =
+      options?.locale || locale
+        ? translatePath(as || url, options?.locale || (locale as string), { format: 'object' })
+        : url
+    console.log('From enhanceNextRouter, replace.', { url, as, options, locale, translatedPath, otherRouterProps })
+    return replace(translatedPath, as || translatedPath, options)
   },
   prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-    const translatedUrl =
+    const translatedPath =
       options?.locale || locale
-        ? (translateUrl(asPath || inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
+        ? (translatePath(asPath || inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
         : inputUrl
-    return prefetch(inputUrl, asPath || translatedUrl, options)
+    return prefetch(inputUrl, asPath || translatedPath, options)
   },
   locale,
   ...otherRouterProps,

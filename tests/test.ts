@@ -1,5 +1,5 @@
 import { getPageReRoutes, getRouteBranchReRoutes, parsePagesTree } from '../src/config'
-import { translateUrl } from '../src'
+import { translatePath, translateUrl } from '../src'
 import path from 'path'
 import routesTree from './fixtures/routesTree.json'
 import reRoutesData from './fixtures/reRoutesData.json'
@@ -31,7 +31,7 @@ test('getRouteBranchReRoutes.', () => {
   expect(reRoutes).toEqual(allReRoutes)
 })
 
-test('translateHref.', () => {
+test('translate.', () => {
   ;[
     {
       href: {
@@ -39,7 +39,7 @@ test('translateHref.', () => {
         query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
         hash: 'section',
       },
-      expected: {
+      translatedPath: {
         pathname: '/communaute/300-three-hundred/statistiques',
         query: { baz: 3 },
         hash: 'section',
@@ -50,7 +50,7 @@ test('translateHref.', () => {
         pathname: '/communities/[[...tagSlug]]',
         query: { baz: 3 },
       },
-      expected: {
+      translatedPath: {
         pathname: '/communautes',
         query: { baz: 3 },
       },
@@ -58,23 +58,24 @@ test('translateHref.', () => {
     {
       href: '/community/300/three-hundred/statistics?baz=3#section',
       locale: 'en',
-      expected: '/en/root/community/300-three-hundred/statistics?baz=3#section',
+      translatedPath: '/root/community/300-three-hundred/statistics?baz=3#section',
+      translatedUrl: '/en/root/community/300-three-hundred/statistics?baz=3#section',
     },
     {
       href: '/feast-days?baz=3#section',
-      expected: '/fetes?baz=3#section',
+      translatedPath: '/fetes?baz=3#section',
     },
     {
       href: '/feast-days/?baz=3#section',
-      expected: '/fetes?baz=3#section',
+      translatedPath: '/fetes?baz=3#section',
     },
     {
       href: '/feast-days/foo/bar?baz=3#section',
-      expected: '/fetes/foo/bar?baz=3#section',
+      translatedPath: '/fetes/foo/bar?baz=3#section',
     },
     {
       href: '/?baz=3#section',
-      expected: '/?baz=3#section',
+      translatedPath: '/?baz=3#section',
     },
     {
       href: {
@@ -83,7 +84,12 @@ test('translateHref.', () => {
         hash: 'section',
       },
       locale: 'en',
-      expected: {
+      translatedPath: {
+        pathname: '/root/community/300-three-hundred/statistics',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+      translatedUrl: {
         pathname: '/en/root/community/300-three-hundred/statistics',
         query: { baz: 3 },
         hash: 'section',
@@ -92,11 +98,16 @@ test('translateHref.', () => {
     {
       href: '/en/root/feast-days/foo/bar?baz=3#section',
       locale: 'en',
-      expected: '/en/root/feast-days/foo/bar?baz=3#section',
+      translatedPath: '/root/feast-days/foo/bar?baz=3#section',
+      translatedUrl: '/en/root/feast-days/foo/bar?baz=3#section',
     },
-  ].forEach(({ href, locale = 'fr', expected }) => {
-    expect(
-      translateUrl(href, locale || 'fr', { routesTree, locales: ['fr', 'en', 'es', 'pt'], defaultLocale: 'fr' }),
-    ).toEqual(expected)
+  ].forEach(({ href, locale = 'fr', translatedPath, translatedUrl }) => {
+    const args = [
+      href,
+      locale || 'fr',
+      { routesTree, locales: ['fr', 'en', 'es', 'pt'] as string[], defaultLocale: 'fr' },
+    ] as const
+    expect(translatePath(...args)).toEqual(translatedPath)
+    expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
   })
 })
