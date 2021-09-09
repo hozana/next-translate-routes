@@ -28,7 +28,7 @@ interface TransitionOptions {
   scroll?: boolean
 }
 
-const routesTree = JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
+const getRoutesTree = () => JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
 const locales = (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
 const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
@@ -151,7 +151,7 @@ const translatePathParts = ({
 
 const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] => {
   const {
-    routesTree: optionsRoutesTree = routesTree,
+    routesTree: optionsRoutesTree = getRoutesTree(),
     locales: optionsLocales = locales,
     defaultLocale: optionsDefaultLocale = defaultLocale,
   } = options
@@ -200,7 +200,7 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
   : UrlObject
 
 export function translatePath(url: Url, locale: string, options: Options = {}): Url {
-  const { format, routesTree: optionsRoutesTree = routesTree } = options
+  const { format, routesTree: optionsRoutesTree = getRoutesTree() } = options
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
   const { pathname, query, hash } = urlObject
