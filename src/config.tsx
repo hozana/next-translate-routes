@@ -27,16 +27,13 @@
 
 import fs from 'fs'
 import pathUtils from 'path'
+import { ignoreSegmentPathRegex } from '.'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
 
 const ROUTES_DATA_FILE_NAME = 'routes.json'
-
-const countPathRegexps = (path: string): number => [...(path.match(/:[\w_]+\(/g) || [])].length
-const countPathSegments = (path: string): number => path.split('/').length - 1
-const staticSegmentRegex = /^[\w_]+$|^\([\w_|]+\)$/
 
 /** Transform Next file-system synthax to path-to-regexp synthax */
 const fileNameToPath = (fileName: string) =>
@@ -108,6 +105,32 @@ export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk
 const sourceToDestination = (sourcePath: string) =>
   sourcePath.replace(/[{}]|(:\w+)\([^)]+\)/g, (_match, arg) => arg || '')
 
+const staticSegmentRegex = /^[\w-_]+$|^\([\w-_|]+\)$/
+
+/**
+ * Find index of a similar redirect/rewrite
+ * This is used to merge similar redirects and rewrites
+ */
+const getSimilarIndex = <R extends Redirect | Rewrite>(sourceSegments: string[], acc: R[]) =>
+  acc.findIndex(({ source: otherSource }) => {
+    const otherSourceSegments = otherSource.split('/')
+
+    return (
+      // source and otherSource must have the same segments number
+      otherSourceSegments.length === sourceSegments.length &&
+      // each corresponding source and otherSource segments should be compatible, which means that...
+      sourceSegments.every((sourceSegment, index) => {
+        const correspondingSegment = otherSourceSegments[index]
+        return (
+          // ...either they are equal
+          sourceSegment === correspondingSegment ||
+          // ...either they are both static
+          (staticSegmentRegex.test(sourceSegment) && staticSegmentRegex.test(correspondingSegment))
+        )
+      })
+    )
+  })
+
 /**
  * Get redirects and rewrites for a page
  */
@@ -127,12 +150,16 @@ export const getPageReRoutes = <L extends string>({
   const getPath = (locale: L | 'default') =>
     `/${routeSegments
       .map(({ paths }) => paths[locale] || paths.default)
-      .filter((pathPart) => pathPart && pathPart !== '.')
+      .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
       .join('/')}`
 
   /** File path in path-to-regexp syntax (cannot be customised in routes data files) */
   const basePath = `/${routeSegments
-    .map(({ name }) => fileNameToPath(name))
+    .map(({ name, paths: { default: defaultPath } }) => {
+      const match = defaultPath.match(ignoreSegmentPathRegex) || []
+      // If a pattern is added to the ignore token "."
+      return fileNameToPath(name) + (match[1] || '')
+    })
     .filter((pathPart) => pathPart)
     .join('/')}`
 
@@ -160,6 +187,7 @@ export const getPageReRoutes = <L extends string>({
 
   const redirects = locales.reduce((acc, locale) => {
     const localePath = getPath(locale)
+    const destination = `/${locale}${sourceToDestination(localePath)}`
 
     return [
       ...acc,
@@ -167,15 +195,44 @@ export const getPageReRoutes = <L extends string>({
         .filter(({ sourceLocales }) => !sourceLocales.includes(locale))
         // Redirect from base path so that it does not display the page but only the translated path does
         .concat(...(localePath === basePath ? [] : [{ sourceLocales: [], source: basePath }]))
-        .map(
-          ({ source }) =>
-            ({
-              source: `/${locale}${source}`,
-              destination: `/${locale}${sourceToDestination(localePath)}`,
-              locale: false,
+        .reduce((acc, { source: rawSource }) => {
+          const source = `/${locale}${rawSource}`
+          const sourceSegments = source.split('/')
+
+          // Look for similar redirects
+          const similarIndex = getSimilarIndex(sourceSegments, acc)
+
+          // If similar redirect exist, merge the new one
+          if (similarIndex >= 0) {
+            const similar = acc[similarIndex]
+            return [
+              ...acc.slice(0, similarIndex),
+              {
+                ...similar,
+                source: similar.source
+                  .split('/')
+                  .map((similarSegment, index) =>
+                    similarSegment === sourceSegments[index]
+                      ? similarSegment
+                      : `(${similarSegment.replace(/\(|\)/g, '').split('|').concat(sourceSegments[index]).join('|')})`,
+                  )
+                  .join('/'),
+              },
+              ...acc.slice(similarIndex + 1),
+            ]
+          }
+
+          // Else append the new redirect
+          return [
+            ...acc,
+            {
+              source,
+              destination,
+              locale: false as const,
               permanent: true,
-            } as Redirect),
-        )
+            },
+          ]
+        }, [] as Redirect[])
         .filter(({ source, destination }) => sourceToDestination(source) !== destination),
     ]
   }, [] as Redirect[])
@@ -187,24 +244,12 @@ export const getPageReRoutes = <L extends string>({
       return acc
     }
 
-    // Merge similar rewrites
     const sourceSegments = source.split('/')
-    const sourceSegmentsCount = sourceSegments.length
 
-    const similarIndex = acc.findIndex(({ source: otherSource }) => {
-      const otherSourceSegments = otherSource.split('/')
-      return (
-        otherSourceSegments.length === sourceSegmentsCount &&
-        sourceSegments.every((sourceSegment, index) => {
-          const correspondingSegment = otherSourceSegments[index]
-          return (
-            sourceSegment === correspondingSegment ||
-            (staticSegmentRegex.test(sourceSegment) && staticSegmentRegex.test(correspondingSegment))
-          )
-        })
-      )
-    })
+    // Look for similar rewrites
+    const similarIndex = getSimilarIndex(sourceSegments, acc)
 
+    // If similar rewrite exist, merge the new one
     if (similarIndex >= 0) {
       const similar = acc[similarIndex]
       return [
@@ -224,6 +269,7 @@ export const getPageReRoutes = <L extends string>({
       ]
     }
 
+    // Else append a new rewrite
     return [
       ...acc,
       {
@@ -278,8 +324,14 @@ export const getRouteBranchReRoutes = <L extends string>({
  */
 const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
   rArray.sort((a, b) => {
-    const regexpNbDiff = countPathRegexps(b.source) - countPathRegexps(a.source)
-    return regexpNbDiff !== 0 ? regexpNbDiff : countPathSegments(b.source) - countPathSegments(a.source)
+    if (a.source.includes(':') && !b.source.includes(':')) {
+      return 1
+    }
+    if (!a.source.includes(':') && b.source.includes(':')) {
+      return -1
+    }
+
+    return b.source.split('/').length - a.source.split('/').length
   })
 
 /**
@@ -306,12 +358,13 @@ export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig
 
     async rewrites() {
       const existingRewrites = (nextConfig.rewrites && (await nextConfig.rewrites())) || []
+      const sortedRewrites = sortBySpecificity(rewrites)
       if (Array.isArray(existingRewrites)) {
-        return [...existingRewrites, ...rewrites]
+        return [...existingRewrites, ...sortedRewrites]
       }
       return {
         ...existingRewrites,
-        beforeFiles: [...(existingRewrites.beforeFiles || []), ...sortBySpecificity(rewrites)],
+        afterFiles: [...(existingRewrites.afterFiles || []), ...sortedRewrites],
       }
     },
   } as NextConfig

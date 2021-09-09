@@ -1,19 +1,7 @@
 {
   "redirects": [
       {
-          "source": "/en/a-propos",
-          "destination": "/en/root/about",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/acerca-de-nosotros",
-          "destination": "/en/root/about",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/about",
+          "source": "/en/(a-propos|acerca-de-nosotros|about)",
           "destination": "/en/root/about",
           "locale": false,
           "permanent": true
@@ -25,13 +13,7 @@
           "permanent": true
       },
       {
-          "source": "/fr/acerca-de-nosotros",
-          "destination": "/fr/a-propos",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/fr/about",
+          "source": "/fr/(acerca-de-nosotros|about)",
           "destination": "/fr/a-propos",
           "locale": false,
           "permanent": true
@@ -43,13 +25,7 @@
           "permanent": true
       },
       {
-          "source": "/es/a-propos",
-          "destination": "/es/acerca-de-nosotros",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/es/about",
+          "source": "/es/(a-propos|about)",
           "destination": "/es/acerca-de-nosotros",
           "locale": false,
           "permanent": true
@@ -73,19 +49,7 @@
           "permanent": true
       },
       {
-          "source": "/en/communautes/:tagSlug*",
-          "destination": "/en/root/communities/:tagSlug*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/comunidades/:tagSlug*",
-          "destination": "/en/root/communities/:tagSlug*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/communities/:tagSlug*",
+          "source": "/en/(communautes|comunidades|communities)/:tagSlug*",
           "destination": "/en/root/communities/:tagSlug*",
           "locale": false,
           "permanent": true
@@ -97,13 +61,7 @@
           "permanent": true
       },
       {
-          "source": "/fr/comunidades/:tagSlug*",
-          "destination": "/fr/communautes/:tagSlug*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/fr/communities/:tagSlug*",
+          "source": "/fr/(comunidades|communities)/:tagSlug*",
           "destination": "/fr/communautes/:tagSlug*",
           "locale": false,
           "permanent": true
@@ -115,25 +73,13 @@
           "permanent": true
       },
       {
-          "source": "/es/communautes/:tagSlug*",
+          "source": "/es/(communautes|communities)/:tagSlug*",
           "destination": "/es/comunidades/:tagSlug*",
           "locale": false,
           "permanent": true
       },
       {
-          "source": "/es/communities/:tagSlug*",
-          "destination": "/es/comunidades/:tagSlug*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/communaute/:communityId(\\d+){-:communitySlug}",
-          "destination": "/en/root/community/:communityId-:communitySlug",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/comunidad/:communityId(\\d+){-:communitySlug}",
+          "source": "/en/(communaute|comunidad)/:communityId(\\d+){-:communitySlug}",
           "destination": "/en/root/community/:communityId-:communitySlug",
           "locale": false,
           "permanent": true
@@ -181,13 +127,7 @@
           "permanent": true
       },
       {
-          "source": "/en/communaute/:communityId(\\d+){-:communitySlug}/statistiques",
-          "destination": "/en/root/community/:communityId-:communitySlug/statistics",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/comunidad/:communityId(\\d+){-:communitySlug}/estadisticas",
+          "source": "/en/(communaute|comunidad)/:communityId(\\d+){-:communitySlug}/(statistiques|estadisticas)",
           "destination": "/en/root/community/:communityId-:communitySlug/statistics",
           "locale": false,
           "permanent": true
@@ -253,13 +193,7 @@
           "permanent": true
       },
       {
-          "source": "/en/FAQ",
-          "destination": "/en/root/FAQ",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/faq",
+          "source": "/en/(FAQ|faq)",
           "destination": "/en/root/FAQ",
           "locale": false,
           "permanent": true
@@ -289,19 +223,7 @@
           "permanent": true
       },
       {
-          "source": "/en/fetes/:path*",
-          "destination": "/en/root/feast-days/:path*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/fiestas/:path*",
-          "destination": "/en/root/feast-days/:path*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/en/feast-days/:path*",
+          "source": "/en/(fetes|fiestas|feast-days)/:path*",
           "destination": "/en/root/feast-days/:path*",
           "locale": false,
           "permanent": true
@@ -313,13 +235,7 @@
           "permanent": true
       },
       {
-          "source": "/fr/fiestas/:path*",
-          "destination": "/fr/fetes/:path*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/fr/feast-days/:path*",
+          "source": "/fr/(fiestas|feast-days)/:path*",
           "destination": "/fr/fetes/:path*",
           "locale": false,
           "permanent": true
@@ -331,13 +247,7 @@
           "permanent": true
       },
       {
-          "source": "/es/fetes/:path*",
-          "destination": "/es/fiestas/:path*",
-          "locale": false,
-          "permanent": true
-      },
-      {
-          "source": "/es/feast-days/:path*",
+          "source": "/es/(fetes|feast-days)/:path*",
           "destination": "/es/fiestas/:path*",
           "locale": false,
           "permanent": true
@@ -367,11 +277,7 @@
           "destination": "/about"
       },
       {
-          "source": "/a-propos",
-          "destination": "/about"
-      },
-      {
-          "source": "/acerca-de-nosotros",
+          "source": "/(a-propos|acerca-de-nosotros)",
           "destination": "/about"
       },
       {
