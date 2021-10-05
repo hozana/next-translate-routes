@@ -2,11 +2,11 @@
 
 This is a simple project that shows the usage of next-translate-routes.
 
-## Notes
+## Starting
 
-Imports from next-translate-routes are either imported directly from the root for live tests, either from the npm registry:
-- next.config.js
-- pages/_app.tsx
-- components/Link.tsx
+1. `yarn install` (This will first execute `yarn install` in the root package, then link `next-translate-routes` into this example package.)
+2. `yarn dev` or `yarn build && yarn start`
 
-Comment/uncomment the one you want to use or not.
+## Note
+
+There is no `next-translate-routes` dependency in package.json because this example directly use the root package: it is built and linked during preinstall (Cf. package.json preinstall hook in scripts).

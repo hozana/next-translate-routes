@@ -1,11 +1,11 @@
 import React from 'react'
 import { GetStaticProps } from 'next'
+import { Link } from 'next-translate-routes'
 
 import { User } from '../../interfaces'
 import { sampleUserData } from '../../utils/sample-data'
 import Layout from '../../components/Layout'
 import List from '../../components/List'
-import { Link } from '../../components/Link'
 
 type Props = {
   items: User[]

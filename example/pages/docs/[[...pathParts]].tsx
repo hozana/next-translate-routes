@@ -1,5 +1,5 @@
 import React from 'react'
-import Link from 'next/link'
+import { Link } from 'next-translate-routes'
 import { useRouter } from 'next/router'
 import Layout from '../../components/Layout'
 

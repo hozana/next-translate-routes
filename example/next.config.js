@@ -1,5 +1,4 @@
-// const withTranslateRoutes = require("next-translate-routes/plugin") // Regular import
-const withTranslateRoutes = require('../plugin') // Live test import
+const withTranslateRoutes = require("next-translate-routes/plugin")
 
 const nextConfig = withTranslateRoutes({
   i18n: {

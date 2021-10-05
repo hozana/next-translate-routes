@@ -1,6 +1,6 @@
 import React from 'react'
+import { Link } from 'next-translate-routes'
 import Layout from '../components/Layout'
-import { Link } from '../components/Link'
 
 const IndexPage = () => (
   <Layout title="Home | Next.js + TypeScript Example">

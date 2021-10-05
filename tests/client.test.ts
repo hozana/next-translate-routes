@@ -1,37 +1,24 @@
-import { getPageReRoutes, getRouteBranchReRoutes, parsePagesTree } from '../src/config'
+/**
+ * @jest-environment jsdom
+ */
+
 import { translatePath, translateUrl } from '../src'
-import path from 'path'
 import routesTree from './fixtures/routesTree.json'
-import reRoutesData from './fixtures/reRoutesData.json'
-import allReRoutes from './fixtures/allReRoutes.json'
-import type { NEXT_DATA } from 'next/dist/shared/lib/utils'
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface Global {
-      __NEXT_DATA__: Partial<NEXT_DATA>
-    }
-  }
-}
-test('parsePagesTree.', () => {
-  const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const parsedPagesTree = parsePagesTree(pagesPath, true)
-  expect(parsedPagesTree).toEqual(routesTree)
-})
-
-test('getPageReRoutes.', () => {
-  const { reRoutes, ...getPageReRoutesProps } = reRoutesData
-  const pageReRoutes = getPageReRoutes(getPageReRoutesProps)
-  expect(pageReRoutes).toEqual(reRoutes)
-})
-
-test('getRouteBranchReRoutes.', () => {
-  const reRoutes = getRouteBranchReRoutes({ locales: ['en', 'fr', 'es'], routeBranch: routesTree })
-  expect(reRoutes).toEqual(allReRoutes)
-})
-
-test('translate.', () => {
+describe('translate.', () => {
+  const windowSpy = jest.spyOn(window, 'window', 'get')
+  windowSpy.mockImplementation(
+    () =>
+      ({
+        location: {
+          host: 'next-translate-routes.com',
+          hostname: 'next-translate-routes.com',
+          href: 'https://next-translate-routes.com/current/path',
+          origin: 'https://next-translate-routes.com',
+          pathname: '/current/path',
+        } as Window['location'],
+      } as Window & typeof globalThis),
+  )
   ;[
     {
       href: {
@@ -101,13 +88,30 @@ test('translate.', () => {
       translatedPath: '/root/feast-days/foo/bar?baz=3#section',
       translatedUrl: '/en/root/feast-days/foo/bar?baz=3#section',
     },
+    {
+      href: 'https://next-translate-routes.com/en/root/feast-days/foo/bar?baz=3#section',
+      locale: 'en',
+      translatedPath: 'https://next-translate-routes.com/root/feast-days/foo/bar?baz=3#section',
+      translatedUrl: 'https://next-translate-routes.com/en/root/feast-days/foo/bar?baz=3#section',
+    },
+    {
+      href: 'https://hozana.org/communautes',
+      locale: 'en',
+      translatedUrl: 'https://hozana.org/communautes',
+    },
   ].forEach(({ href, locale = 'fr', translatedPath, translatedUrl }) => {
     const args = [
       href,
       locale || 'fr',
       { routesTree, locales: ['fr', 'en', 'es', 'pt'] as string[], defaultLocale: 'fr' },
     ] as const
-    expect(translatePath(...args)).toEqual(translatedPath)
-    expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
+    test(typeof href === 'string' ? href : href.pathname, () => {
+      expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
+      if (translatedPath) {
+        expect(translatePath(...args)).toEqual(translatedPath)
+      }
+    })
   })
+
+  windowSpy.mockRestore()
 })

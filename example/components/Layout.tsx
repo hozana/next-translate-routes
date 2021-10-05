@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
-import { Link } from '../../index'
-import NextLink from 'next/link'
+import { Link } from 'next-translate-routes'
+import NextLink, { LinkProps } from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
@@ -9,7 +9,7 @@ type Props = {
   title?: string
 }
 
-const Nav: React.FC<{ LinkComponent: typeof Link | typeof NextLink }> = ({ LinkComponent }) => {
+const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ LinkComponent }) => {
   const { locale, pathname, query } = useRouter()
   const newLocale = locale === 'en' ? 'fr' : 'en'
 
@@ -33,6 +33,10 @@ const Nav: React.FC<{ LinkComponent: typeof Link | typeof NextLink }> = ({ LinkC
       |{' '}
       <LinkComponent href="/users">
         <a>Users List</a>
+      </LinkComponent>{' '}
+      |{' '}
+      <LinkComponent href="https://hozana.org/en">
+        <a>External link</a>
       </LinkComponent>{' '}
       |{' '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>

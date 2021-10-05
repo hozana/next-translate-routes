@@ -242,6 +242,7 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
   }/${compiledPath}`
 
   const translatedUrlObject = {
+    ...urlObject,
     hash,
     pathname: translatedPathname,
     query: remainingQuery,
@@ -252,6 +253,15 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
 
 export const translateUrl = ((url, locale, options) => {
   const { defaultLocale: optionsDefaultLocale = defaultLocale } = options || {}
+
+  // Handle external urls
+  const parsedUrl: UrlObject = typeof url === 'string' ? parseUrl(url) : url
+  if (parsedUrl.host) {
+    if (parsedUrl.host !== parseUrl(global.location.href).host) {
+      return url
+    }
+  }
+
   const translatedPath = translatePath(url, locale, options)
   const prefix = locale === optionsDefaultLocale ? '' : `/${locale}`
 
@@ -296,7 +306,6 @@ const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProp
       options?.locale || locale
         ? translatePath(as || url, options?.locale || (locale as string), { format: 'object' })
         : url
-    console.log('From enhanceNextRouter, replace.', { url, as, options, locale, translatedPath, otherRouterProps })
     return replace(translatedPath, as || translatedPath, options)
   },
   prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
