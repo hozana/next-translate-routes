@@ -33,7 +33,7 @@ const locales = (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
 const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
 /**
- * A segment can be ignored by setting its path to "." in routes.json.
+ * A segment can be ignored by setting its path to "." in _routes.json.
  * It can be done for some lang only and not others.
  *
  * It can cause troubles with the redirections. Ex:
@@ -175,7 +175,7 @@ const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] 
 }
 
 /**
- * Translate url into option.locale locale, or if not defined, in current locale
+ * Translate path into option.locale locale, or if not defined, in current locale
  *
  * @param url string url or UrlObject
  * @param locale string
@@ -251,13 +251,24 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
   return returnFormat === 'object' ? translatedUrlObject : formatUrl(translatedUrlObject)
 }
 
+/**
+ * Translate url into option.locale locale, or if not defined, in current locale
+ *
+ * @param url string url or UrlObject
+ * @param locale string
+ * @param options (optional)
+ * @param options.format `'string'` or `'object'`
+ * @return string if `options.format === 'string'`,
+ * UrlObject if `options.format === 'object'`,
+ * same type as url if options.format is not defined
+ */
 export const translateUrl = ((url, locale, options) => {
   const { defaultLocale: optionsDefaultLocale = defaultLocale } = options || {}
 
   // Handle external urls
   const parsedUrl: UrlObject = typeof url === 'string' ? parseUrl(url) : url
   if (parsedUrl.host) {
-    if (parsedUrl.host !== parseUrl(global.location.href).host) {
+    if (typeof window === 'undefined' || parsedUrl.host !== parseUrl(window.location.href).host) {
       return url
     }
   }
@@ -279,18 +290,8 @@ export const translateUrl = ((url, locale, options) => {
  */
 export const Link: React.FC<LinkProps> = ({ href, as, locale, ...props }) => {
   const { locale: routerLocale } = useNextRouter()
-  const language = locale || routerLocale || defaultLocale
-
-  if (!locale && !routerLocale) {
-    console.error(`> next-translate-routes - No locale prop in Router: fallback to ${language}. Link props:`, {
-      href,
-      ...props,
-    })
-  }
-
-  const translatedPath = language ? translatePath(as || href, language) : ''
-
-  return <NextLink href={translatedPath || href} as={translatedPath || as} locale={locale} {...props} />
+  const language = locale || (routerLocale as string)
+  return <NextLink href={translateUrl(as || href, language, { format: 'string' })} locale={false} {...props} />
 }
 
 const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProps }: NextRouter): NextRouter => ({
@@ -341,7 +342,14 @@ export const useRouter = (): NextRouter => {
 export const withRouter = <P extends Record<string, any>>(Component: ComponentType<{ router: NextRouter } & P>) =>
   Object.assign(
     (props: P) => {
-      const router = useNextRouter()
+      const { ...router } = useNextRouter()
+
+      if (!router.locale) {
+        const fallbackLocale = defaultLocale || locales[0]
+        router.locale = fallbackLocale
+        console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
+      }
+
       return <Component router={router} {...props} />
     },
     { displayName: `withRouter(${Component.displayName})` },
