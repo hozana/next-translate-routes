@@ -1,3 +1,4 @@
+[] remove defaultLocale from redirection destination
 [] make translatePath able to translate from translated url in non default locale
 [] validate custom pagesTree
 [] throw if destination is equal to source

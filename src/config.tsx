@@ -137,9 +137,11 @@ const getSimilarIndex = <R extends Redirect | Rewrite>(sourceSegments: string[],
 export const getPageReRoutes = <L extends string>({
   locales,
   routeSegments,
+  defaultLocale,
 }: {
   locales: L[]
   routeSegments: TRouteSegment<L>[]
+  defaultLocale?: L
 }): TReRoutes => {
   /** If there is only one path possible: it is common to all locales and to files. No redirection nor rewrite is needed. */
   if (!routeSegments.some(({ paths }) => Object.keys(paths).length > 1)) {
@@ -187,7 +189,7 @@ export const getPageReRoutes = <L extends string>({
 
   const redirects = locales.reduce((acc, locale) => {
     const localePath = getPath(locale)
-    const destination = `/${locale}${sourceToDestination(localePath)}`
+    const destination = `${locale === defaultLocale ? '' : `/${locale}`}${sourceToDestination(localePath)}`
 
     return [
       ...acc,
@@ -289,10 +291,12 @@ export const getRouteBranchReRoutes = <L extends string>({
   locales,
   routeBranch: { children, ...routeSegment },
   previousRouteSegments = [],
+  defaultLocale,
 }: {
   locales: L[]
   routeBranch: TRouteBranch<L>
   previousRouteSegments?: TRouteSegment<L>[]
+  defaultLocale?: L
 }): TReRoutes => {
   const routeSegments = [...previousRouteSegments, routeSegment]
 
@@ -301,11 +305,12 @@ export const getRouteBranchReRoutes = <L extends string>({
         (acc, child) => {
           const childReRoutes =
             child.name === 'index'
-              ? getPageReRoutes({ locales, routeSegments })
+              ? getPageReRoutes({ locales, routeSegments, defaultLocale })
               : getRouteBranchReRoutes({
                   locales,
                   routeBranch: child,
                   previousRouteSegments: routeSegments,
+                  defaultLocale,
                 })
           return {
             redirects: [...acc.redirects, ...childReRoutes.redirects],
@@ -314,7 +319,7 @@ export const getRouteBranchReRoutes = <L extends string>({
         },
         { redirects: [], rewrites: [] } as TReRoutes,
       )
-    : getPageReRoutes({ locales, routeSegments })
+    : getPageReRoutes({ locales, routeSegments, defaultLocale })
 }
 
 /**
@@ -339,21 +344,22 @@ const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
  */
 export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
   const { locales = [] } = nextConfig.i18n || {}
+  const defaultLocale = nextConfig.i18n?.defaultLocale
   const existingRoutesTree = nextConfig?.env?.NEXT_PUBLIC_ROUTES
   const routesTree = existingRoutesTree ? JSON.parse(existingRoutesTree) : parsePagesTree()
-  const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree })
   // TODO: validateRoutesTree(routesTree)
+  const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree, defaultLocale })
 
   process.env.NEXT_PUBLIC_ROUTES = JSON.stringify(routesTree)
   process.env.NEXT_PUBLIC_LOCALES = nextConfig.i18n?.locales?.join(',') || ''
-  process.env.NEXT_PUBLIC_DEFAULT_LOCALE = nextConfig.i18n?.defaultLocale || ''
+  process.env.NEXT_PUBLIC_DEFAULT_LOCALE = defaultLocale || ''
 
   return {
     ...nextConfig,
 
     async redirects() {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
-      return [...existingRedirects, ...sortBySpecificity(redirects)]
+      return [...sortBySpecificity(redirects), ...existingRedirects]
     },
 
     async rewrites() {

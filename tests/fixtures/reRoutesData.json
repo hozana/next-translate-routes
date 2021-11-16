@@ -31,13 +31,13 @@
     "redirects": [
       {
         "source": "/en/premier/:secondPart(\\d+)/troisieme",
-        "destination": "/en/1st/:secondPart/thirdPart",
+        "destination": "/1st/:secondPart/thirdPart",
         "locale": false,
         "permanent": true
       },
       {
         "source": "/en/first/:secondPart/thirdPart",
-        "destination": "/en/1st/:secondPart/thirdPart",
+        "destination": "/1st/:secondPart/thirdPart",
         "locale": false,
         "permanent": true
       },
