@@ -53,10 +53,10 @@ module.exports = withTranslateRoutes({
 
 #### 2. Define your routes
 
-You can add a `routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:
+You can add a `_routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:
 
 ```js
-// `/pages/section/routes.json`
+// `/pages/section/_routes.json`
 {
   "/": {
     "es": "seccion" // Folder path in es
@@ -129,7 +129,7 @@ const MyLinks = (props) => {
 ### Constrained dynamic paths segments
 
 ```js
-// `/pages/blog/[id]/routes.json`
+// `/pages/blog/[id]/_routes.json`
 {
   "/": ":id(\\d+)", // Constrain a dynamic folder segment (to be a number here)
   "[slug]": ":slug(\\w+)", // Constrain a dynamic page segment (to be letters here)
@@ -143,7 +143,7 @@ For a catch all route: `"[...path]": ":path*"`.
 This will ignore the `blog` path segment:
 
 ```js
-// `/pages/blog/routes.json`
+// `/pages/blog/_routes.json`
 {
   "/": "."
 }
@@ -152,7 +152,7 @@ This will ignore the `blog` path segment:
 It can be done for some lang only and not others.
 
 ```js
-// `/pages/blog/routes.json`
+// `/pages/blog/_routes.json`
 {
   "/": {
     fr: "."
@@ -173,7 +173,7 @@ Then /a/b(\\d+)/c will be redirected to /a/b-c, and /a/b-c/d will not be redirec
 ### Complex paths segments
 
 ```js
-// `/pages/blog/[id]/routes.json`
+// `/pages/blog/[id]/_routes.json`
 {
   "/": "article{-:id}?-view", // Add prefix, optional prefix, suffix
 }
@@ -184,7 +184,7 @@ First, create a path segment for each dynamic parameter: `/articles/[id]/[slug].
 Then:
 
 ```js
-// `/articles/[id]/routes.json`
+// `/articles/[id]/_routes.json`
 {
   "/": ".", // Ignore the [id] segment
   "[slug]": ":id{-:slug}?" // Give the 2 params to the 2nd segment
@@ -193,7 +193,7 @@ Then:
 
 ### Custom route tree
 
-If you want to avoid seeding `routes.json` files in your `/pages` folder,
+If you want to avoid seeding `_routes.json` files in your `/pages` folder,
 you can directly create a routesTree object, and inject it in the next config as stringified JSON.
 
 ```javascript

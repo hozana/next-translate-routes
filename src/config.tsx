@@ -33,7 +33,8 @@ import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
 
-const ROUTES_DATA_FILE_NAME = 'routes.json'
+/** Keep 'routes.json' for backward compatibility */
+const ROUTES_DATA_FILE_NAMES = ['_routes.json', 'routes.json']
 
 /** Transform Next file-system synthax to path-to-regexp synthax */
 const fileNameToPath = (fileName: string) =>
@@ -67,8 +68,8 @@ const getRouteSegment = <L extends string>(
 export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk?: boolean): TRouteBranch<L> => {
   const dirPath = directoryPath || pathUtils.resolve(process.cwd(), 'pages')
   const directoryItems = fs.readdirSync(dirPath)
-  const hasRoutesDataFile = directoryItems.find((directoryItem) => directoryItem === ROUTES_DATA_FILE_NAME)
-  const routeSegmentsData = hasRoutesDataFile ? require(pathUtils.join(dirPath, ROUTES_DATA_FILE_NAME)) : {}
+  const routesDataFileName = directoryItems.find((directoryItem) => ROUTES_DATA_FILE_NAMES.includes(directoryItem))
+  const routeSegmentsData = routesDataFileName ? require(pathUtils.join(dirPath, routesDataFileName)) : {}
   const directoryPathParts = dirPath.split(/[\\/]/)
   const name = !directoryPath || isTrunk ? '' : directoryPathParts[directoryPathParts.length - 1]
 
