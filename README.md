@@ -1,6 +1,6 @@
 # Next-translate-routes
 
-_Translated routing and more for Next using Next regular file-base routing system_
+Translated routing and more for Next using Next regular file-base routing system
 
 ## Features
 

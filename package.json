@@ -31,13 +31,10 @@
     "react": "^17.0.2"
   },
   "files": [
-    "config.js",
-    "config.d.ts",
-    "index.js",
-    "index.d.ts",
-    "plugin.js",
-    "plugin.d.ts",
-    "types.d.ts"
+    "*.js",
+    "*.d.ts",
+    "*.js.map",
+    "src/*"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.23",
