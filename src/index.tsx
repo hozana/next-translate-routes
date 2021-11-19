@@ -12,12 +12,6 @@ import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
   format?: F
-  /** For testing only: do not use this option in production */
-  routesTree?: TRouteBranch
-  /** For testing only: do not use this option in production */
-  locales?: string[]
-  /** For testing only: do not use this option in production */
-  defaultLocale?: string
 }
 
 type Url = UrlObject | string
@@ -29,8 +23,8 @@ interface TransitionOptions {
 }
 
 const getRoutesTree = () => JSON.parse(process.env.NEXT_PUBLIC_ROUTES || 'null') as TRouteBranch
-const locales = (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
-const defaultLocale = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
+const getLocales = () => (process.env.NEXT_PUBLIC_LOCALES || '').split(',') as string[]
+const getDefaultLocale = () => process.env.NEXT_PUBLIC_DEFAULT_LOCALE as string
 
 /**
  * A segment can be ignored by setting its path to "." in _routes.json.
@@ -149,27 +143,48 @@ const translatePathParts = ({
   }
 }
 
-const removeLangPrefix = (pathParts: string[], options: Options = {}): string[] => {
-  const {
-    routesTree: optionsRoutesTree = getRoutesTree(),
-    locales: optionsLocales = locales,
-    defaultLocale: optionsDefaultLocale = defaultLocale,
-  } = options
+export const removeLangPrefix = (pathParts: string[]): string[] => {
+  const routesTree = getRoutesTree()
+  const locales = getLocales()
+  const defaultLocale = getDefaultLocale()
 
-  const getLangRoot = (lang: string) => optionsRoutesTree.paths[lang] || optionsRoutesTree.paths.default
+  const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
 
-  const hasLangPrefix = optionsLocales.includes(pathParts[0])
-  const defaultLocaleRoot = getLangRoot(optionsDefaultLocale)
+  const defaultLocaleRoot = getLangRoot(defaultLocale)
+  const hasLangPrefix = locales.includes(pathParts[0])
   const hasDefaultLocalePrefix = !hasLangPrefix && !!defaultLocaleRoot && pathParts[0] === defaultLocaleRoot
 
-  const locale = hasLangPrefix ? pathParts[0] : hasDefaultLocalePrefix ? optionsDefaultLocale : undefined
+  if (pathParts[1] === 'any' && pathParts[0] === 'en') {
+    console.log('From removeLangPrefix.', {
+      pathParts,
+      defaultLocaleRoot,
+      hasLangPrefix,
+      hasDefaultLocalePrefix,
+      defaultLocale,
+      rootPaths: routesTree.paths,
+    })
+  }
 
-  if (!locale) {
+  if (!hasLangPrefix && !hasDefaultLocalePrefix) {
     return pathParts
   }
 
+  const locale = hasLangPrefix ? pathParts[0] : defaultLocale
+  const localeRootParts = getLangRoot(locale)?.split('/')
   const nbPathPartsToRemove =
-    (locale === optionsDefaultLocale ? 0 : 1) + (getLangRoot(locale) ? getLangRoot(locale).split('/').length : 0)
+    (hasLangPrefix ? 1 : 0) +
+    (localeRootParts && (!hasLangPrefix || pathParts[1] === localeRootParts[0]) ? localeRootParts.length : 0)
+
+  if (pathParts[1] === 'any' && pathParts[0] === 'en') {
+    console.log('From removeLangPrefix.', {
+      pathParts,
+      locale,
+      hasLangPrefix,
+      hasDefaultLocalePrefix,
+      langRoot: getLangRoot(locale),
+      nbPathPartsToRemove,
+    })
+  }
 
   return pathParts.slice(nbPathPartsToRemove)
 }
@@ -199,8 +214,8 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
   ? string
   : UrlObject
 
-export function translatePath(url: Url, locale: string, options: Options = {}): Url {
-  const { format, routesTree: optionsRoutesTree = getRoutesTree() } = options
+export function translatePath(url: Url, locale: string, { format }: Options = {}): Url {
+  const routesTree = getRoutesTree()
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
   const { pathname, query, hash } = urlObject
@@ -209,20 +224,13 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
     return returnFormat === 'object' ? url : formatUrl(url)
   }
 
-  if (!optionsRoutesTree) {
-    throw new Error(
-      '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
-    )
-  }
-
-  const rawPathParts = pathname.replace(/^\//, '').split('/')
-  const pathParts = removeLangPrefix(rawPathParts, options)
+  const pathParts = removeLangPrefix(pathname.replace(/^\//, '').split('/'))
 
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
     locale,
     pathParts,
     query: parseQuery(typeof query === 'string' ? query : stringifyQuery(query || {})),
-    routeBranch: optionsRoutesTree,
+    routeBranch: routesTree,
   })
   const path = translatedPathParts.join('/')
   const compiledPath = compile(path, { validate: false })(augmentedQuery)
@@ -237,9 +245,7 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
     {},
   )
 
-  const translatedPathname = `${
-    optionsRoutesTree.paths[locale] ? `/${optionsRoutesTree.paths[locale]}` : ''
-  }/${compiledPath}`
+  const translatedPathname = `${routesTree.paths[locale] ? `/${routesTree.paths[locale]}` : ''}/${compiledPath}`
 
   const translatedUrlObject = {
     ...urlObject,
@@ -263,7 +269,7 @@ export function translatePath(url: Url, locale: string, options: Options = {}): 
  * same type as url if options.format is not defined
  */
 export const translateUrl = ((url, locale, options) => {
-  const { defaultLocale: optionsDefaultLocale = defaultLocale } = options || {}
+  const defaultLocale = getDefaultLocale()
 
   // Handle external urls
   const parsedUrl: UrlObject = typeof url === 'string' ? parseUrl(url) : url
@@ -274,7 +280,7 @@ export const translateUrl = ((url, locale, options) => {
   }
 
   const translatedPath = translatePath(url, locale, options)
-  const prefix = locale === optionsDefaultLocale ? '' : `/${locale}`
+  const prefix = locale === defaultLocale ? '' : `/${locale}`
 
   if (typeof translatedPath === 'object') {
     return {
@@ -340,20 +346,9 @@ export const useRouter = (): NextRouter => {
  * Use withTranslateRoutes in _app instead, then use Next withRouter (`next/router`)
  */
 export const withRouter = <P extends Record<string, any>>(Component: ComponentType<{ router: NextRouter } & P>) =>
-  Object.assign(
-    (props: P) => {
-      const { ...router } = useNextRouter()
-
-      if (!router.locale) {
-        const fallbackLocale = defaultLocale || locales[0]
-        router.locale = fallbackLocale
-        console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
-      }
-
-      return <Component router={router} {...props} />
-    },
-    { displayName: `withRouter(${Component.displayName})` },
-  )
+  Object.assign((props: P) => <Component router={useNextRouter()} {...props} />, {
+    displayName: `withRouter(${Component.displayName})`,
+  })
 
 /**
  * Must wrap the App component in `pages/_app`.
@@ -362,7 +357,20 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
 export const withTranslateRoutes = <A extends ComponentType<any>>(AppComponent: A) =>
   Object.assign(
     (props: any) => {
-      const nextRouter = useNextRouter()
+      if (!getRoutesTree()) {
+        throw new Error(
+          '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
+        )
+      }
+
+      const { ...nextRouter } = useNextRouter()
+
+      if (!nextRouter.locale) {
+        const fallbackLocale = getDefaultLocale() || getLocales()[0]
+        nextRouter.locale = fallbackLocale
+        console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
+      }
+
       const router = enhanceNextRouter(nextRouter)
 
       return (

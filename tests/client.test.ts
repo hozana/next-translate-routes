@@ -2,8 +2,63 @@
  * @jest-environment jsdom
  */
 
-import { translatePath, translateUrl } from '../src'
+import { removeLangPrefix, translatePath, translateUrl } from '../src'
 import routesTree from './fixtures/routesTree.json'
+
+const originalEnv = process.env
+const defaultEnv = {
+  ...originalEnv,
+  NEXT_PUBLIC_ROUTES: JSON.stringify(routesTree),
+  NEXT_PUBLIC_LOCALES: 'fr,en,es,pt',
+  NEXT_PUBLIC_DEFAULT_LOCALE: 'fr',
+}
+
+afterEach(() => {
+  process.env = originalEnv
+})
+
+beforeEach(() => {
+  process.env = defaultEnv
+})
+
+describe('removeLangPrefix.', () => {
+  test('with root prefix only on default locale', () => {
+    process.env = {
+      ...defaultEnv,
+      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
+    }
+    expect(removeLangPrefix(['root', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('with default locale prefix and root prefix', () => {
+    process.env = {
+      ...defaultEnv,
+      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
+    }
+    expect(removeLangPrefix(['en', 'root', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('with non default locale prefix and root prefix', () => {
+    expect(removeLangPrefix(['en', 'root', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('with non default locale prefix that should have a root prefix but that is not here', () => {
+    expect(removeLangPrefix(['en', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('with non default locale prefix that has no root prefix', () => {
+    expect(removeLangPrefix(['fr', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('with default locale prefix that has no root prefix', () => {
+    expect(removeLangPrefix(['fr', 'any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('without locale prefix', () => {
+    expect(removeLangPrefix(['any', 'path'])).toEqual(['any', 'path'])
+  })
+  test('without locale prefix when default locale has a root prefix', () => {
+    process.env = {
+      ...defaultEnv,
+      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
+    }
+    expect(removeLangPrefix(['any', 'path'])).toEqual(['any', 'path'])
+  })
+})
 
 describe('translate.', () => {
   const windowSpy = jest.spyOn(window, 'window', 'get')
@@ -66,7 +121,7 @@ describe('translate.', () => {
     },
     {
       href: {
-        pathname: '/community/[communityId]/[communitySlug]/statistics',
+        pathname: '/en/community/[communityId]/[communitySlug]/statistics',
         query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
         hash: 'section',
       },
@@ -100,17 +155,19 @@ describe('translate.', () => {
       translatedUrl: 'https://hozana.org/communautes',
     },
   ].forEach(({ href, locale = 'fr', translatedPath, translatedUrl }) => {
-    const args = [
-      href,
-      locale || 'fr',
-      { routesTree, locales: ['fr', 'en', 'es', 'pt'] as string[], defaultLocale: 'fr' },
-    ] as const
-    test(typeof href === 'string' ? href : href.pathname, () => {
+    const args = [href, locale || 'fr'] as const
+    const pathname = typeof href === 'string' ? href : href.pathname
+    test(`translateUrl: ${pathname}`, () => {
       expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
       if (translatedPath) {
         expect(translatePath(...args)).toEqual(translatedPath)
       }
     })
+    if (translatedPath) {
+      test(`translatePath: ${pathname}`, () => {
+        expect(translatePath(...args)).toEqual(translatedPath)
+      })
+    }
   })
 
   windowSpy.mockRestore()
