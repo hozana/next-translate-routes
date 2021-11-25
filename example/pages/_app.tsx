@@ -1,9 +1,16 @@
-import NextApp from 'next/app'
-// import withTranslateRoutes from 'next-translate-routes' // Regular import
-import withTranslateRoutes from '../../index' // Live test import
+import React from 'react'
+import { AppProps } from 'next/app'
+import { useRouter } from 'next/router'
+import withTranslateRoutes from 'next-translate-routes'
 
-if (typeof window !== 'undefined') {
-  console.log('From Layout, routesTree:', JSON.parse(process.env.NEXT_PUBLIC_ROUTES))
+const App: React.FC<AppProps> = ({ Component, pageProps }) => {
+  const router = useRouter()
+
+  if (typeof window !== 'undefined') {
+    console.log('From _app.', { routesTree: JSON.parse(process.env.NEXT_PUBLIC_ROUTES), router })
+  }
+
+  return <Component {...pageProps} />
 }
 
-export default withTranslateRoutes(NextApp)
+export default withTranslateRoutes(App)

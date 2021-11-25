@@ -363,19 +363,17 @@ export const withTranslateRoutes = <A extends ComponentType<any>>(AppComponent: 
         )
       }
 
-      const { ...nextRouter } = useNextRouter()
+      const nextRouter = useNextRouter()
 
-      if (!nextRouter.locale) {
+      if (nextRouter && !nextRouter.locale) {
         const fallbackLocale = getDefaultLocale() || getLocales()[0]
         nextRouter.locale = fallbackLocale
         console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
       }
 
-      const router = enhanceNextRouter(nextRouter)
-
       return (
-        <RouterContext.Provider value={router}>
-          <AppComponent {...{ ...props, router }} />
+        <RouterContext.Provider value={nextRouter && enhanceNextRouter(nextRouter)}>
+          <AppComponent {...props} />
         </RouterContext.Provider>
       )
     },

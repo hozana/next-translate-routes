@@ -16,11 +16,16 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
     "prettier"
+  ],
+  "overrides": [
+    {
+      "files": "./src/*",
+      "extends": [
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended"
+      ]
+    }
   ],
   "parserOptions": {
     "ecmaVersion": 2018,

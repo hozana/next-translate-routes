@@ -32,6 +32,8 @@ To be able to use theses, a new approach is needed. Next.js provides it with [Re
 
 ### Basic usage
 
+Check the example folder to see next-translate-routes in action. Some advanced techniques are shown there too: they may seem complicated but those 4 steps should cover most of the cases.
+
 #### 1. Wrap you next config with the next-translate-routes plugin
 
 Import the `withTranslateRoutes` from `next-translate-routes/plugin`.
@@ -53,9 +55,27 @@ module.exports = withTranslateRoutes({
 
 #### 2. Define your routes
 
-You can add a `_routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes, with the following:
+You can add a `_routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes.
 
-```js
+Given a folder structure like so, you can add a `_routes.json` in `/pages/` and in `/pages/section/`.
+
+```none
+/pages/
+ ├ section/
+ | ├ page1.tsx
+ | ├ page2.tsx
+ | └ _routes.json
+ ├ somewhere/
+ | └ else.json
+ ├ _app.tsx
+ ├ about.tsx
+ ├ contact.tsx
+ └ _routes.json
+```
+
+In `/pages/section/`, the `_routes.json` file could look like this.
+
+```json
 // `/pages/section/_routes.json`
 {
   "/": {
@@ -69,7 +89,36 @@ You can add a `_routes.json` file in the `pages` folder, and in the every subfol
 }
 ```
 
-The `"/"` section define the folder paths, each other section define the paths of a page file in this folder.
+The `"/": { ... }` part define the folder paths, each other section define the paths of a page file in this folder:
+
+- page1 will be accessible at `/seccion/articulo` in `es`, and at `/section/article` in other languages,
+- page2 will be accessible at `/seccion/definition` in `es`, and at `/section/definition` in other languages.
+
+You don't need a `_routes.json` file in folder where you don't customize anything. If it is empty, then delete it.
+Here, the `/somewhere/` subfolder does not have any `_routes.json` file.
+
+Then, in `/pages/`, the `_routes.json` file could look like this.
+
+```json
+// `/pages/_routes.json`
+{
+  "/": {
+    "pt": "blog" // As we are in the root pages folder, this will add a "blog" path prefix for all pages in pt
+  },
+  "contact": {
+    "es": "contactar",
+    "pt": "contatar"
+  }
+}
+```
+
+In the root pages folder, the `"/": { ... }` part of the root `_routes.json` allows to add a different basePath
+for each language or only some language, like "blog" in `pt` here:
+
+- about will be accessible at `/blog/about` in `pt` and at `/about` in other languages,
+- contact will be accessible at `/blog/contatar` in `pt`, at `/contactar` in `es` and at `/contact` in other languages,
+- page1 will in fact be accessible at `/blog/section/article` in `pt`,
+- page2 will in fact be accessible at `/blog/section/definition` in `pt`.
 
 #### 3. Wrap you \_app component with the withTranslateRoutes hoc
 
@@ -87,7 +136,7 @@ Or:
 // `/pages/_app.js`
 import { withTranslateRoutes } from 'next-translate-routes'
 
-const App = ({ Component, pageProps, router }) => {
+const App = ({ Component, pageProps }) => {
   // Custom code...
 
   return <Component {...pageProps} />
@@ -126,7 +175,11 @@ const MyLinks = (props) => {
 
 ```
 
-### Constrained dynamic paths segments
+### Advanced usage
+
+Check the example folder to see some advanced techniques in action.
+
+#### Constrained dynamic paths segments
 
 ```js
 // `/pages/blog/[id]/_routes.json`
@@ -138,7 +191,7 @@ const MyLinks = (props) => {
 
 For a catch all route: `"[...path]": ":path*"`.
 
-### Ignoring a path part
+#### Ignoring a path part
 
 This will ignore the `blog` path segment:
 
@@ -170,7 +223,7 @@ This path-to-regex pattern will be added after the segment name in the redirect.
 Then /a/b(\\d+)/c will be redirected to /a/b-c, and /a/b-c/d will not be redirected to /a/b-c-d.  
 /!\ This is only handled in default paths (i.e. "/": ".(\\\\d+)" or "/": { "default": ".(\\\\d+)" }), not in lang-specific paths.
 
-### Complex paths segments
+#### Complex paths segments
 
 ```js
 // `/pages/blog/[id]/_routes.json`
@@ -191,7 +244,7 @@ Then:
 }
 ```
 
-### Custom route tree
+#### Custom route tree
 
 If you want to avoid seeding `_routes.json` files in your `/pages` folder,
 you can directly create a routesTree object, and inject it in the next config as stringified JSON.
