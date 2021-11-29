@@ -1,4 +1,4 @@
-const withTranslateRoutes = require("next-translate-routes/plugin")
+const withTranslateRoutes = require('next-translate-routes/plugin')
 
 const nextConfig = withTranslateRoutes({
   i18n: {

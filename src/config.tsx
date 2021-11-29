@@ -27,11 +27,12 @@
 
 import fs from 'fs'
 import pathUtils from 'path'
-import { ignoreSegmentPathRegex } from '.'
+import { ignoreSegmentPathRegex } from './translateUrl'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
+import { NormalModuleReplacementPlugin } from 'webpack'
 
 /** Keep 'routes.json' for backward compatibility */
 const ROUTES_DATA_FILE_NAMES = ['_routes.json', 'routes.json']
@@ -357,6 +358,21 @@ export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig
 
   return {
     ...nextConfig,
+
+    webpack(config, context) {
+      const newConfig = typeof nextConfig.webpack === 'function' ? nextConfig.webpack(config, context) : config
+      newConfig.plugins.push(
+        new NormalModuleReplacementPlugin(/^next\/link$/, (request) => {
+          console.log('From config, webpack, nmrp. request:', request)
+          if (request.context.endsWith('next-translate-routes')) {
+            return request
+          }
+          return 'next-translate-routes/link'
+        }),
+      )
+      console.log('From config, webpack.', { newConfig })
+      return newConfig
+    },
 
     async redirects() {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
