@@ -18,7 +18,7 @@
     "dynamic"
   ],
   "scripts": {
-    "build": "yarn run lint && npx tsc",
+    "build": "yarn run lint && `rm ./*.d.ts ./*.js.map ./*.js` npx tsc",
     "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest",
     "prepare": "yarn run build",

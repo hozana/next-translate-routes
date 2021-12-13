@@ -147,12 +147,12 @@ export default withTranslateRoutes(App)
 
 #### 4. Use the next-translate-routes Link
 
-next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes' instead of 'next/link' and use as you ever did.
+next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes/link' instead of 'next/link' and use as you ever did.
 
 ```jsx
 import React, { useEffect, useState } from 'react'
 
-import { Link } from 'next-translate-routes'
+import Link from 'next-translate-routes/link'
 
 const MyLinks = (props) => {
   const { locales } = useRouter()

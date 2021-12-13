@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'next-translate-routes'
+import Link from 'next-translate-routes/link'
 
 import { User } from '../interfaces'
 

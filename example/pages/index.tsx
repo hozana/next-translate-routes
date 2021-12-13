@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link } from 'next-translate-routes'
+import Link from 'next-translate-routes/link'
+
 import Layout from '../components/Layout'
 
 const IndexPage = () => (
@@ -12,6 +13,11 @@ const IndexPage = () => (
     </p>
     <p>
       <Link href="/rewrites">
+        <a>Rewrites</a>
+      </Link>
+    </p>
+    <p>
+      <Link href="/news">
         <a>Rewrites</a>
       </Link>
     </p>

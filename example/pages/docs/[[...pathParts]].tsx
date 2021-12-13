@@ -1,22 +1,37 @@
 import React from 'react'
-import { Link } from 'next-translate-routes'
+import Link from 'next-translate-routes/link'
 import { useRouter } from 'next/router'
 import Layout from '../../components/Layout'
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 
-const AboutPage = () => {
+export const getStaticProps: GetStaticProps<{ date: string; pathList: string[] }, { pathParts: string[] }> = ({
+  params,
+}) => ({
+  props: {
+    date: new Date().toISOString(),
+    pathList: params.pathParts?.map((pathPart) => `Part ${pathPart}`) || [],
+  },
+})
+
+const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ date, pathList }) => {
   const {
     pathname,
     query: { pathParts },
   } = useRouter()
 
+  const pathPartsArray = typeof pathParts === 'string' ? [pathParts] : pathParts || []
+
   return (
     <Layout title="Docs">
       <h1>Docs</h1>
-      <p>This is the docs page</p>
-      <h3>Path parts:</h3>
+      <p>This is the docs page, statically generated at {new Date(date).toLocaleString()}</p>
+      <h3>Path list:</h3>
       <ul>
-        {(pathParts as string[])?.map((pathPart, i) => (
-          <li key={pathPart + i}>{pathPart}</li>
+        {pathList.map((pathListItem, i) => (
+          <li key={pathListItem + i}>
+            {pathListItem} -{' '}
+            {<Link href={{ pathname, query: { pathParts: pathPartsArray.slice(0, i + 1) } }}>back to there</Link>}
+          </li>
         ))}
       </ul>
       <p>
@@ -24,7 +39,7 @@ const AboutPage = () => {
         {['a', 'b', 'c'].map((p, i) => (
           <React.Fragment key={p + i}>
             {' '}
-            <Link href={{ pathname, query: { pathParts: [...((pathParts || []) as string[]), p] } }}>
+            <Link href={{ pathname, query: { pathParts: [...pathPartsArray, p] } }}>
               <a>`/{p}`</a>
             </Link>
             {', '}
@@ -41,4 +56,6 @@ const AboutPage = () => {
   )
 }
 
-export default AboutPage
+export const getStaticPaths: GetStaticPaths = async () => ({ paths: [], fallback: 'blocking' })
+
+export default DocsPage

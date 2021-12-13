@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Link } from 'next-translate-routes'
+import Link from 'next-translate-routes/link'
 import NextLink, { LinkProps } from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -23,6 +23,10 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ Link
         <a>About</a>
       </LinkComponent>{' '}
       |{' '}
+      <LinkComponent href="/news">
+        <a>News</a>
+      </LinkComponent>{' '}
+      |{' '}
       <LinkComponent href="/rewrites">
         <a>Rewrites</a>
       </LinkComponent>{' '}
@@ -31,7 +35,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ Link
         <a>Docs</a>
       </LinkComponent>{' '}
       |{' '}
-      <LinkComponent href="/users">
+      <LinkComponent href={{ pathname: '/users' }}>
         <a>Users List</a>
       </LinkComponent>{' '}
       |{' '}
@@ -47,8 +51,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ Link
 }
 
 const Layout = ({ children, title = 'This is the default title' }: Props) => {
-  const { locale, asPath, pathname, query } = useRouter()
-
+  const { locale, pathname, query } = useRouter()
   return (
     <div>
       <Head>
@@ -57,17 +60,15 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <header>
-        <h3>With next-translate-routes Link</h3>
+        <h3>With next-translate-routes/link</h3>
         <Nav LinkComponent={Link} />
-        <h3>With next/link Link</h3>
+        <h3>With next/link</h3>
         <Nav LinkComponent={NextLink} />
       </header>
       {children}
       <footer>
         <hr />
-        <blockquote>{`locale: ${locale}, asPath: ${asPath}, pathname: ${pathname}, query: ${JSON.stringify(
-          query,
-        )}`}</blockquote>
+        <blockquote>{`locale: ${locale}, pathname: ${pathname}, query: ${JSON.stringify(query)}`}</blockquote>
       </footer>
     </div>
   )

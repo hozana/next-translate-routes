@@ -1,5 +1,8 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 
+import type { UrlObject } from 'url'
+
+export type Url = UrlObject | string
 type TAnyLocale = Exclude<string, 'default'>
 export type TReRoutes = { redirects: Redirect[]; rewrites: Rewrite[] }
 export type TRouteSegmentPaths<L extends TAnyLocale> = { default: string } & Partial<Record<L, string>>

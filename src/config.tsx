@@ -27,7 +27,7 @@
 
 import fs from 'fs'
 import pathUtils from 'path'
-import { ignoreSegmentPathRegex } from '.'
+import { ignoreSegmentPathRegex } from './translateUrl'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
