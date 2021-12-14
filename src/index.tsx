@@ -2,7 +2,7 @@ import React, { ComponentType } from 'react'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 
-import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
+import type { AppProps, PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { getDefaultLocale, getLocales, getRoutesTree } from './getEnv'
 import { translateUrl } from './translateUrl'
 import type { Url } from './types'
@@ -67,9 +67,9 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
  * Must wrap the App component in `pages/_app`.
  * This HOC will make the route push, replace, and refetch functions able to translate routes.
  */
-export const withTranslateRoutes = <A extends ComponentType<any>>(AppComponent: A) =>
+export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppComponent: A) =>
   Object.assign(
-    (props: any) => {
+    ((props: any) => {
       if (!getRoutesTree()) {
         throw new Error(
           '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
@@ -85,11 +85,11 @@ export const withTranslateRoutes = <A extends ComponentType<any>>(AppComponent: 
       }
 
       return (
-        <RouterContext.Provider value={nextRouter && enhanceNextRouter(nextRouter)}>
+        <RouterContext.Provider value={nextRouter ? enhanceNextRouter(nextRouter) : props.router}>
           <AppComponent {...props} />
         </RouterContext.Provider>
       )
-    },
+    }) as ComponentType<AppProps>,
     { displayName: `withTranslateRoutes(${AppComponent.displayName})` },
   )
 
