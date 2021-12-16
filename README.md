@@ -280,3 +280,13 @@ type TRouteBranch<Locale extends string> = {
   children?: TRouteBranch[]
 }
 ```
+
+## How does it works
+
+- Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the _routes.json files.
+- The plugin then uses this information to build optimized redirects and rewrites, then add them to the next config object.
+- Rewrites take care of displaying the right page for the translates urls, redirects take care of the urls that would give an unwanted access to the pages (and would create duplicated content).
+- This routes tree object is stringified and stored in the NEXT_PUBLIC_ROUTES public env var to be accessible both on the server and on the client.
+- The translateUrl function uses this env var to translate routes.
+- The next-translate-routes/link leverages the translateUrl function to set the 'as' prop of next/link to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
+- The withTranslateRoutes hoc wrap the app, and enhance the router in by overriding the router context, to give translation skills to the router.push (which is used on click on a next/link), router.replace, and router.prefetch functions, using the translateUrl function too.

@@ -18,12 +18,16 @@ const IndexPage = () => (
     </p>
     <p>
       <Link href="/news">
-        <a>Rewrites</a>
+        <a>News</a>
       </Link>
     </p>
     <p>
-      <Link href="/docs">
-        <a>Docs</a>
+      <Link href="/docs/api">
+        <a>Api docs</a>
+      </Link>
+      {' - '}
+      <Link href="/docs/client">
+        <a>Client docs</a>
       </Link>
     </p>
     <p>

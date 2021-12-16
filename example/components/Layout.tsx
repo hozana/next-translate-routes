@@ -17,32 +17,36 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ Link
     <nav>
       <LinkComponent href="/">
         <a>Home</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
       <LinkComponent href="/about">
         <a>About</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
       <LinkComponent href="/news">
         <a>News</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
       <LinkComponent href="/rewrites">
         <a>Rewrites</a>
-      </LinkComponent>{' '}
-      |{' '}
-      <LinkComponent href="/docs">
-        <a>Docs</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
+      <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'api' } }}>
+        <a>Api docs</a>
+      </LinkComponent>
+      {' - '}
+      <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'client' } }}>
+        <a>Client docs</a>
+      </LinkComponent>
+      {' | '}
       <LinkComponent href={{ pathname: '/users' }}>
         <a>Users List</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
       <LinkComponent href="https://hozana.org/en">
         <a>External link</a>
-      </LinkComponent>{' '}
-      |{' '}
+      </LinkComponent>
+      {' | '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>
         <a>{newLocale}</a>
       </LinkComponent>

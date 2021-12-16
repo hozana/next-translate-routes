@@ -1,19 +1,21 @@
 import React from 'react'
 import Link from 'next-translate-routes/link'
 import { useRouter } from 'next/router'
-import Layout from '../../components/Layout'
+import Layout from '../../../components/Layout'
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 
-export const getStaticProps: GetStaticProps<{ date: string; pathList: string[] }, { pathParts: string[] }> = ({
-  params,
-}) => ({
+export const getStaticProps: GetStaticProps<
+  { date: string; type: string; pathList: string[] },
+  { type: string; pathParts: string[] }
+> = ({ params }) => ({
   props: {
     date: new Date().toISOString(),
+    type: params.type,
     pathList: params.pathParts?.map((pathPart) => `Part ${pathPart}`) || [],
   },
 })
 
-const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ date, pathList }) => {
+const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ date, type, pathList }) => {
   const {
     pathname,
     query: { pathParts },
@@ -29,8 +31,8 @@ const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ da
       <ul>
         {pathList.map((pathListItem, i) => (
           <li key={pathListItem + i}>
-            {pathListItem} -{' '}
-            {<Link href={{ pathname, query: { pathParts: pathPartsArray.slice(0, i + 1) } }}>back to there</Link>}
+            {type} - {pathListItem} -{' '}
+            {<Link href={{ pathname, query: { type, pathParts: pathPartsArray.slice(0, i + 1) } }}>back to there</Link>}
           </li>
         ))}
       </ul>
@@ -39,7 +41,7 @@ const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ da
         {['a', 'b', 'c'].map((p, i) => (
           <React.Fragment key={p + i}>
             {' '}
-            <Link href={{ pathname, query: { pathParts: [...pathPartsArray, p] } }}>
+            <Link href={{ pathname, query: { type, pathParts: [...pathPartsArray, p] } }}>
               <a>`/{p}`</a>
             </Link>
             {', '}

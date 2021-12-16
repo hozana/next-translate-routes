@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react'
+import React, { ComponentProps, ComponentType } from 'react'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 
@@ -19,13 +19,13 @@ const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProp
     const translatedPath =
       as ||
       (options?.locale || locale ? translateUrl(url, options?.locale || (locale as string), { format: 'object' }) : url)
-    return push(url, translatedPath, options)
+    return push(translatedPath, as, options)
   },
   replace: (url: Url, as?: Url, options?: TransitionOptions) => {
     const translatedPath =
       as ||
       (options?.locale || locale ? translateUrl(url, options?.locale || (locale as string), { format: 'object' }) : url)
-    return replace(url, translatedPath, options)
+    return replace(translatedPath, as, options)
   },
   prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
     const as =
@@ -67,31 +67,31 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
  * Must wrap the App component in `pages/_app`.
  * This HOC will make the route push, replace, and refetch functions able to translate routes.
  */
-export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppComponent: A) =>
-  Object.assign(
-    ((props: any) => {
-      if (!getRoutesTree()) {
-        throw new Error(
-          '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
-        )
-      }
+export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppComponent: A) => {
+  if (!getRoutesTree()) {
+    throw new Error(
+      '> next-translate-routes - No routes tree defined. next-translate-routes plugin is probably missing from next.config.js',
+    )
+  }
 
-      const nextRouter = useNextRouter()
+  const WithTranslateRoutesApp: React.FC<ComponentProps<A>> = (props: any) => {
+    const nextRouter = useNextRouter()
 
-      if (nextRouter && !nextRouter.locale) {
-        const fallbackLocale = getDefaultLocale() || getLocales()[0]
-        nextRouter.locale = fallbackLocale
-        console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
-      }
+    if (nextRouter && !nextRouter.locale) {
+      const fallbackLocale = getDefaultLocale() || getLocales()[0]
+      nextRouter.locale = fallbackLocale
+      console.error(`> next-translate-routes - No locale prop in Router: fallback to ${fallbackLocale}.`)
+    }
 
-      return (
-        <RouterContext.Provider value={nextRouter ? enhanceNextRouter(nextRouter) : props.router}>
-          <AppComponent {...props} />
-        </RouterContext.Provider>
-      )
-    }) as ComponentType<AppProps>,
-    { displayName: `withTranslateRoutes(${AppComponent.displayName})` },
-  )
+    return (
+      <RouterContext.Provider value={nextRouter ? enhanceNextRouter(nextRouter) : props.router}>
+        <AppComponent {...props} />
+      </RouterContext.Provider>
+    )
+  }
+
+  return WithTranslateRoutesApp
+}
 
 export default withTranslateRoutes
 export { Link, translateUrl }
