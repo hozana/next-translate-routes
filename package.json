@@ -22,7 +22,9 @@
     "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest",
     "prepare": "yarn run build",
-    "release": "npx np"
+    "release": "npx np",
+    "prestart": "yarn --cwd ./example install && yarn build && yarn --cwd ./example build && yarn",
+    "start": "yarn --cwd ./example start"
   },
   "dependencies": {
     "next": "^12.0.4",
