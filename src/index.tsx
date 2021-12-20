@@ -1,8 +1,9 @@
 import React, { ComponentProps, ComponentType } from 'react'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
+import type { AppProps } from 'next/app'
 
-import type { AppProps, PrefetchOptions } from 'next/dist/shared/lib/router/router'
+import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { getDefaultLocale, getLocales, getRoutesTree } from './getEnv'
 import { translateUrl } from './translateUrl'
 import type { Url } from './types'
