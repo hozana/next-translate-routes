@@ -27,12 +27,14 @@
 
 import fs from 'fs'
 import pathUtils from 'path'
+import YAML from 'yamljs'
+import { DefinePlugin, Configuration as WebpackConfiguration } from 'webpack'
+
 import { ignoreSegmentPathRegex } from './translateUrl'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { I18NConfig, NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
-import { DefinePlugin, Configuration as WebpackConfiguration } from 'webpack'
 
 /** Keep 'routes.json' for backward compatibility */
 const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
@@ -76,7 +78,7 @@ export const parsePagesTree = <L extends string>({
   const dirPath = directoryPath || pathUtils.resolve(process.cwd(), 'pages')
   const directoryItems = fs.readdirSync(dirPath)
   const routesFileName = directoryItems.find((directoryItem) => {
-    const fileNameNoExt = directoryItem.match(/^(.+)\.json$/)?.[1]
+    const fileNameNoExt = directoryItem.match(/^(.+)\.(json|yaml)$/)?.[1]
     return (
       fileNameNoExt &&
       (routesDataFileName
@@ -84,7 +86,12 @@ export const parsePagesTree = <L extends string>({
         : DEFAULT_ROUTES_DATA_FILE_NAMES.includes(fileNameNoExt))
     )
   })
-  const routeSegmentsData = routesFileName ? require(pathUtils.join(dirPath, routesFileName)) : {}
+  const routeSegmentsFileContent = routesFileName
+    ? fs.readFileSync(pathUtils.join(dirPath, routesFileName), { encoding: 'utf8' })
+    : ''
+  const routeSegmentsData = routeSegmentsFileContent
+    ? (/\.yaml$/.test(routesFileName as string) ? YAML : JSON).parse(routeSegmentsFileContent)
+    : {}
   const directoryPathParts = dirPath.split(/[\\/]/)
   const name = !directoryPath || isTrunk ? '' : directoryPathParts[directoryPathParts.length - 1]
 
