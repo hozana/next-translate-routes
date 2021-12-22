@@ -18,12 +18,12 @@
     "dynamic"
   ],
   "scripts": {
-    "build": "yarn run lint && `rm ./*.d.ts ./*.js.map ./*.js` npx tsc",
+    "build": "`rm ./*.d.ts ./*.js.map ./*.js` && npx tsc",
     "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest",
-    "prepare": "yarn run build",
+    "prerelease": "yarn lint && yarn build",
     "release": "npx np",
-    "prestart": "yarn --cwd ./example install && yarn build && yarn --cwd ./example build && yarn",
+    "prestart": "yarn --cwd ./example install && yarn build && yarn --cwd ./example build",
     "start": "yarn --cwd ./example start"
   },
   "dependencies": {
