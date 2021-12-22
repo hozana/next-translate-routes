@@ -30,7 +30,8 @@
     "next": "^12.0.4",
     "path-to-regexp": "^6.2.0",
     "querystring": "^0.2.1",
-    "react": "^17.0.2"
+    "react": "^17.0.2",
+    "webpack": "^5.65.0"
   },
   "files": [
     "*.js",
@@ -39,19 +40,21 @@
     "src/*"
   ],
   "devDependencies": {
+    "@testing-library/react": "^12.1.2",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
-    "babel-jest": "^27.0.5",
+    "babel-jest": "^27.4.5",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "jest": "^27.0.5",
+    "jest": "^27.4.5",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
+    "react-dom": "^17.0.2",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.4"
   }

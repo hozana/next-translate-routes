@@ -1,9 +1,20 @@
+const path = require('path')
 const withTranslateRoutes = require("next-translate-routes/plugin")
 
 const nextConfig = withTranslateRoutes({
   i18n: {
     locales: ['en', 'fr'],
     defaultLocale: 'en',
+  },
+
+  translateRoutes: {
+    debug: true,
+  },
+
+  webpack(config) {
+    // Needed to avoid conflicts between example's react and next-translate-routes react
+    config.resolve.alias.react = path.resolve('../node_modules/react')
+    return config
   },
 
   rewrites: async () => {
@@ -15,11 +26,5 @@ const nextConfig = withTranslateRoutes({
     ]
   },
 })
-
-const logRR = async () => {
-  console.log('From next.config.', { rewrites: await nextConfig.rewrites?.(), redirects: await nextConfig.redirects?.() })
-}
-
-logRR()
 
 module.exports = nextConfig

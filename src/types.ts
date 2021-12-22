@@ -20,3 +20,14 @@ export type NextData = {
   locale?: string
   defaultLocale?: string
 }
+
+export type TNtrData = {
+  debug?: boolean
+  defaultLocale: string
+  locales: string[]
+  routesTree: TRouteBranch
+}
+
+declare global {
+  const __NTR_DATA__: TNtrData
+}

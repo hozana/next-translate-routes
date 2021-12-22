@@ -2,7 +2,7 @@ import { compile, parse as parsePath, Key } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 
-import { getDefaultLocale, getLocales, getRoutesTree } from './getEnv'
+import { getNtrData } from './getNtrData'
 import type { TRouteBranch, Url } from './types'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
@@ -131,9 +131,7 @@ export function removeLangPrefix(pathname: string, toArray?: false): string
 export function removeLangPrefix(pathname: string, toArray: true): string[]
 export function removeLangPrefix(pathname: string, toArray?: boolean): string | string[] {
   const pathParts = pathname.split('/').filter(Boolean)
-  const routesTree = getRoutesTree()
-  const locales = getLocales()
-  const defaultLocale = getDefaultLocale()
+  const { routesTree, defaultLocale, locales } = getNtrData()
 
   const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
 
@@ -167,7 +165,7 @@ export function removeLangPrefix(pathname: string, toArray?: boolean): string | 
  */
 export function translatePath<U extends string | UrlObject, F extends 'string' | 'object'>(
   url: U,
-  locale: string,
+  locale?: string,
   options?: Options<F>,
 ): 'string' | 'object' extends F
   ? U extends string
@@ -179,8 +177,8 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
   ? string
   : UrlObject
 
-export function translatePath(url: Url, locale: string, { format }: Options = {}): Url {
-  const routesTree = getRoutesTree()
+export function translatePath(url: Url, locale?: string, { format }: Options = {}): Url {
+  const { routesTree } = getNtrData()
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
   const { pathname, query, hash } = urlObject
@@ -222,6 +220,8 @@ export function translatePath(url: Url, locale: string, { format }: Options = {}
   return returnFormat === 'object' ? translatedUrlObject : formatUrl(translatedUrlObject)
 }
 
+export type TTranslateUrl = typeof translatePath
+
 /**
  * Translate url into locale
  *
@@ -233,8 +233,8 @@ export function translatePath(url: Url, locale: string, { format }: Options = {}
  * UrlObject if `options.format === 'object'`,
  * same type as url if options.format is not defined
  */
-export const translateUrl = ((url, locale, options) => {
-  const defaultLocale = getDefaultLocale()
+export const translateUrl: TTranslateUrl = ((url, locale, options) => {
+  const { defaultLocale } = getNtrData()
 
   // Handle external urls
   const parsedUrl: UrlObject = typeof url === 'string' ? parseUrl(url) : url

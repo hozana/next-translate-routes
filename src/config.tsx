@@ -30,11 +30,12 @@ import pathUtils from 'path'
 import { ignoreSegmentPathRegex } from './translateUrl'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
-import type { NextConfig } from 'next/dist/server/config-shared'
+import type { I18NConfig, NextConfig } from 'next/dist/server/config-shared'
 import type { TReRoutes, TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from './types'
+import { DefinePlugin, Configuration as WebpackConfiguration } from 'webpack'
 
 /** Keep 'routes.json' for backward compatibility */
-const ROUTES_DATA_FILE_NAMES = ['_routes.json', 'routes.json']
+const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
 
 /** Transform Next file-system synthax to path-to-regexp synthax */
 const fileNameToPath = (fileName: string) =>
@@ -62,14 +63,28 @@ const getRouteSegment = <L extends string>(
   }
 }
 
+export type TParsePageTreeProps = { directoryPath?: string; isTrunk?: boolean; routesDataFileName?: string }
+
 /**
  * Recursively parse pages directory and build a page tree object
  */
-export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk?: boolean): TRouteBranch<L> => {
+export const parsePagesTree = <L extends string>({
+  directoryPath,
+  isTrunk,
+  routesDataFileName,
+}: TParsePageTreeProps): TRouteBranch<L> => {
   const dirPath = directoryPath || pathUtils.resolve(process.cwd(), 'pages')
   const directoryItems = fs.readdirSync(dirPath)
-  const routesDataFileName = directoryItems.find((directoryItem) => ROUTES_DATA_FILE_NAMES.includes(directoryItem))
-  const routeSegmentsData = routesDataFileName ? require(pathUtils.join(dirPath, routesDataFileName)) : {}
+  const routesFileName = directoryItems.find((directoryItem) => {
+    const fileNameNoExt = directoryItem.match(/^(.+)\.json$/)?.[1]
+    return (
+      fileNameNoExt &&
+      (routesDataFileName
+        ? fileNameNoExt === routesDataFileName
+        : DEFAULT_ROUTES_DATA_FILE_NAMES.includes(fileNameNoExt))
+    )
+  })
+  const routeSegmentsData = routesFileName ? require(pathUtils.join(dirPath, routesFileName)) : {}
   const directoryPathParts = dirPath.split(/[\\/]/)
   const name = !directoryPath || isTrunk ? '' : directoryPathParts[directoryPathParts.length - 1]
 
@@ -89,7 +104,7 @@ export const parsePagesTree = <L extends string>(directoryPath?: string, isTrunk
       return [
         ...acc,
         isDirectory
-          ? parsePagesTree(pathUtils.join(dirPath, item))
+          ? parsePagesTree({ directoryPath: pathUtils.join(dirPath, item), routesDataFileName })
           : getRouteSegment(pageName || item, routeSegmentsData),
       ]
     }
@@ -340,32 +355,66 @@ const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
     return b.source.split('/').length - a.source.split('/').length
   })
 
+export type NTRConfig = {
+  debug?: boolean
+  routesDataFileName?: string
+  routesTree?: TRouteBranch
+  i18n: I18NConfig
+}
+
 /**
  * Inject translated routes
  */
-export const withTranslateRoutes = (nextConfig: Partial<NextConfig>): NextConfig => {
-  const { locales = [] } = nextConfig.i18n || {}
-  const defaultLocale = nextConfig.i18n?.defaultLocale
-  const existingRoutesTree = nextConfig?.env?.NEXT_PUBLIC_ROUTES
-  const routesTree = existingRoutesTree ? JSON.parse(existingRoutesTree) : parsePagesTree()
+export const withTranslateRoutes = ({
+  translateRoutes: { debug = false, routesDataFileName = null, routesTree: customRoutesTree = null } = {},
+  ...nextConfig
+}: NextConfig & NTRConfig): NextConfig => {
+  if (!nextConfig.i18n) {
+    throw new Error(
+      '[next-translate-routes] - No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',
+    )
+  }
+  const { defaultLocale, locales = [] } = nextConfig.i18n
+  const routesTree = customRoutesTree || parsePagesTree({ routesDataFileName })
   // TODO: validateRoutesTree(routesTree)
   const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree, defaultLocale })
+  const sortedRedirects = sortBySpecificity(redirects)
+  const sortedRewrites = sortBySpecificity(rewrites)
 
-  process.env.NEXT_PUBLIC_ROUTES = JSON.stringify(routesTree)
-  process.env.NEXT_PUBLIC_LOCALES = nextConfig.i18n?.locales?.join(',') || ''
-  process.env.NEXT_PUBLIC_DEFAULT_LOCALE = defaultLocale || ''
+  if (debug) {
+    console.log('[next-translate-routes] - Redirects:', sortedRedirects)
+    console.log('[next-translate-routes] - Rewrites:', sortedRewrites)
+  }
 
   return {
     ...nextConfig,
 
+    webpack(conf: WebpackConfiguration, options) {
+      const config = typeof nextConfig.webpack === 'function' ? nextConfig.webpack(conf, options) : conf
+
+      config.plugins.push(
+        new DefinePlugin({
+          // __NTR_DATA__ should be used in only one place!
+          // DefinePlugin will replace it at compile time EVERYWHERE by the whole data value
+          __NTR_DATA__: JSON.stringify({
+            debug,
+            defaultLocale,
+            locales,
+            routesTree,
+          }),
+        }),
+      )
+
+      return config
+    },
+
     async redirects() {
       const existingRedirects = (nextConfig.redirects && (await nextConfig.redirects())) || []
-      return [...sortBySpecificity(redirects), ...existingRedirects]
+      return [...sortedRedirects, ...existingRedirects]
     },
 
     async rewrites() {
       const existingRewrites = (nextConfig.rewrites && (await nextConfig.rewrites())) || []
-      const sortedRewrites = sortBySpecificity(rewrites)
       if (Array.isArray(existingRewrites)) {
         return [...existingRewrites, ...sortedRewrites]
       }

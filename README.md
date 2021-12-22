@@ -2,6 +2,22 @@
 
 Translated routing and more for Next using Next regular file-base routing system
 
+- [Features](#features)
+- [Motivation](#motivation)
+- [How to](#how-to)
+  - [Basic usage](#basic-usage)
+    1. [Wrap you next config with the next-translate-routes plugin](#1-wrap-you-next-config-with-the-next-translate-routes-plugin)
+    2. [Define your routes](#2-define-your-routes)
+    3. [Wrap you \_app component with the withTranslateRoutes hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
+    4. [Use next-translate-routes/link instead of next/link](#4-use-next-translate-routeslink-instead-of-nextlink)
+  - [Advanced usage](#advanced-usage)
+    - [Debugging](#debugging)
+    - [Constrained dynamic paths segments](#constrained-dynamic-paths-segments)
+    - [Ignoring a path part](#ignoring-a-path-part)
+    - [Complex paths segments](#complex-paths-segments)
+    - [Custom route tree](#custom-route-tree)
+- [How does it works](#how-does-it-works)
+
 ## Features
 
 - **Translated paths segments**  
@@ -145,7 +161,7 @@ const App = ({ Component, pageProps }) => {
 export default withTranslateRoutes(App)
 ```
 
-#### 4. Use the next-translate-routes Link
+#### 4. Use next-translate-routes/link instead of next/link
 
 next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes/link' instead of 'next/link' and use as you ever did.
 
@@ -178,6 +194,18 @@ const MyLinks = (props) => {
 ### Advanced usage
 
 Check the example folder to see some advanced techniques in action.
+
+#### Debugging
+
+You can add `debug: true` in the `translateRoutes` part of you next.config.js.
+
+```js
+  translateRoutes: {
+    debug: true
+  }
+```
+
+When debug is set to true, you will get some logs, both in the server terminal and in the browser console.
 
 #### Constrained dynamic paths segments
 
@@ -247,7 +275,7 @@ Then:
 #### Custom route tree
 
 If you want to avoid seeding `_routes.json` files in your `/pages` folder,
-you can directly create a routesTree object, and inject it in the next config as stringified JSON.
+you can directly create a routesTree object, and inject it in the next config as follow.
 
 ```javascript
 // next.config.js
@@ -263,8 +291,8 @@ module.exports = withTranslateRoutes({
     defaultLocale: 'pl',
   },
 
-  env: {
-    NEXT_PUBLIC_ROUTES: routesTree,
+  translateRoutes: {
+    routesTree,
   },
 
   // ...Remaining next config

@@ -10,7 +10,6 @@ const App: React.FC<AppProps> = ({ Component, pageProps, router: baseRouter }) =
     () =>
       console.log('From _app.', {
         translateUrl,
-        routesTree: JSON.parse(process.env.NEXT_PUBLIC_ROUTES),
         baseRouter,
       }),
     [baseRouter],

@@ -25,7 +25,7 @@ const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ da
 
   return (
     <Layout title="Docs">
-      <h1>Docs</h1>
+      <h1>{type} docs</h1>
       <p>This is the docs page, statically generated at {new Date(date).toLocaleString()}</p>
       <h3>Path list:</h3>
       <ul>

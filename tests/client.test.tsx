@@ -2,41 +2,43 @@
  * @jest-environment jsdom
  */
 
+import React from 'react'
+import { render } from '@testing-library/react'
+import { RouterContext } from 'next/dist/shared/lib/router-context'
+
 import { removeLangPrefix, translatePath, translateUrl } from '../src/translateUrl'
+import { Link } from '../link'
 import routesTree from './fixtures/routesTree.json'
 
-const originalEnv = process.env
-const defaultEnv = {
-  ...originalEnv,
-  NEXT_PUBLIC_ROUTES: JSON.stringify(routesTree),
-  NEXT_PUBLIC_LOCALES: 'fr,en,es,pt',
-  NEXT_PUBLIC_DEFAULT_LOCALE: 'fr',
+import type { TNtrData } from '../src/types'
+
+const defaultNtrData = {
+  defaultLocale: 'fr',
+  locales: ['fr', 'en', 'es', 'pt'],
+  routesTree,
 }
 
-afterEach(() => {
-  process.env = originalEnv
-})
+const setEnvData = (ntrData: Partial<TNtrData> = {}) => {
+  window.__NTR_DATA__ = {
+    ...defaultNtrData,
+    ...ntrData,
+  }
+}
 
 beforeEach(() => {
-  process.env = defaultEnv
+  setEnvData()
 })
 
-describe('removeLangPrefix.', () => {
+describe('removeLangPrefix', () => {
   test('with non default locale prefix and root prefix to array', () => {
     expect(removeLangPrefix('/en/root/any/path', true)).toEqual(['any', 'path'])
   })
   test('with root prefix only on default locale', () => {
-    process.env = {
-      ...defaultEnv,
-      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
-    }
+    setEnvData({ defaultLocale: 'en' })
     expect(removeLangPrefix('/root/any/path')).toEqual('/any/path')
   })
   test('with default locale prefix and root prefix', () => {
-    process.env = {
-      ...defaultEnv,
-      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
-    }
+    setEnvData({ defaultLocale: 'en' })
     expect(removeLangPrefix('/en/root/any/path')).toEqual('/any/path')
   })
   test('with non default locale prefix that should have a root prefix but that is not here', () => {
@@ -52,15 +54,12 @@ describe('removeLangPrefix.', () => {
     expect(removeLangPrefix('/any/path')).toEqual('/any/path')
   })
   test('without locale prefix when default locale has a root prefix', () => {
-    process.env = {
-      ...defaultEnv,
-      NEXT_PUBLIC_DEFAULT_LOCALE: 'en',
-    }
+    setEnvData({ defaultLocale: 'en' })
     expect(removeLangPrefix('/any/path')).toEqual('/any/path')
   })
 })
 
-describe('translate.', () => {
+describe('translate', () => {
   const windowSpy = jest.spyOn(window, 'window', 'get')
   windowSpy.mockImplementation(
     () =>
@@ -171,4 +170,76 @@ describe('translate.', () => {
   })
 
   windowSpy.mockRestore()
+})
+
+describe('Link', () => {
+  const push = jest.fn(() => Promise.resolve(true))
+  beforeEach(() => push.mockClear())
+
+  test('with no locale', () => {
+    const { container } = render(
+      <RouterContext.Provider
+        value={{
+          isLocaleDomain: true,
+          locale: 'en',
+          locales: ['en', 'fr'],
+          defaultLocale: 'en',
+          push,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...({} as any),
+        }}
+      >
+        <Link
+          href={{
+            pathname: '/en/community/[communityId]/[communitySlug]/statistics',
+            query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
+          }}
+        >
+          Link
+        </Link>
+      </RouterContext.Provider>,
+    )
+
+    expect(push).not.toHaveBeenCalled()
+    container.querySelector('a')?.click()
+    expect(push).toHaveBeenCalledWith(
+      '/en/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
+      '/en/root/community/300-three-hundred/statistics?baz=3',
+      { locale: 'en', scroll: undefined, shallow: undefined },
+    )
+  })
+
+  test('with locale', () => {
+    const { container } = render(
+      <RouterContext.Provider
+        value={{
+          isLocaleDomain: true,
+          locale: 'en',
+          locales: ['en', 'fr'],
+          defaultLocale: 'en',
+          push,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...({} as any),
+        }}
+      >
+        <Link
+          href={{
+            pathname: '/en/community/[communityId]/[communitySlug]/statistics',
+            query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
+          }}
+          locale="fr"
+        >
+          Link
+        </Link>
+      </RouterContext.Provider>,
+    )
+
+    expect(push).not.toHaveBeenCalled()
+    container.querySelector('a')?.click()
+    expect(push).toHaveBeenCalledWith(
+      '/en/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
+      '/communaute/300-three-hundred/statistiques?baz=3',
+      { locale: 'fr', scroll: undefined, shallow: undefined },
+    )
+  })
 })

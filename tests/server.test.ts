@@ -19,7 +19,7 @@ declare global {
 }
 test('parsePagesTree.', () => {
   const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const parsedPagesTree = parsePagesTree(pagesPath, true)
+  const parsedPagesTree = parsePagesTree({ directoryPath: pagesPath, isTrunk: true })
   expect(parsedPagesTree).toEqual(routesTree)
 })
 

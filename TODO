@@ -1,11 +1,16 @@
-[] in example, clicking on the Docs link in fr makes the page reload, no idea why
-[] validate custom pagesTree
-[] throw if destination is equal to source
-[] add a debug parameter to print pagesTree => merge all config in one env var ? In v2 ?
-[] check if and where special characters should be escaped (https://nextjs.org/docs/api-reference/next.config.js/rewrites#regex-path-matching)
-[] improve comments, documentation
-[] trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
-[] getRouteList: (locale?: string) => (? Record<string, string[]> ? string[] ? string[][] ?)
-[] create a function `getRouteSegments(filePath: string): TRouteSegment[]`
+# Todo
+
+- add yaml support
+- check pageExtensions before adding a page in the routesTree
+- check basePath compatibility
+- check middlewares compatibility
+- check if and where special characters should be escaped (<https://nextjs.org/docs/api-reference/next.config.js/rewrites#regex-path-matching>)
+- support pages folder in src/pages
+- validate custom pagesTree
+- throw if destination is equal to source
+- trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
+- improve comments, documentation
+- getRouteList: (locale?: string) => (? Record<string, string[]> ? string? string[]?)
+- create a function `getRouteSegments(filePath: string): TRouteSegment[]`
   - return the whole path as is if not found and not dynamic file path
   - export a routeExist function
