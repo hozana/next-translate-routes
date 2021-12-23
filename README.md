@@ -33,6 +33,8 @@ Translated routing and more for Next using Next regular file-base routing system
 - **No custom server needed!**  
   Next automatic static optimization remains available.
 
+See it in action: <https://codesandbox.io/s/github/hozana/next-translate-routes/tree/master>
+
 __Note__: Next-translate-routes does not work with Next html static export, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
 
 ## Motivation

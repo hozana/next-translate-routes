@@ -21,10 +21,10 @@
     "build": "`rm ./*.d.ts ./*.js.map ./*.js` npx tsc",
     "lint": "npx eslint --ignore-path .gitignore .",
     "test": "jest",
-    "prerelease": "yarn lint && yarn build",
+    "prerelease": "yon lint && yon build",
     "release": "npx np",
-    "prestart": "yarn --cwd ./example install && yarn build && yarn --cwd ./example build",
-    "start": "yarn --cwd ./example start"
+    "prestart": "yon --cwd ./example install && yon build && yon --cwd ./example build",
+    "start": "yon --cwd ./example start"
   },
   "dependencies": {
     "next": "^12.0.4",
@@ -59,6 +59,7 @@
     "prettier": "^2.3.2",
     "react-dom": "^17.0.2",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "typescript": "^4.3.4",
+    "yarn-or-npm": "^3.0.1"
   }
 }
