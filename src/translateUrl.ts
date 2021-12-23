@@ -1,6 +1,7 @@
 import { compile, parse as parsePath, Key } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
+import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-slash'
 
 import { getNtrData } from './getNtrData'
 import type { TRouteBranch, Url } from './types'
@@ -253,7 +254,7 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
       pathname: prefix + translatedPath.pathname,
     }
   }
-  return prefix + translatedPath
+  return normalizePathTrailingSlash(prefix + translatedPath)
 }) as typeof translatePath
 
 export default translateUrl

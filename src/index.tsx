@@ -1,13 +1,13 @@
-import React, { ComponentProps, ComponentType, useMemo } from 'react'
+import React, { ComponentType, useMemo } from 'react'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
-import type { AppProps } from 'next/app'
 
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { getNtrData } from './getNtrData'
 import { translateUrl } from './translateUrl'
 import type { Url } from './types'
 import { Link } from './link'
+import { AppType } from 'next/dist/shared/lib/utils'
 
 interface TransitionOptions {
   shallow?: boolean
@@ -91,7 +91,7 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
  * Must wrap the App component in `pages/_app`.
  * This HOC will make the route push, replace, and refetch functions able to translate routes.
  */
-export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppComponent: A) => {
+export const withTranslateRoutes = (AppComponent: AppType) => {
   const ntrData = getNtrData()
 
   if (!ntrData) {
@@ -104,7 +104,7 @@ export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppCompon
     console.log('[next-translate-routes] - withTranslateRoutes. NTR data:', ntrData)
   }
 
-  const WithTranslateRoutesApp: React.FC<ComponentProps<A>> = (props: any) => {
+  const WithTranslateRoutesApp: AppType = (props) => {
     const nextRouter = useNextRouter()
 
     const enhancedRouter = useMemo(
@@ -124,6 +124,8 @@ export const withTranslateRoutes = <A extends ComponentType<AppProps>>(AppCompon
       </RouterContext.Provider>
     )
   }
+
+  WithTranslateRoutesApp.getInitialProps = 'getInitialProps' in AppComponent ? AppComponent.getInitialProps : undefined
 
   return WithTranslateRoutesApp
 }

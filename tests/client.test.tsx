@@ -18,6 +18,12 @@ const defaultNtrData = {
   routesTree,
 }
 
+declare global {
+  interface Window {
+    __NTR_DATA__: import('../src/types').TNtrData
+  }
+}
+
 const setEnvData = (ntrData: Partial<TNtrData> = {}) => {
   window.__NTR_DATA__ = {
     ...defaultNtrData,
