@@ -366,16 +366,15 @@ export type NTRConfig = {
   debug?: boolean
   routesDataFileName?: string
   routesTree?: TRouteBranch
-  i18n: I18NConfig
 }
 
 /**
  * Inject translated routes
  */
 export const withTranslateRoutes = ({
-  translateRoutes: { debug = false, routesDataFileName = null, routesTree: customRoutesTree = null } = {},
+  translateRoutes: { debug, routesDataFileName, routesTree: customRoutesTree } = {},
   ...nextConfig
-}: NextConfig & NTRConfig): NextConfig => {
+}: NextConfig & { i18n: I18NConfig; translateRoutes: NTRConfig }): NextConfig => {
   if (!nextConfig.i18n) {
     throw new Error(
       '[next-translate-routes] - No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',

@@ -11,7 +11,7 @@ Translated routing and more for Next using Next regular file-base routing system
     3. [Wrap you \_app component with the withTranslateRoutes hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
     4. [Use next-translate-routes/link instead of next/link](#4-use-next-translate-routeslink-instead-of-nextlink)
   - [Advanced usage](#advanced-usage)
-    - [Debugging](#debugging)
+    - [Configuration](#configuration)
     - [Constrained dynamic paths segments](#constrained-dynamic-paths-segments)
     - [Ignoring a path part](#ignoring-a-path-part)
     - [Complex paths segments](#complex-paths-segments)
@@ -32,6 +32,8 @@ Translated routing and more for Next using Next regular file-base routing system
   Ex: `/fr/english/path` redirects to `/fr/french/path`
 - **No custom server needed!**  
   Next automatic static optimization remains available.
+
+__Note__: Next-translate-routes does not work with Next html static export, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
 
 ## Motivation
 
@@ -71,7 +73,7 @@ module.exports = withTranslateRoutes({
 
 #### 2. Define your routes
 
-You can add a `_routes.json` file in the `pages` folder, and in the every subfolder where you want to define routes.
+You can add a `_routes.json`, or a `_routes.yaml`, file in the `pages` folder, and in the every subfolder where you want to define routes.
 
 Given a folder structure like so, you can add a `_routes.json` in `/pages/` and in `/pages/section/`.
 
@@ -195,17 +197,47 @@ const MyLinks = (props) => {
 
 Check the example folder to see some advanced techniques in action.
 
-#### Debugging
+#### Configuration
 
-You can add `debug: true` in the `translateRoutes` part of you next.config.js.
+Next-translate-routes is configurable by adding a `translateRoutes` key in Next config that accept an object of the following `NTRConfig` type.
+
+```ts
+type NTRConfig = {
+  debug?: boolean
+  routesDataFileName?: string
+  routesTree?: TRouteBranch<L>
+}
+```
+
+<details>
+  <summary>See more about TRouteBranch</summary>
+
+  If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
+
+  ```ts
+  /** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
+  type TRouteBranchEnFr = {
+    name: string
+    en: string
+    fr: string
+    children: TRouteBranchEnFr[]
+  }
+  ```
+
+</details>
+
+&nbsp;
 
 ```js
   translateRoutes: {
-    debug: true
+    debug: true,
+    routesDataFileName: 'routesData',
   }
 ```
 
-When debug is set to true, you will get some logs, both in the server terminal and in the browser console.
+When `debug` is set to true, you will get some logs, both in the server terminal and in the browser console.
+If `routesDataFileName` is defined, to `'routesData'` for example, next-translate-routes will look in the `pages` folder for files named `routesData.json` or `routesData.yaml` instead of the default `_routes.json` or `_routes.yaml`.
+If `routesTree` is defined, next-translate-routes won't parse the `pages` folder and will use the given object as the routes tree. If you uses it, beware of building correctly the routes tree to avoid bugs.
 
 #### Constrained dynamic paths segments
 
@@ -311,10 +343,10 @@ type TRouteBranch<Locale extends string> = {
 
 ## How does it works
 
-- Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the _routes.json files.
+- Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the `_routes.json` files.
 - The plugin then uses this information to build optimized redirects and rewrites, then add them to the next config object.
 - Rewrites take care of displaying the right page for the translates urls, redirects take care of the urls that would give an unwanted access to the pages (and would create duplicated content).
-- This routes tree object is stringified and stored in the NEXT_PUBLIC_ROUTES public env var to be accessible both on the server and on the client.
-- The translateUrl function uses this env var to translate routes.
-- The next-translate-routes/link leverages the translateUrl function to set the 'as' prop of next/link to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
-- The withTranslateRoutes hoc wrap the app, and enhance the router in by overriding the router context, to give translation skills to the router.push (which is used on click on a next/link), router.replace, and router.prefetch functions, using the translateUrl function too.
+- This routes tree object along with other data are written by webpack in place of `__NTR_DATA__`, the return value of `getNtrData` function.
+- The `translateUrl` function uses `getNtrData` to translate routes.
+- The `next-translate-routes/link` leverages the `translateUrl` function to set the `as` prop of `next/link` to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
+- The `withTranslateRoutes` hoc wrap the app, and enhance the router in by overriding the router context, to give translation skills to the router.push (which is used on click on a `next/link`), router.replace, and router.prefetch functions, using the `translateUrl` function too.
