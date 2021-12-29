@@ -103,7 +103,9 @@
     {
       "name": "faq",
       "paths": {
-        "default": "FAQ"
+        "default": "faq",
+        "en": "FAQ",
+        "fr": "FAQ"
       }
     },
     {
@@ -127,6 +129,25 @@
       "name": "index",
       "paths": {
         "default": "index"
+      }
+    },
+    {
+      "children": [
+        {
+          "name": "favorites",
+          "paths": {
+            "default": "favorites",
+            "en": "favoris",
+            "es": "favorito",
+            "fr": "favoris"
+          }
+        }
+      ],
+      "name": "my-account",
+      "paths": {
+        "default": "my-account",
+        "es": "mi-cuenta",
+        "fr": "mon-compte"
       }
     }
   ]

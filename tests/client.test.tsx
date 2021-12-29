@@ -20,12 +20,12 @@ const defaultNtrData = {
 
 declare global {
   interface Window {
-    __NTR_DATA__: import('../src/types').TNtrData
+    __NEXT_TRANSLATE_ROUTES_DATA: import('../src/types').TNtrData
   }
 }
 
 const setEnvData = (ntrData: Partial<TNtrData> = {}) => {
-  window.__NTR_DATA__ = {
+  window.__NEXT_TRANSLATE_ROUTES_DATA = {
     ...defaultNtrData,
     ...ntrData,
   }

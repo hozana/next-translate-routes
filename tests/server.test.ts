@@ -19,7 +19,7 @@ declare global {
 }
 test('parsePagesTree.', () => {
   const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const parsedPagesTree = parsePagesTree({ directoryPath: pagesPath, isTrunk: true })
+  const parsedPagesTree = parsePagesTree({ directoryPath: pagesPath, pageExtensions: ['tsx', 'jsx', 'ts', 'js'] })
   expect(parsedPagesTree).toEqual(routesTree)
 })
 
@@ -30,6 +30,9 @@ test('getPageReRoutes.', () => {
 })
 
 test('getRouteBranchReRoutes.', () => {
-  const reRoutes = getRouteBranchReRoutes({ locales: ['en', 'fr', 'es'], routeBranch: routesTree })
+  const reRoutes = getRouteBranchReRoutes({
+    locales: ['en', 'fr', 'es'],
+    routeBranch: { ...routesTree, paths: { default: '' } },
+  })
   expect(reRoutes).toEqual(allReRoutes)
 })

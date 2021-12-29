@@ -1,0 +1,11 @@
+{
+  "/": {
+    "fr": "mon-compte",
+    "es": "mi-cuenta"
+  },
+  "favorites": {
+    "fr": "favoris",
+    "en": "favoris",
+    "es": "favorito"
+  }
+}

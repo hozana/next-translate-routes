@@ -15,11 +15,6 @@ export type TRouteSegment<L extends TAnyLocale> = {
 export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
   children?: TRouteBranch<L>[]
 }
-export type NextData = {
-  locales?: string[]
-  locale?: string
-  defaultLocale?: string
-}
 
 export type TNtrData = {
   debug?: boolean
@@ -29,5 +24,10 @@ export type TNtrData = {
 }
 
 declare global {
-  const __NTR_DATA__: TNtrData
+  // eslint-disable-next-line no-var
+  var __NEXT_TRANSLATE_ROUTES_DATA: TNtrData
+
+  interface Window {
+    __NEXT_TRANSLATE_ROUTES_DATA: TNtrData
+  }
 }
