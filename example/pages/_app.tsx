@@ -9,6 +9,7 @@ const App: React.FC<AppProps> = ({ Component, pageProps, router: baseRouter }) =
   useEffect(
     () =>
       console.log('From _app.', {
+        __NEXT_TRANSLATE_ROUTES_DATA,
         translateUrl,
         baseRouter,
       }),

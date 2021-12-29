@@ -28,7 +28,8 @@
 import fs from 'fs'
 import pathUtils from 'path'
 import YAML from 'yamljs'
-import { DefinePlugin, Configuration as WebpackConfiguration } from 'webpack'
+import { pathToRegexp } from 'path-to-regexp'
+import { Configuration as WebpackConfiguration } from 'webpack'
 
 import { ignoreSegmentPathRegex } from './translateUrl'
 
@@ -65,18 +66,23 @@ const getRouteSegment = <L extends string>(
   }
 }
 
-export type TParsePageTreeProps = { directoryPath?: string; isTrunk?: boolean; routesDataFileName?: string }
+export type TParsePageTreeProps = {
+  directoryPath: string
+  pageExtensions: string[]
+  isSubBranch?: boolean
+  routesDataFileName?: string
+}
 
 /**
  * Recursively parse pages directory and build a page tree object
  */
 export const parsePagesTree = <L extends string>({
   directoryPath,
-  isTrunk,
+  pageExtensions,
+  isSubBranch,
   routesDataFileName,
 }: TParsePageTreeProps): TRouteBranch<L> => {
-  const dirPath = directoryPath || pathUtils.resolve(process.cwd(), 'pages')
-  const directoryItems = fs.readdirSync(dirPath)
+  const directoryItems = fs.readdirSync(directoryPath)
   const routesFileName = directoryItems.find((directoryItem) => {
     const fileNameNoExt = directoryItem.match(/^(.+)\.(json|yaml)$/)?.[1]
     return (
@@ -87,23 +93,20 @@ export const parsePagesTree = <L extends string>({
     )
   })
   const routeSegmentsFileContent = routesFileName
-    ? fs.readFileSync(pathUtils.join(dirPath, routesFileName), { encoding: 'utf8' })
+    ? fs.readFileSync(pathUtils.join(directoryPath, routesFileName), { encoding: 'utf8' })
     : ''
   const routeSegmentsData = routeSegmentsFileContent
     ? (/\.yaml$/.test(routesFileName as string) ? YAML : JSON).parse(routeSegmentsFileContent)
     : {}
-  const directoryPathParts = dirPath.split(/[\\/]/)
-  const name = !directoryPath || isTrunk ? '' : directoryPathParts[directoryPathParts.length - 1]
+  const directoryPathParts = directoryPath.replace(/[\\/]/, '').split(/[\\/]/)
+  const name = isSubBranch ? directoryPathParts[directoryPathParts.length - 1] : ''
 
   const children = directoryItems.reduce((acc, item) => {
-    const isDirectory = fs.statSync(pathUtils.join(dirPath, item)).isDirectory()
-    const pageMatch = item.match(/(.+)\.[jt]sx?$/)
+    const isDirectory = fs.statSync(pathUtils.join(directoryPath, item)).isDirectory()
+    const pageMatch = item.match(new RegExp(`(.+)\\.(${pageExtensions.join('|')})$`))
     const pageName = (!isDirectory && pageMatch?.[1]) || ''
 
-    if (
-      (isTrunk || !directoryPath) &&
-      (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')
-    ) {
+    if (!isSubBranch && (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')) {
       return acc
     }
 
@@ -111,7 +114,12 @@ export const parsePagesTree = <L extends string>({
       return [
         ...acc,
         isDirectory
-          ? parsePagesTree({ directoryPath: pathUtils.join(dirPath, item), routesDataFileName })
+          ? parsePagesTree({
+              directoryPath: pathUtils.join(directoryPath, item),
+              isSubBranch: true,
+              pageExtensions,
+              routesDataFileName,
+            })
           : getRouteSegment(pageName || item, routeSegmentsData),
       ]
     }
@@ -153,6 +161,17 @@ const getSimilarIndex = <R extends Redirect | Rewrite>(sourceSegments: string[],
       })
     )
   })
+
+/**
+ * mergeOrRegex('(one|two|tree)', 'four') => '(one|two|tree|four)'
+ * mergeOrRegex('(one|two|tree)', 'tree') => '(one|two|tree)'
+ */
+const mergeOrRegex = (existingRegex: string, newPossiblity: string) => {
+  const existingPossibilities = existingRegex.replace(/\(|\)/g, '').split('|')
+  return existingPossibilities.includes(newPossiblity)
+    ? existingRegex
+    : `(${[...existingPossibilities, newPossiblity].join('|')})`
+}
 
 /**
  * Get redirects and rewrites for a page
@@ -230,21 +249,22 @@ export const getPageReRoutes = <L extends string>({
           // If similar redirect exist, merge the new one
           if (similarIndex >= 0) {
             const similar = acc[similarIndex]
-            return [
-              ...acc.slice(0, similarIndex),
-              {
-                ...similar,
-                source: similar.source
-                  .split('/')
-                  .map((similarSegment, index) =>
-                    similarSegment === sourceSegments[index]
-                      ? similarSegment
-                      : `(${similarSegment.replace(/\(|\)/g, '').split('|').concat(sourceSegments[index]).join('|')})`,
-                  )
-                  .join('/'),
-              },
-              ...acc.slice(similarIndex + 1),
-            ]
+            const mergedWithSimilar = {
+              ...similar,
+              source: similar.source
+                .split('/')
+                .map((similarSegment, index) =>
+                  sourceSegments[index] === similarSegment
+                    ? similarSegment
+                    : mergeOrRegex(similarSegment, sourceSegments[index]),
+                )
+                .join('/'),
+            }
+
+            // Avoid to merge path that would introduce redirect loop
+            if (!pathToRegexp(mergedWithSimilar.source).test(destination)) {
+              return [...acc.slice(0, similarIndex), mergedWithSimilar, ...acc.slice(similarIndex + 1)]
+            }
           }
 
           // Else append the new redirect
@@ -380,9 +400,26 @@ export const withTranslateRoutes = ({
       '[next-translate-routes] - No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',
     )
   }
-  const { defaultLocale, locales = [] } = nextConfig.i18n
-  const routesTree = customRoutesTree || parsePagesTree({ routesDataFileName })
+
+  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages'].find((dirPath) =>
+    fs.existsSync(pathUtils.join(process.cwd(), dirPath)),
+  )
+
+  if (!pagesDir) {
+    throw new Error('[next-translate-routes] - No pages folder found.')
+  }
+
+  const pagesPath = pathUtils.join(process.cwd(), pagesDir, '/')
+
+  const {
+    i18n: { defaultLocale, locales = [] },
+    pageExtensions = ['js', 'jsx', 'ts', 'tsx'],
+  } = nextConfig
+
+  const routesTree =
+    customRoutesTree || parsePagesTree({ directoryPath: pagesPath, pageExtensions, routesDataFileName })
   // TODO: validateRoutesTree(routesTree)
+
   const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree, defaultLocale })
   const sortedRedirects = sortBySpecificity(redirects)
   const sortedRewrites = sortBySpecificity(rewrites)
@@ -396,20 +433,30 @@ export const withTranslateRoutes = ({
     ...nextConfig,
 
     webpack(conf: WebpackConfiguration, options) {
-      const config = typeof nextConfig.webpack === 'function' ? nextConfig.webpack(conf, options) : conf
+      const config =
+        typeof nextConfig.webpack === 'function' ? (nextConfig.webpack(conf, options) as WebpackConfiguration) : conf
 
-      config.plugins.push(
-        new DefinePlugin({
-          // __NTR_DATA__ should be used in only one place!
-          // DefinePlugin will replace it at compile time EVERYWHERE by the whole data value
-          __NTR_DATA__: JSON.stringify({
-            debug,
-            defaultLocale,
-            locales,
-            routesTree,
-          }),
-        }),
-      )
+      if (!config.module) {
+        config.module = {}
+      }
+      if (!config.module.rules) {
+        config.module.rules = []
+      }
+      config.module.rules.push({
+        test: new RegExp(`_app\\.(${pageExtensions.join('|')})$`),
+        use: {
+          loader: 'next-translate-routes/loader',
+          options: {
+            pagesPath,
+            data: {
+              debug,
+              defaultLocale,
+              locales,
+              routesTree,
+            },
+          },
+        },
+      })
 
       return config
     },

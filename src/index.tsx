@@ -5,7 +5,7 @@ import { RouterContext } from 'next/dist/shared/lib/router-context'
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { getNtrData } from './getNtrData'
 import { translateUrl } from './translateUrl'
-import type { Url } from './types'
+import type { TNtrData, Url } from './types'
 import { Link } from './link'
 import { AppType } from 'next/dist/shared/lib/utils'
 
@@ -91,13 +91,34 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
  * Must wrap the App component in `pages/_app`.
  * This HOC will make the route push, replace, and refetch functions able to translate routes.
  */
-export const withTranslateRoutes = (AppComponent: AppType) => {
-  const ntrData = getNtrData()
+export const withTranslateRoutes = (...args: (AppType | TNtrData)[]) => {
+  // ntrData argument is added as a argument by webpack next-translate-routes/loader, and can also be added manually
+  const { ntrData, AppComponent } = args.reduce((acc, arg) => {
+    if (typeof arg === 'function') {
+      return {
+        ...acc,
+        AppComponent: arg,
+      }
+    }
+    return {
+      ...acc,
+      ntrData: {
+        ...acc.ntrData,
+        ...arg,
+      },
+    }
+  }, {} as { ntrData: TNtrData; AppComponent: AppType })
 
   if (!ntrData) {
     throw new Error(
       '[next-translate-routes] - No translate routes data found. next-translate-routes plugin is probably missing from next.config.js',
     )
+  }
+
+  if (typeof window === 'undefined') {
+    global.__NEXT_TRANSLATE_ROUTES_DATA = ntrData
+  } else {
+    window.__NEXT_TRANSLATE_ROUTES_DATA = ntrData
   }
 
   if (ntrData.debug && typeof window !== 'undefined') {

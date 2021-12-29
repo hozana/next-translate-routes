@@ -348,7 +348,8 @@ type TRouteBranch<Locale extends string> = {
 - Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the `_routes.json` files.
 - The plugin then uses this information to build optimized redirects and rewrites, then add them to the next config object.
 - Rewrites take care of displaying the right page for the translates urls, redirects take care of the urls that would give an unwanted access to the pages (and would create duplicated content).
-- This routes tree object along with other data are written by webpack in place of `__NTR_DATA__`, the return value of `getNtrData` function.
-- The `translateUrl` function uses `getNtrData` to translate routes.
+- The plugin adds a webpack loader for the pages/_app file. This loader adds a data object (containing the routes tree object along with other config) as first argument of the `withTranslateRoutes` high order component that wrap the app.
+- `withTranslateRoutes` makes this data available as a global variable, `__NEXT_TRANSLATE_ROUTES_DATA`.
+- The `translateUrl` function uses this data to translate routes.
 - The `next-translate-routes/link` leverages the `translateUrl` function to set the `as` prop of `next/link` to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
-- The `withTranslateRoutes` hoc wrap the app, and enhance the router in by overriding the router context, to give translation skills to the router.push (which is used on click on a `next/link`), router.replace, and router.prefetch functions, using the `translateUrl` function too.
+- The `withTranslateRoutes` enhance the router by overriding the router context, to give translation skills to the router.push (which is used on click on a `next/link`), router.replace, and router.prefetch functions, using the `translateUrl` function too.

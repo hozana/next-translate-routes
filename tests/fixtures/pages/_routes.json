@@ -6,5 +6,8 @@
     "fr": "a-propos",
     "es": "acerca-de-nosotros"
   },
-  "faq": "FAQ"
+  "faq": {
+    "en": "FAQ",
+    "fr": "FAQ"
+  }
 }
