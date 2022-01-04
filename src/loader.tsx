@@ -15,9 +15,9 @@ export default function loader(
 
   const uncommentedCode = rawCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
 
-  const defaultExportHocMatch = uncommentedCode.match(/^\s*import (\w+).* from 'next-translate-routes'/m)
+  const defaultExportHocMatch = uncommentedCode.match(/^\s*import (\w+).* from ["']next-translate-routes["']/m)
   const namedExportHocMatch = uncommentedCode.match(
-    /^\s*import .*\{.*withTranslateRoutes(?: as (\w+))?\W?.*\} from 'next-translate-routes'/m,
+    /^\s*import .*\{.*withTranslateRoutes(?: as (\w+))?\W?.*\} from ["']next-translate-routes["']/m,
   )
 
   const defaultExportHocName = defaultExportHocMatch?.[1]
@@ -33,7 +33,9 @@ export default function loader(
     if (name) {
       result = rawCode.replace(
         new RegExp(`(${name}\\()`, 'g'),
-        `$1JSON.parse(\`${JSON.stringify(this.query.data)}\`), `,
+        `$1JSON.parse(\`${JSON.stringify(this.query.data, (_key, value) =>
+          typeof value === 'string' ? value.replace('\\', '\\\\') : value,
+        )}\`), `,
       )
     }
   })
