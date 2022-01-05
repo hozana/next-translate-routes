@@ -343,6 +343,40 @@ type TRouteBranch<Locale extends string> = {
 }
 ```
 
+#### Outside Next
+
+One might need to mock next-translate-routes outside Next, for example in [Storybook](https://storybook.js.org/).
+It is possible as follow:
+
+```typescript
+import { RouterContext } from 'next/dist/shared/lib/router-context'
+import withTranslateRoutes from 'next-translate-routes'
+
+  //[...]
+
+  const TranslateRoutes = withTranslateRoutes(
+    {
+      defaultLocale: 'fr',
+      debug: true,
+      locales: ['fr', 'en', 'es', 'pt'],
+      routesTree: { name: '/', paths: { default: '/' } }, // Mocked routes tree
+    },
+    ({ children }) => <>{children}</>,
+  )
+
+  return (
+    <RouterContext.Provider value={Router.router}>
+      <TranslateRoutes pageProps={{}} router={Router.router}>
+        {children}
+      </TranslateRoutes>
+    </RouterContext.Provider>
+  )
+
+  // [...]
+```
+
+For Storybook, this piece of code can be used to create a decorator function.
+
 ## How does it works
 
 - Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the `_routes.json` files.

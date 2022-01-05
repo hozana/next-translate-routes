@@ -7,7 +7,8 @@ import { getNtrData } from './getNtrData'
 import { translateUrl } from './translateUrl'
 import type { TNtrData, Url } from './types'
 import { Link } from './link'
-import { AppType } from 'next/dist/shared/lib/utils'
+import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
+import type { NextComponentType } from 'next'
 
 interface TransitionOptions {
   shallow?: boolean
@@ -87,11 +88,13 @@ export const withRouter = <P extends Record<string, any>>(Component: ComponentTy
     displayName: `withRouter(${Component.displayName})`,
   })
 
+type TWrappedAppComponent = NextComponentType<AppContextType<NextRouter>, AppInitialProps, any>
+
 /**
  * Must wrap the App component in `pages/_app`.
  * This HOC will make the route push, replace, and refetch functions able to translate routes.
  */
-export const withTranslateRoutes = (...args: (AppType | TNtrData)[]) => {
+export const withTranslateRoutes = (...args: (TWrappedAppComponent | TNtrData)[]) => {
   // ntrData argument is added as a argument by webpack next-translate-routes/loader, and can also be added manually
   const { ntrData, AppComponent } = args.reduce((acc, arg) => {
     if (typeof arg === 'function') {
@@ -107,7 +110,11 @@ export const withTranslateRoutes = (...args: (AppType | TNtrData)[]) => {
         ...arg,
       },
     }
-  }, {} as { ntrData: TNtrData; AppComponent: AppType })
+  }, {} as { ntrData: TNtrData; AppComponent: TWrappedAppComponent })
+
+  if (!AppComponent) {
+    throw new Error('[next-translate-routes] - No wrapped App component in withTranslateRoutes')
+  }
 
   if (!ntrData) {
     throw new Error(
@@ -125,7 +132,7 @@ export const withTranslateRoutes = (...args: (AppType | TNtrData)[]) => {
     console.log('[next-translate-routes] - withTranslateRoutes. NTR data:', ntrData)
   }
 
-  const WithTranslateRoutesApp: AppType = (props) => {
+  const WithTranslateRoutesApp: TWrappedAppComponent = (props) => {
     const nextRouter = useNextRouter()
 
     const enhancedRouter = useMemo(
