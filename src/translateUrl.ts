@@ -1,4 +1,5 @@
-import { compile, parse as parsePath, Key } from 'path-to-regexp'
+import type { Key } from 'path-to-regexp'
+import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-slash'
@@ -197,7 +198,7 @@ export function translatePath(url: Url, locale?: string, { format }: Options = {
     routeBranch: routesTree,
   })
   const path = translatedPathParts.join('/')
-  const compiledPath = compile(path, { validate: false })(augmentedQuery)
+  const compiledPath = compilePath(path, { validate: false })(augmentedQuery)
   const paramNames = (parsePath(path).filter((token) => typeof token === 'object') as Key[]).map((token) => token.name)
   const remainingQuery = Object.keys(augmentedQuery).reduce(
     (acc, key) => ({
@@ -246,14 +247,13 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
   }
 
   const translatedPath = translatePath(url, locale, options)
-  const prefix = locale === defaultLocale || options?.withoutLangPrefix ? '' : `/${locale}`
 
   if (typeof translatedPath === 'object') {
-    return {
-      ...(translatedPath as UrlObject),
-      pathname: prefix + translatedPath.pathname,
-    }
+    return translatedPath
   }
+
+  const prefix = locale === defaultLocale || options?.withoutLangPrefix ? '' : `/${locale}`
+
   return normalizePathTrailingSlash(prefix + translatedPath)
 }) as typeof translatePath
 
