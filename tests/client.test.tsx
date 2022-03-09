@@ -109,18 +109,6 @@ describe('translate', () => {
       translatedUrl: '/en/root/community/300-three-hundred/statistics?baz=3#section',
     },
     {
-      href: '/feast-days?baz=3#section',
-      translatedPath: '/fetes?baz=3#section',
-    },
-    {
-      href: '/feast-days/?baz=3#section',
-      translatedPath: '/fetes?baz=3#section',
-    },
-    {
-      href: '/feast-days/foo/bar?baz=3#section',
-      translatedPath: '/fetes/foo/bar?baz=3#section',
-    },
-    {
       href: '/?baz=3#section',
       translatedPath: '/?baz=3#section',
     },
@@ -137,22 +125,74 @@ describe('translate', () => {
         hash: 'section',
       },
       translatedUrl: {
-        pathname: '/en/root/community/300-three-hundred/statistics',
+        pathname: '/root/community/300-three-hundred/statistics',
         query: { baz: 3 },
         hash: 'section',
       },
     },
     {
-      href: '/en/root/feast-days/foo/bar?baz=3#section',
-      locale: 'en',
-      translatedPath: '/root/feast-days/foo/bar?baz=3#section',
-      translatedUrl: '/en/root/feast-days/foo/bar?baz=3#section',
+      href: '/catch-all/foo/bar?baz=3#section',
+      translatedPath: '/tout/foo/bar?baz=3#section',
     },
     {
-      href: 'https://next-translate-routes.com/en/root/feast-days/foo/bar?baz=3#section',
+      href: '/en/root/catch-all-or-none?baz=3#section',
       locale: 'en',
-      translatedPath: 'https://next-translate-routes.com/root/feast-days/foo/bar?baz=3#section',
-      translatedUrl: 'https://next-translate-routes.com/en/root/feast-days/foo/bar?baz=3#section',
+      translatedPath: '/root/catch-all-or-none?baz=3#section',
+      translatedUrl: '/en/root/catch-all-or-none?baz=3#section',
+    },
+    {
+      href: '/en/root/catch-all/foo/bar?baz=3#section',
+      locale: 'en',
+      translatedPath: '/root/catch-all/foo/bar?baz=3#section',
+      translatedUrl: '/en/root/catch-all/foo/bar?baz=3#section',
+    },
+    {
+      href: {
+        pathname: '/catch-all-or-none/[[...path]]',
+        query: { path: [], baz: 3 },
+        hash: 'section',
+      },
+      locale: 'en',
+      translatedPath: {
+        pathname: '/root/catch-all-or-none',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+      translatedUrl: {
+        pathname: '/root/catch-all-or-none',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+    },
+    {
+      href: '/en/root/catch-all/foo/bar?baz=3#section',
+      locale: 'en',
+      translatedPath: '/root/catch-all/foo/bar?baz=3#section',
+      translatedUrl: '/en/root/catch-all/foo/bar?baz=3#section',
+    },
+    {
+      href: {
+        pathname: '/catch-all/[...path]',
+        query: { path: ['foo', 'bar'], baz: 3 },
+        hash: 'section',
+      },
+      locale: 'en',
+      translatedPath: {
+        pathname: '/root/catch-all/foo/bar',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+      translatedUrl: {
+        pathname: '/root/catch-all/foo/bar',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+    },
+    {
+      href: 'https://next-translate-routes.com/en/root/catch-all-or-none/foo/bar?baz=3#section',
+      locale: 'en',
+      translatedPath: 'https://next-translate-routes.com/root/catch-all-or-none/foo/bar?baz=3#section',
+      translatedUrl: 'https://next-translate-routes.com/en/root/catch-all-or-none/foo/bar?baz=3#section',
     },
     {
       href: 'https://hozana.org/communautes',

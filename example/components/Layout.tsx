@@ -43,6 +43,10 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ Link
         <a>Users List</a>
       </LinkComponent>
       {' | '}
+      <LinkComponent href={{ pathname: '/random/[...pathParts]', query: { pathParts: ['path'] } }}>
+        <a>Random</a>
+      </LinkComponent>
+      {' | '}
       <LinkComponent href="https://hozana.org/en">
         <a>External link</a>
       </LinkComponent>

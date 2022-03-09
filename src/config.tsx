@@ -44,7 +44,7 @@ const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
 const fileNameToPath = (fileName: string) =>
   fileName
     .replace(/\[\[\.\.\.(\S+)\]\]/g, ':$1*') // [[...param]]
-    .replace(/\[\.\.\.(\S+)\]/g, ':$1') // [...param]
+    .replace(/\[\.\.\.(\S+)\]/g, ':$1+') // [...param]
     .replace(/\[(\S+)\]/g, ':$1') // [param]
 
 /** Get path and path translations from name and all translations */

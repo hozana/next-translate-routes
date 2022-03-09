@@ -19,6 +19,42 @@
       "permanent": true
     },
     {
+      "source": "/en/(tout|todo)/:path+",
+      "destination": "/en/catch-all/:path+",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/fr/(todo|catch-all)/:path+",
+      "destination": "/fr/tout/:path+",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/es/(tout|catch-all)/:path+",
+      "destination": "/es/todo/:path+",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/en/(tout-ou-rien|todo-o-nada)/:path*",
+      "destination": "/en/catch-all-or-none/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/fr/(todo-o-nada|catch-all-or-none)/:path*",
+      "destination": "/fr/tout-ou-rien/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
+      "source": "/es/(tout-ou-rien|catch-all-or-none)/:path*",
+      "destination": "/es/todo-o-nada/:path*",
+      "locale": false,
+      "permanent": true
+    },
+    {
       "source": "/en/(communautes|comunidades)/:tagSlug*",
       "destination": "/en/communities/:tagSlug*",
       "locale": false,
@@ -127,24 +163,6 @@
       "permanent": true
     },
     {
-      "source": "/en/(fetes|fiestas)/:path*",
-      "destination": "/en/feast-days/:path*",
-      "locale": false,
-      "permanent": true
-    },
-    {
-      "source": "/fr/(fiestas|feast-days)/:path*",
-      "destination": "/fr/fetes/:path*",
-      "locale": false,
-      "permanent": true
-    },
-    {
-      "source": "/es/(fetes|feast-days)/:path*",
-      "destination": "/es/fiestas/:path*",
-      "locale": false,
-      "permanent": true
-    },
-    {
       "source": "/en/(mon-compte|mi-cuenta)/(favoris|favorito)",
       "destination": "/en/my-account/favoris",
       "locale": false,
@@ -175,6 +193,14 @@
       "destination": "/about"
     },
     {
+      "source": "/(tout|todo)/:path+",
+      "destination": "/catch-all/:path+"
+    },
+    {
+      "source": "/(tout-ou-rien|todo-o-nada)/:path*",
+      "destination": "/catch-all-or-none/:path*"
+    },
+    {
       "source": "/(communautes|comunidades)/:tagSlug*",
       "destination": "/communities/:tagSlug*"
     },
@@ -189,10 +215,6 @@
     {
       "source": "/FAQ",
       "destination": "/faq"
-    },
-    {
-      "source": "/(fetes|fiestas)/:path*",
-      "destination": "/feast-days/:path*"
     },
     {
       "source": "/(my-account|mon-compte|mi-cuenta)/(favoris|favorito)",

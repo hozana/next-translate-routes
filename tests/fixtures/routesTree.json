@@ -36,6 +36,40 @@
       ]
     },
     {
+      "name": "catch-all",
+      "paths": {
+        "default": "catch-all",
+        "fr": "tout",
+        "es": "todo",
+        "pt": "tudo"
+      },
+      "children": [
+        {
+          "name": "[...path]",
+          "paths": {
+            "default": ":path+"
+          }
+        }
+      ]
+    },
+    {
+      "name": "catch-all-or-none",
+      "paths": {
+        "default": "catch-all-or-none",
+        "fr": "tout-ou-rien",
+        "es": "todo-o-nada",
+        "pt": "tudo-ou-nada"
+      },
+      "children": [
+        {
+          "name": "[[...path]]",
+          "paths": {
+            "default": ":path*"
+          }
+        }
+      ]
+    },
+    {
       "name": "communities",
       "paths": {
         "default": "communities",
@@ -107,23 +141,6 @@
         "en": "FAQ",
         "fr": "FAQ"
       }
-    },
-    {
-      "name": "feast-days",
-      "paths": {
-        "default": "feast-days",
-        "fr": "fetes",
-        "es": "fiestas",
-        "pt": "festas"
-      },
-      "children": [
-        {
-          "name": "[[...path]]",
-          "paths": {
-            "default": ":path*"
-          }
-        }
-      ]
     },
     {
       "name": "index",
