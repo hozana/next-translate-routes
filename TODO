@@ -1,6 +1,7 @@
 # Todo
 
-- add yaml support
+- add exclude options to exclude redirects/rewrites
+- fix looping redirect for /fr/bible
 - check pageExtensions before adding a page in the routesTree
 - check basePath compatibility
 - check middlewares compatibility
