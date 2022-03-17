@@ -180,7 +180,7 @@ const MyLinks = (props) => {
   return (
     <>
       <Link href="/file/path/to/page">Current locale</Link>
-      {locale.map((locale) => (
+      {locales.map((locale) => (
         <Link
           href={{ pathname: '/file/path/to/[dynamic]/page', query: { dynamic: props.param, otherQueryParam: 'foo' } }}
           locale={locale}
@@ -188,7 +188,7 @@ const MyLinks = (props) => {
         >
           {locale}
         </Link>
-      )}
+      ))}
     </>
   )
 }
