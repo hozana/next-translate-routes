@@ -105,7 +105,7 @@ In `/pages/section/`, the `_routes.json` file could look like this.
     "default": "article", // Overwrite the default page path (fallback)
     "es": "articulo"
   },
-  "page2": "definition", // Overwrite the page path for all language
+  "page2": "definition" // Overwrite the page path for all language
 }
 ```
 
