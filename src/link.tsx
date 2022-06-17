@@ -6,7 +6,7 @@ import { removeLangPrefix, translateUrl } from './translateUrl'
 /**
  * Link component that handle route translations
  */
-export const Link: React.FC<LinkProps> = ({ href, as, locale: propLocale, ...props }) => {
+export const Link: React.FC<React.PropsWithChildren<LinkProps>> = ({ href, as, locale: propLocale, ...props }) => {
   const { locale: routerLocale, defaultLocale, locales } = useNextRouter()
   let locale = propLocale || routerLocale || defaultLocale || locales?.[0]
   const unPrefixedHref = typeof href === 'string' ? removeLangPrefix(href) : href
