@@ -9,7 +9,9 @@ type Props = {
   title?: string
 }
 
-const Nav: React.FC<{ LinkComponent: React.ComponentType<LinkProps> }> = ({ LinkComponent }) => {
+const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren<LinkProps>> }> = ({
+  LinkComponent,
+}) => {
   const { locale, pathname, query } = useRouter()
   const newLocale = locale === 'en' ? 'fr' : 'en'
 
