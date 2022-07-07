@@ -208,6 +208,7 @@ type NTRConfig = {
   debug?: boolean
   routesDataFileName?: string
   routesTree?: TRouteBranch<L>
+  pagesDirectory?: string
 }
 ```
 

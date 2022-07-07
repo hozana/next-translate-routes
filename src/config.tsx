@@ -386,13 +386,14 @@ export type NTRConfig = {
   debug?: boolean
   routesDataFileName?: string
   routesTree?: TRouteBranch
+  pagesDirectory?: string
 }
 
 /**
  * Inject translated routes
  */
 export const withTranslateRoutes = ({
-  translateRoutes: { debug, routesDataFileName, routesTree: customRoutesTree } = {},
+  translateRoutes: { debug, routesDataFileName, routesTree: customRoutesTree, pagesDirectory } = {},
   ...nextConfig
 }: NextConfig & { i18n: I18NConfig; translateRoutes: NTRConfig }): NextConfig => {
   if (!nextConfig.i18n) {
@@ -401,7 +402,7 @@ export const withTranslateRoutes = ({
     )
   }
 
-  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages'].find((dirPath) =>
+  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages', pagesDirectory].find((dirPath) =>
     fs.existsSync(pathUtils.join(process.cwd(), dirPath)),
   )
 
