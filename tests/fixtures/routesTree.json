@@ -166,6 +166,21 @@
         "es": "mi-cuenta",
         "fr": "mon-compte"
       }
+    },
+    {
+      "name": "news",
+      "paths": {
+        "default": "news",
+        "fr": "actualites"
+      },
+      "children": [
+        {
+          "name": "[...newsPathPart]",
+          "paths": {
+            "default": ":newsPathPart+"
+          }
+        }
+      ]
     }
   ]
 }

@@ -7,7 +7,7 @@ import { render } from '@testing-library/react'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 
 import { removeLangPrefix, translatePath, translateUrl } from '../src/translateUrl'
-import { Link } from '../link'
+import { Link } from '../src/link'
 import routesTree from './fixtures/routesTree.json'
 
 import type { TNtrData } from '../src/types'
@@ -101,6 +101,44 @@ describe('translate', () => {
         pathname: '/communautes',
         query: { baz: 3 },
       },
+    },
+    {
+      href: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a'] },
+      },
+      translatedPath: {
+        pathname: '/actualites/a',
+        query: {},
+      },
+    },
+    {
+      href: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a', 'b'] },
+      },
+      translatedPath: {
+        pathname: '/actualites/a/b',
+        query: {},
+      },
+    },
+    {
+      href: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: 'a' },
+      },
+      translatedPath: {
+        pathname: '/actualites/a',
+        query: {},
+      },
+    },
+    {
+      href: '/news/a/b',
+      translatedPath: '/actualites/a/b',
+    },
+    {
+      href: '/news/a',
+      translatedPath: '/actualites/a',
     },
     {
       href: '/community/300/three-hundred/statistics?baz=3#section',
@@ -201,18 +239,13 @@ describe('translate', () => {
     },
   ].forEach(({ href, locale = 'fr', translatedPath, translatedUrl }) => {
     const args = [href, locale || 'fr'] as const
-    const pathname = typeof href === 'string' ? href : href.pathname
-    test(`translateUrl: ${pathname}`, () => {
-      expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
+    const titleInput = typeof href === 'string' ? href : JSON.stringify(href)
+    test(`translateUrl: ${titleInput}`, () => {
       if (translatedPath) {
         expect(translatePath(...args)).toEqual(translatedPath)
       }
+      expect(translateUrl(...args)).toEqual(translatedUrl || translatedPath)
     })
-    if (translatedPath) {
-      test(`translatePath: ${pathname}`, () => {
-        expect(translatePath(...args)).toEqual(translatedPath)
-      })
-    }
   })
 
   windowSpy.mockRestore()

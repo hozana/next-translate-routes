@@ -30,7 +30,7 @@ import pathUtils from 'path'
 import YAML from 'yamljs'
 import { pathToRegexp } from 'path-to-regexp'
 import { Configuration as WebpackConfiguration } from 'webpack'
-
+import { findPagesDir } from 'next/dist/lib/find-pages-dir'
 import { ignoreSegmentPathRegex } from './translateUrl'
 
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
@@ -77,11 +77,12 @@ export type TParsePageTreeProps = {
  * Recursively parse pages directory and build a page tree object
  */
 export const parsePagesTree = <L extends string>({
-  directoryPath,
+  directoryPath: propDirectoryPath,
   pageExtensions,
   isSubBranch,
   routesDataFileName,
 }: TParsePageTreeProps): TRouteBranch<L> => {
+  const directoryPath = propDirectoryPath || findPagesDir(process.cwd())
   const directoryItems = fs.readdirSync(directoryPath)
   const routesFileName = directoryItems.find((directoryItem) => {
     const fileNameNoExt = directoryItem.match(/^(.+)\.(json|yaml)$/)?.[1]
@@ -402,8 +403,8 @@ export const withTranslateRoutes = ({
     )
   }
 
-  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages', pagesDirectory].find((dirPath) =>
-    fs.existsSync(pathUtils.join(process.cwd(), dirPath)),
+  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages', pagesDirectory].find(
+    (dirPath) => dirPath && fs.existsSync(pathUtils.join(process.cwd(), dirPath)),
   )
 
   if (!pagesDir) {

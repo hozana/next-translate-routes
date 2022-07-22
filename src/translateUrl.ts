@@ -37,7 +37,9 @@ const getAllCandidates = (lang: string, children?: TRouteBranch[]): TRouteBranch
       }, [] as TRouteBranch[])
     : []
 
+/** Ex: [slug] */
 const getSingleDynamicPathPartName = (pathPartName: string) => /^\[([^/[\].]+)\]$/.exec(pathPartName)?.[1] || null
+/** Ex: [...pathPart] or [[...pathPart]] */
 const getSpreadDynamicPathPartName = (pathPartName: string) =>
   /^\[\[?\.{3}([^/[\].]+)\]?\]$/.exec(pathPartName)?.[1] || null
 
@@ -76,14 +78,17 @@ const translatePathParts = ({
   const candidates = getAllCandidates(locale, children).filter((child) =>
     pathParts.length === 1 // Last path part
       ? !child.children ||
-        child.children.some((grandChild) => grandChild.name === 'index' || /\[\[\.{3}\w+\]\]/.exec(grandChild.name))
-      : !!child.children,
+        child.children.some((grandChild) => grandChild.name === 'index' || /\[\[\.{0,3}\w+\]\]/.exec(grandChild.name))
+      : !!child.children || /\[\[?\.{3}\w+\]?\]/.exec(child.name),
   )
 
   let currentQuery = query
+
+  /**
+   * If defined: pathPart is a route segment name that should be translated.
+   * If dynamic, the value should already be contained in the query.
+   */
   let childRouteBranch = candidates.find(({ name }) => pathPart === name)
-  // If defined: pathPart is a route segment name that should be translated.
-  // If dynamic, the value should already be contained in the query.
 
   if (!childRouteBranch) {
     // If not defined: pathPart is either a dynamic value either a wrong path.
@@ -104,7 +109,7 @@ const translatePathParts = ({
           [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
         }
         return {
-          translatedPathParts: [childRouteBranch.name], // [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
+          translatedPathParts: [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
           augmentedQuery: currentQuery,
         }
       }
