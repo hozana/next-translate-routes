@@ -185,6 +185,24 @@
       "destination": "/es/mi-cuenta/favorito",
       "locale": false,
       "permanent": true
+    },
+    {
+      "destination": "/en/news/:newsPathPart+",
+      "locale": false,
+      "permanent": true,
+      "source": "/en/actualites/:newsPathPart+"
+    },
+    {
+      "destination": "/fr/actualites/:newsPathPart+",
+      "locale": false,
+      "permanent": true,
+      "source": "/fr/news/:newsPathPart+"
+    },
+    {
+      "destination": "/es/news/:newsPathPart+",
+      "locale": false,
+      "permanent": true,
+      "source": "/es/actualites/:newsPathPart+"
     }
   ],
   "rewrites": [
@@ -219,6 +237,10 @@
     {
       "source": "/(my-account|mon-compte|mi-cuenta)/(favoris|favorito)",
       "destination": "/my-account/favorites"
+    },
+    {
+      "destination": "/news/:newsPathPart+",
+      "source": "/actualites/:newsPathPart+"
     }
   ]
 }

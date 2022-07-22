@@ -6,7 +6,6 @@
 - check basePath compatibility
 - check middlewares compatibility
 - check if and where special characters should be escaped (<https://nextjs.org/docs/api-reference/next.config.js/rewrites#regex-path-matching>)
-- support pages folder in src/pages
 - validate custom pagesTree
 - throw if destination is equal to source
 - trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
