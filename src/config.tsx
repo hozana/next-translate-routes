@@ -82,7 +82,7 @@ export const parsePagesTree = <L extends string>({
   isSubBranch,
   routesDataFileName,
 }: TParsePageTreeProps): TRouteBranch<L> => {
-  const directoryPath = propDirectoryPath || findPagesDir(process.cwd())
+  const directoryPath = propDirectoryPath || findPagesDir(process.cwd()).pages
   const directoryItems = fs.readdirSync(directoryPath)
   const routesFileName = directoryItems.find((directoryItem) => {
     const fileNameNoExt = directoryItem.match(/^(.+)\.(json|yaml)$/)?.[1]
