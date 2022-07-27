@@ -1,16 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-
-import React from 'react'
 import { render } from '@testing-library/react'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
+import React from 'react'
 
-import { removeLangPrefix, translatePath, translateUrl } from '../src/translateUrl'
+import { removeLangPrefix, translatePath, translateUrl } from '../src/client/translateUrl'
 import { Link } from '../src/link'
-import routesTree from './fixtures/routesTree.json'
-
 import type { TNtrData } from '../src/types'
+import routesTree from './fixtures/routesTree.json'
 
 const defaultNtrData = {
   defaultLocale: 'fr',

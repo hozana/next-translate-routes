@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react'
 import Link from 'next-translate-routes/link'
-import NextLink, { LinkProps } from 'next/link'
 import Head from 'next/head'
+import NextLink, { LinkProps } from 'next/link'
 import { useRouter } from 'next/router'
+import React, { ReactNode } from 'react'
 
 type Props = {
   children?: ReactNode

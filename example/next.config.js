@@ -1,5 +1,5 @@
 const path = require('path')
-const withTranslateRoutes = require("next-translate-routes/plugin")
+const withTranslateRoutes = require('next-translate-routes/plugin')
 
 const nextConfig = withTranslateRoutes({
   i18n: {
@@ -21,7 +21,7 @@ const nextConfig = withTranslateRoutes({
     return [
       {
         source: '/france/blog/documentation',
-        destination: '/docs'
+        destination: '/docs',
       },
     ]
   },

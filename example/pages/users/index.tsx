@@ -1,11 +1,11 @@
-import React from 'react'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 import Link from 'next-translate-routes/link'
+import React from 'react'
 
-import { User } from '../../interfaces'
-import { sampleUserData } from '../../utils/sample-data'
 import Layout from '../../components/Layout'
 import List from '../../components/List'
+import { User } from '../../interfaces'
+import { sampleUserData } from '../../utils/sample-data'
 
 export const getStaticProps: GetStaticProps<{ items: User[] }> = async () => ({ props: { items: sampleUserData } })
 

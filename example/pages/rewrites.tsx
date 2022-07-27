@@ -1,5 +1,6 @@
 import { Rewrite } from 'next/dist/lib/load-custom-routes'
 import React, { useEffect, useState } from 'react'
+
 import Layout from '../components/Layout'
 
 type TRewrites = Record<'beforeFiles' | 'afterFiles', Rewrite[]>

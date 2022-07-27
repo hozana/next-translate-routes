@@ -1,6 +1,6 @@
-import React from 'react'
 import { InferGetServerSidePropsType, NextPage } from 'next'
 import Link from 'next-translate-routes/link'
+import React from 'react'
 
 import Layout from '../components/Layout'
 

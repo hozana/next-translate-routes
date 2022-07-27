@@ -1,5 +1,4 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
-
 import type { UrlObject } from 'url'
 
 export type Url = UrlObject | string
@@ -21,6 +20,13 @@ export type TNtrData = {
   defaultLocale: string
   locales: string[]
   routesTree: TRouteBranch
+}
+
+export type NTRConfig = {
+  debug?: boolean
+  routesDataFileName?: string
+  routesTree?: TRouteBranch
+  pagesDirectory?: string
 }
 
 declare global {

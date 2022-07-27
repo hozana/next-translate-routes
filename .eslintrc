@@ -13,18 +13,11 @@
     }
   },
   "ignorePatterns": ["node_modules", "*.js", "*.d.ts"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "overrides": [
     {
       "files": "./src/*",
-      "extends": [
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended"
-      ],
+      "extends": ["plugin:react/recommended", "plugin:react-hooks/recommended"],
       "rules": {
         "react/prop-types": "off"
       }

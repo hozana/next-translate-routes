@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
+import withTranslateRoutes, { translateUrl } from 'next-translate-routes'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
-import withTranslateRoutes, { translateUrl } from 'next-translate-routes'
+import React, { useEffect } from 'react'
 
 const App: React.FC<AppProps> = ({ Component, pageProps, router: baseRouter }) => {
   const router = useRouter()

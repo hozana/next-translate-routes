@@ -13,4 +13,4 @@
 - getRouteList: (locale?: string) => (? Record<string, string[]> ? string? string[]?)
 - create a function `getRouteSegments(filePath: string): TRouteSegment[]`
   - return the whole path as is if not found and not dynamic file path
-  - export a routeExist function
+- export a routeExist function

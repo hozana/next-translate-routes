@@ -4,5 +4,7 @@
   "singleQuote": true,
   "trailingComma": "all",
   "bracketSpacing": true,
-  "semi": false
+  "semi": false,
+  "importOrder": ["^[./]"],
+  "importOrderSeparation": true
 }

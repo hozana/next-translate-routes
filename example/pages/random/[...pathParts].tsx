@@ -1,8 +1,9 @@
-import React from 'react'
+import type { NextPage } from 'next'
 import Link from 'next-translate-routes/link'
 import { useRouter } from 'next/router'
+import React from 'react'
+
 import Layout from '../../components/Layout'
-import type { NextPage } from 'next'
 
 export const getServerSideProps = async () => ({ props: {} })
 

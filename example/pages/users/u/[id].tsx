@@ -1,10 +1,10 @@
-import React from 'react'
 import { GetStaticProps, GetStaticPaths } from 'next'
+import React from 'react'
 
-import { User } from '../../../interfaces'
-import { sampleUserData } from '../../../utils/sample-data'
 import Layout from '../../../components/Layout'
 import ListDetail from '../../../components/ListDetail'
+import { User } from '../../../interfaces'
+import { sampleUserData } from '../../../utils/sample-data'
 
 type Props = {
   item?: User

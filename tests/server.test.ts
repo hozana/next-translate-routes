@@ -1,13 +1,14 @@
 /**
  * @jest-environment node
  */
-
-import { getPageReRoutes, getRouteBranchReRoutes, parsePagesTree } from '../src/config'
-import path from 'path'
-import routesTree from './fixtures/routesTree.json'
-import reRoutesData from './fixtures/reRoutesData.json'
-import allReRoutes from './fixtures/allReRoutes.json'
 import type { NEXT_DATA } from 'next/dist/shared/lib/utils'
+import path from 'path'
+
+import { getPageReRoutes, getRouteBranchReRoutes } from '../src/server/getRouteBranchReRoutes'
+import { parsePages } from '../src/server/parsePages'
+import allReRoutes from './fixtures/allReRoutes.json'
+import reRoutesData from './fixtures/reRoutesData.json'
+import routesTree from './fixtures/routesTree.json'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -19,7 +20,7 @@ declare global {
 }
 test('parsePagesTree.', () => {
   const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const parsedPagesTree = parsePagesTree({ directoryPath: pagesPath, pageExtensions: ['tsx', 'jsx', 'ts', 'js'] })
+  const parsedPagesTree = parsePages({ directoryPath: pagesPath, pageExtensions: ['tsx', 'jsx', 'ts', 'js'] })
   expect(parsedPagesTree).toEqual(routesTree)
 })
 

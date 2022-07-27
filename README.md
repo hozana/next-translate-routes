@@ -35,7 +35,7 @@ Translated routing and more for Next using Next regular file-base routing system
 
 See it in action: <https://codesandbox.io/s/github/hozana/next-translate-routes/tree/master>
 
-__Note__: Next-translate-routes does not work with Next html static export, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
+**Note**: Next-translate-routes does not work with Next html static export, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
 
 ## Motivation
 
@@ -144,8 +144,8 @@ for each language or only some language, like "blog" in `pt` here:
 
 ```js
 // `/pages/_app.js`
-import { App } from 'next/app'
 import { withTranslateRoutes } from 'next-translate-routes'
+import { App } from 'next/app'
 
 export default withTranslateRoutes(App)
 ```
@@ -170,9 +170,8 @@ export default withTranslateRoutes(App)
 next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes/link' instead of 'next/link' and use as you ever did.
 
 ```jsx
-import React, { useEffect, useState } from 'react'
-
 import Link from 'next-translate-routes/link'
+import React, { useEffect, useState } from 'react'
 
 const MyLinks = (props) => {
   const { locales } = useRouter()
@@ -192,7 +191,6 @@ const MyLinks = (props) => {
     </>
   )
 }
-
 ```
 
 ### Advanced usage
@@ -215,17 +213,17 @@ type NTRConfig = {
 <details>
   <summary>See more about TRouteBranch</summary>
 
-  If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
+If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
 
-  ```ts
-  /** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
-  type TRouteBranchEnFr = {
-    name: string
-    en: string
-    fr: string
-    children: TRouteBranchEnFr[]
-  }
-  ```
+```ts
+/** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
+type TRouteBranchEnFr = {
+  name: string
+  en: string
+  fr: string
+  children: TRouteBranchEnFr[]
+}
+```
 
 </details>
 
@@ -383,7 +381,7 @@ For Storybook, this piece of code can be used to create a decorator function.
 - Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the `_routes.json` files.
 - The plugin then uses this information to build optimized redirects and rewrites, then add them to the next config object.
 - Rewrites take care of displaying the right page for the translates urls, redirects take care of the urls that would give an unwanted access to the pages (and would create duplicated content).
-- The plugin adds a webpack loader for the pages/_app file. This loader adds a data object (containing the routes tree object along with other config) as first argument of the `withTranslateRoutes` high order component that wrap the app.
+- The plugin adds a webpack loader for the pages/\_app file. This loader adds a data object (containing the routes tree object along with other config) as first argument of the `withTranslateRoutes` high order component that wrap the app.
 - `withTranslateRoutes` makes this data available as a global variable, `__NEXT_TRANSLATE_ROUTES_DATA`.
 - The `translateUrl` function uses this data to translate routes.
 - The `next-translate-routes/link` leverages the `translateUrl` function to set the `as` prop of `next/link` to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).

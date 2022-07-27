@@ -1,8 +1,9 @@
-import React from 'react'
+import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 import Link from 'next-translate-routes/link'
 import { useRouter } from 'next/router'
+import React from 'react'
+
 import Layout from '../../../components/Layout'
-import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 
 export const getStaticPaths: GetStaticPaths = async () => ({ paths: [], fallback: 'blocking' })
 
