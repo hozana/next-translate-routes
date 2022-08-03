@@ -7,7 +7,10 @@ import List from '../../components/List'
 import { User } from '../../interfaces'
 import { sampleUserData } from '../../utils/sample-data'
 
-export const getStaticProps: GetStaticProps<{ items: User[] }> = async () => ({ props: { items: sampleUserData } })
+export const getStaticProps: GetStaticProps<{ items: User[] }> = async () => {
+  console.log('From users/index, getStaticProps.', { props: { items: sampleUserData } })
+  return { props: { items: sampleUserData } }
+}
 
 const UsersPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ items }) => (
   <Layout title="Users List | Next.js + TypeScript Example">
