@@ -1,0 +1,1 @@
+{"version":3,"file":"fileNameToPaths.js","sourceRoot":"","sources":["../src/server/fileNameToPaths.ts"],"names":[],"mappings":";;;AAAA,mEAAmE;AAC5D,IAAM,cAAc,GAAG,UAAC,QAAgB;IAC7C,OAAA,QAAQ;SACL,OAAO,CAAC,sBAAsB,EAAE,MAAM,CAAC,CAAC,eAAe;SACvD,OAAO,CAAC,kBAAkB,EAAE,MAAM,CAAC,CAAC,aAAa;SACjD,OAAO,CAAC,YAAY,EAAE,KAAK,CAAC;AAH/B,CAG+B,CAAA,CAAC,UAAU;AAJ/B,QAAA,cAAc,kBAIM"}
