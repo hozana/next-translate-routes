@@ -53,7 +53,7 @@ const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProp
           ? (translateUrl(inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
           : inputUrl)
 
-      if (debug) {
+      if (debug === 'withPrefetch') {
         console.log('[next-translate-routes] - router.prefetch.', { inputUrl, asPath, options, as, locale })
       }
 
