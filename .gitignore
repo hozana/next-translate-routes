@@ -6,6 +6,6 @@ yarn-error.log
 ./client
 ./server
 ./shared
-/*.js
-/*.map
-/*.d.ts
+./*.js
+./*.map
+./*.d.ts
