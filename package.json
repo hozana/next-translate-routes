@@ -36,6 +36,9 @@
     "*.js",
     "*.d.ts",
     "*.js.map",
+    "client/*",
+    "server/*",
+    "shared/*",
     "src/*"
   ],
   "devDependencies": {

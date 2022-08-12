@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc",
-    "preinstall": "yon --cwd .. install && yon --cwd .. link && yon link next-translate-routes"
+    "preinstall": "yon --cwd .. unlink && yon unlink next-tranlate-routes && yon --cwd .. install && yon --cwd .. link && yon link next-translate-routes"
   },
   "dependencies": {
     "next": "^12.2.3",
