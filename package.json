@@ -18,13 +18,14 @@
     "dynamic"
   ],
   "scripts": {
-    "build": "`rm ./*.d.ts ./*.js.map ./*.js` npx tsc",
+    "build:clear": "rm -rf client server shared ./*.d.ts ./*.js.map ./*.js",
+    "build": "yon build:clear && yon tsc",
     "format": "yarn prettier -c --write .",
-    "lint": "npx eslint --ignore-path .gitignore .",
+    "lint": "yon eslint --ignore-path .gitignore .",
     "test": "jest",
     "prerelease": "yon lint && yon build",
     "release": "npx np",
-    "prestart": "yon --cwd ./example install && yon build && yon --cwd ./example build",
+    "prestart": "yon --cwd ./example install && yon --cwd ./example build",
     "start": "yon --cwd ./example start"
   },
   "dependencies": {

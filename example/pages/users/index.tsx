@@ -8,7 +8,6 @@ import { User } from '../../interfaces'
 import { sampleUserData } from '../../utils/sample-data'
 
 export const getStaticProps: GetStaticProps<{ items: User[] }> = async () => {
-  console.log('From users/index, getStaticProps.', { props: { items: sampleUserData } })
   return { props: { items: sampleUserData } }
 }
 
