@@ -16,7 +16,7 @@ export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
 }
 
 export type TNtrData = {
-  debug?: boolean
+  debug?: boolean | 'withPrefetch'
   defaultLocale: string
   locales: string[]
   routesTree: TRouteBranch
