@@ -3,9 +3,9 @@ node_modules
 yarn-error.log
 
 # Build
-./plugin
-./react
-./shared
-./*.js
-./*.map
-./*.d.ts
+plugin
+react
+shared
+*.js
+*.map
+*.d.ts
