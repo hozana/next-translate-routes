@@ -195,6 +195,18 @@ const MyLinks = (props) => {
 }
 ```
 
+#### 5. Use next-translate-routes/router instead of next/router for SingletonRouter (default export)
+
+You can use `next-translate-routes/router` everywhere instead of `next/router` but it is only necessary for the SingletonRouter (which is rarely used).
+
+```typescript
+import SingletonRouter from 'next-translate-routes/router'
+// Or:
+import { SingletonRouter } from 'next-translate-routes/router'
+// Indead of:
+import SingletonRouter from 'next/router'
+```
+
 ### Advanced usage
 
 Check the example folder to see some advanced techniques in action.
