@@ -1,12 +1,11 @@
-import fs from 'fs'
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
-import type { I18NConfig, NextConfig } from 'next/dist/server/config-shared'
-import pathUtils from 'path'
+import type { NextConfig } from 'next/dist/server/config-shared'
 import { Configuration as WebpackConfiguration } from 'webpack'
 
-import { NTRConfig } from '../types'
+import { NextConfigWithNTR } from '../types'
+import { createNtrData } from './createNtrData'
+import { getPagesPath } from './getPagesPath'
 import { getRouteBranchReRoutes } from './getRouteBranchReRoutes'
-import { parsePages } from './parsePages'
 
 /**
  * Sort redirects and rewrites by descending specificity:
@@ -28,33 +27,20 @@ const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
 /**
  * Inject translated routes
  */
-export const withTranslateRoutes = ({
-  translateRoutes: { debug, routesDataFileName, routesTree: customRoutesTree, pagesDirectory } = {},
-  ...nextConfig
-}: NextConfig & { i18n: I18NConfig; translateRoutes: NTRConfig }): NextConfig => {
+export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConfig => {
+  const { translateRoutes: { debug, pagesDirectory } = {}, ...nextConfig } = userNextConfig
+
   if (!nextConfig.i18n) {
     throw new Error(
       '[next-translate-routes] - No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',
     )
   }
 
-  const pagesDir = ['pages', 'src/pages', 'app/pages', 'intergrations/pages', pagesDirectory].find(
-    (dirPath) => dirPath && fs.existsSync(pathUtils.join(process.cwd(), dirPath)),
-  )
+  const pagesPath = getPagesPath(pagesDirectory)
 
-  if (!pagesDir) {
-    throw new Error('[next-translate-routes] - No pages folder found.')
-  }
+  const ntrData = createNtrData(userNextConfig, pagesPath)
 
-  const pagesPath = pathUtils.join(process.cwd(), pagesDir, '/')
-
-  const {
-    i18n: { defaultLocale, locales = [] },
-    pageExtensions = ['js', 'jsx', 'ts', 'tsx'],
-  } = nextConfig
-
-  const routesTree = customRoutesTree || parsePages({ directoryPath: pagesPath, pageExtensions, routesDataFileName })
-  // TODO: validateRoutesTree(routesTree)
+  const { routesTree, locales, defaultLocale } = ntrData
 
   const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree, defaultLocale })
   const sortedRedirects = sortBySpecificity(redirects)
@@ -68,9 +54,9 @@ export const withTranslateRoutes = ({
   return {
     ...nextConfig,
 
-    webpack(conf: WebpackConfiguration, options) {
+    webpack(conf: WebpackConfiguration, context) {
       const config =
-        typeof nextConfig.webpack === 'function' ? (nextConfig.webpack(conf, options) as WebpackConfiguration) : conf
+        typeof nextConfig.webpack === 'function' ? (nextConfig.webpack(conf, context) as WebpackConfiguration) : conf
 
       if (!config.module) {
         config.module = {}
@@ -79,17 +65,12 @@ export const withTranslateRoutes = ({
         config.module.rules = []
       }
       config.module.rules.push({
-        test: new RegExp(`_app\\.(${pageExtensions.join('|')})$`),
+        test: new RegExp(`_app\\.(${context.config.pageExtensions.join('|')})$`),
         use: {
           loader: 'next-translate-routes/loader',
           options: {
             pagesPath,
-            data: {
-              debug,
-              defaultLocale,
-              locales,
-              routesTree,
-            },
+            data: ntrData,
           },
         },
       })
