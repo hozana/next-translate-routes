@@ -5,8 +5,8 @@ import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 
 import { ignoreSegmentPathRegex } from '../shared/ignoreSegmentPathRegex'
-import { getNtrData } from '../shared/ntrData'
 import type { TRouteBranch, Url } from '../types'
+import { getNtrData } from './ntrData'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
   format?: F
@@ -246,5 +246,3 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
 
   return normalizePathTrailingSlash(prefix + translatedPath)
 }) as typeof translatePath
-
-export default translateUrl

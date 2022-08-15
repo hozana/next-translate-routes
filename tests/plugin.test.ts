@@ -4,8 +4,8 @@
 import type { NEXT_DATA } from 'next/dist/shared/lib/utils'
 import path from 'path'
 
-import { getPageReRoutes, getRouteBranchReRoutes } from '../src/server/getRouteBranchReRoutes'
-import { parsePages } from '../src/server/parsePages'
+import { getPageReRoutes, getRouteBranchReRoutes } from '../src/plugin/getRouteBranchReRoutes'
+import { parsePages } from '../src/plugin/parsePages'
 import allReRoutes from './fixtures/allReRoutes.json'
 import reRoutesData from './fixtures/reRoutesData.json'
 import routesTree from './fixtures/routesTree.json'

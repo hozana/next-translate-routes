@@ -18,7 +18,7 @@
     "dynamic"
   ],
   "scripts": {
-    "build:clear": "rm -rf client server shared ./*.d.ts ./*.js.map ./*.js",
+    "build:clear": "rm -rf plugin react shared ./*.d.ts ./*.js.map ./*.js",
     "build": "yon build:clear && yon tsc",
     "format": "yarn prettier -c --write .",
     "lint": "yon eslint --ignore-path .gitignore .",
@@ -37,8 +37,8 @@
     "*.js",
     "*.d.ts",
     "*.js.map",
-    "client/*",
-    "server/*",
+    "plugin/*",
+    "react/*",
     "shared/*",
     "src/*"
   ],

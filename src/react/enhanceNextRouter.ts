@@ -1,8 +1,8 @@
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { NextRouter, SingletonRouter } from 'next/router'
 
-import { getNtrData } from '../shared/ntrData'
 import type { Url } from '../types'
+import { getNtrData } from './ntrData'
 import { translateUrl } from './translateUrl'
 
 interface Options {

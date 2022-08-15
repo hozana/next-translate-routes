@@ -1,1 +1,2 @@
-export { Link, Link as default } from './client/link'
+export * from './react/link'
+export { Link as default } from './react/link'

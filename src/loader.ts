@@ -1,1 +1,1 @@
-export { loader as default } from './server/loader'
+export { loader as default } from './plugin/loader'
