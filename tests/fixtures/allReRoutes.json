@@ -4,204 +4,204 @@
       "source": "/en/(a-propos|acerca-de-nosotros)",
       "destination": "/en/about",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(acerca-de-nosotros|about)",
       "destination": "/fr/a-propos",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(a-propos|about)",
       "destination": "/es/acerca-de-nosotros",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(tout|todo)/:path+",
       "destination": "/en/catch-all/:path+",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(todo|catch-all)/:path+",
       "destination": "/fr/tout/:path+",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(tout|catch-all)/:path+",
       "destination": "/es/todo/:path+",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(tout-ou-rien|todo-o-nada)/:path*",
       "destination": "/en/catch-all-or-none/:path*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(todo-o-nada|catch-all-or-none)/:path*",
       "destination": "/fr/tout-ou-rien/:path*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(tout-ou-rien|catch-all-or-none)/:path*",
       "destination": "/es/todo-o-nada/:path*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(communautes|comunidades)/:tagSlug*",
       "destination": "/en/communities/:tagSlug*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(comunidades|communities)/:tagSlug*",
       "destination": "/fr/communautes/:tagSlug*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(communautes|communities)/:tagSlug*",
       "destination": "/es/comunidades/:tagSlug*",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(communaute|comunidad)/:communityId(\\d+){-:communitySlug}",
       "destination": "/en/community/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/community/:communityId/:communitySlug",
       "destination": "/en/community/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(community|comunidad)/:communityId(\\d+){-:communitySlug}",
       "destination": "/fr/communaute/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/community/:communityId/:communitySlug",
       "destination": "/fr/communaute/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(community|communaute)/:communityId(\\d+){-:communitySlug}",
       "destination": "/es/comunidad/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/community/:communityId/:communitySlug",
       "destination": "/es/comunidad/:communityId-:communitySlug",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(communaute|comunidad)/:communityId(\\d+){-:communitySlug}/(statistiques|estadisticas)",
       "destination": "/en/community/:communityId-:communitySlug/statistics",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/community/:communityId/:communitySlug/statistics",
       "destination": "/en/community/:communityId-:communitySlug/statistics",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/(community|comunidad)/:communityId(\\d+){-:communitySlug}/(statistics|estadisticas)",
       "destination": "/fr/communaute/:communityId-:communitySlug/statistiques",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/community/:communityId/:communitySlug/statistics",
       "destination": "/fr/communaute/:communityId-:communitySlug/statistiques",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(community|communaute)/:communityId(\\d+){-:communitySlug}/(statistics|statistiques)",
       "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/community/:communityId/:communitySlug/statistics",
       "destination": "/es/comunidad/:communityId-:communitySlug/estadisticas",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/faq",
       "destination": "/en/FAQ",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/fr/faq",
       "destination": "/fr/FAQ",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/FAQ",
       "destination": "/es/faq",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/en/(mon-compte|mi-cuenta)/(favoris|favorito)",
       "destination": "/en/my-account/favoris",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "destination": "/en/my-account/favoris",
       "locale": false,
-      "permanent": true,
+      "permanent": false,
       "source": "/en/my-account/favorites"
     },
     {
       "source": "/fr/(my-account|mi-cuenta)/(favoris|favorito|favorites)",
       "destination": "/fr/mon-compte/favoris",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/es/(my-account|mon-compte)/(favoris|favorites)",
       "destination": "/es/mi-cuenta/favorito",
       "locale": false,
-      "permanent": true
+      "permanent": false
     },
     {
       "destination": "/en/news/:newsPathPart+",
       "locale": false,
-      "permanent": true,
+      "permanent": false,
       "source": "/en/actualites/:newsPathPart+"
     },
     {
       "destination": "/fr/actualites/:newsPathPart+",
       "locale": false,
-      "permanent": true,
+      "permanent": false,
       "source": "/fr/news/:newsPathPart+"
     },
     {
       "destination": "/es/news/:newsPathPart+",
       "locale": false,
-      "permanent": true,
+      "permanent": false,
       "source": "/es/actualites/:newsPathPart+"
     }
   ],

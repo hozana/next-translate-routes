@@ -147,7 +147,7 @@ export const getPageReRoutes = <L extends string>({
               source,
               destination,
               locale: false as const,
-              permanent: true,
+              permanent: false,
             },
           ]
         }, [] as Redirect[])
