@@ -1,4 +1,8 @@
-import { useRouter as useNextRouter, withRouter as withNextRouter } from 'next/router'
+import NextSingletonRouter, { useRouter as useNextRouter, withRouter as withNextRouter } from 'next/router'
+
+import { enhanceNextRouter } from './client/enhanceNextRouter'
+
+export const SingletonRouter = enhanceNextRouter(NextSingletonRouter)
 
 /**
  * Get router with route translation capabilities

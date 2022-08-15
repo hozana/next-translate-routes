@@ -1,68 +1,12 @@
 import type { NextComponentType } from 'next'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
-import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import React, { useMemo } from 'react'
 
-import { getNtrData, setNtrData } from '../shared/ntrData'
-import type { TNtrData, Url } from '../types'
-import { Link } from './link'
-import { translateUrl } from './translateUrl'
-
-interface TransitionOptions {
-  shallow?: boolean
-  locale?: string | false
-  scroll?: boolean
-}
-
-const enhanceNextRouter = ({ push, replace, prefetch, locale, ...otherRouterProps }: NextRouter): NextRouter => {
-  const { debug } = getNtrData()
-
-  return {
-    push: (url: Url, as?: Url, options?: TransitionOptions) => {
-      const translatedUrl =
-        as ||
-        (options?.locale || locale
-          ? translateUrl(url, options?.locale || (locale as string), { format: 'object' })
-          : url)
-
-      if (debug) {
-        console.log('[next-translate-routes] - router.push.', { url, as, options, translatedUrl, locale })
-      }
-
-      return push(translatedUrl, as, options)
-    },
-    replace: (url: Url, as?: Url, options?: TransitionOptions) => {
-      const translatedUrl =
-        as ||
-        (options?.locale || locale
-          ? translateUrl(url, options?.locale || (locale as string), { format: 'object' })
-          : url)
-
-      if (debug) {
-        console.log('[next-translate-routes] - router.replace.', { url, as, options, translatedUrl, locale })
-      }
-
-      return replace(translatedUrl, as, options)
-    },
-    prefetch: (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-      const as =
-        asPath ||
-        (options?.locale || locale
-          ? (translateUrl(inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
-          : inputUrl)
-
-      if (debug === 'withPrefetch') {
-        console.log('[next-translate-routes] - router.prefetch.', { inputUrl, asPath, options, as, locale })
-      }
-
-      return prefetch(inputUrl, as, options)
-    },
-    locale,
-    ...otherRouterProps,
-  }
-}
+import { setNtrData } from '../shared/ntrData'
+import type { TNtrData } from '../types'
+import { enhanceNextRouter } from './enhanceNextRouter'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TWrappedAppComponent = NextComponentType<AppContextType<NextRouter>, AppInitialProps, any>
@@ -130,6 +74,3 @@ export const withTranslateRoutes = (...args: (TWrappedAppComponent | TNtrData)[]
 
   return WithTranslateRoutesApp
 }
-
-export default withTranslateRoutes
-export { Link, translateUrl }
