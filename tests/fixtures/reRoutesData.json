@@ -30,25 +30,25 @@
         "source": "/en/premier/:secondPart(\\d+)/troisieme",
         "destination": "/1st/:secondPart/thirdPart",
         "locale": false,
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/en/first/:secondPart/thirdPart",
         "destination": "/1st/:secondPart/thirdPart",
         "locale": false,
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/fr/1st/:secondPart(\\d+)/thirdPart",
         "destination": "/fr/premier/:secondPart/troisieme",
         "locale": false,
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/fr/first/:secondPart/thirdPart",
         "destination": "/fr/premier/:secondPart/troisieme",
         "locale": false,
-        "permanent": true
+        "permanent": false
       }
     ],
     "rewrites": [
