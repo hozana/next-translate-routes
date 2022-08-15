@@ -1,6 +1,6 @@
 {
   "name": "next-translate-routes",
-  "version": "1.8.0-0",
+  "version": "1.8.0-1",
   "description": "Flexible and translated routes for Next.js without custom server",
   "main": "index.js",
   "repository": "https://github.com/hozana/next-translate-routes",
