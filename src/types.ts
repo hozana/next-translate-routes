@@ -1,4 +1,5 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
+import type { I18NConfig, NextConfig, NextConfigComplete } from 'next/dist/server/config-shared'
 import type { UrlObject } from 'url'
 
 export type Url = UrlObject | string
@@ -28,6 +29,9 @@ export type NTRConfig = {
   routesTree?: TRouteBranch
   pagesDirectory?: string
 }
+
+export type NextConfigWithNTR = NextConfig & { i18n: I18NConfig; translateRoutes?: NTRConfig }
+export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: I18NConfig; translateRoutes: NTRConfig }
 
 declare global {
   // eslint-disable-next-line no-var

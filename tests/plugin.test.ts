@@ -4,8 +4,8 @@
 import type { NEXT_DATA } from 'next/dist/shared/lib/utils'
 import path from 'path'
 
+import { createNtrData } from '../src/plugin/createNtrData'
 import { getPageReRoutes, getRouteBranchReRoutes } from '../src/plugin/getRouteBranchReRoutes'
-import { parsePages } from '../src/plugin/parsePages'
 import allReRoutes from './fixtures/allReRoutes.json'
 import reRoutesData from './fixtures/reRoutesData.json'
 import routesTree from './fixtures/routesTree.json'
@@ -18,10 +18,14 @@ declare global {
     }
   }
 }
-test('parsePagesTree.', () => {
+test('createNtrData.', () => {
   const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const parsedPagesTree = parsePages({ directoryPath: pagesPath, pageExtensions: ['tsx', 'jsx', 'ts', 'js'] })
-  expect(parsedPagesTree).toEqual(routesTree)
+  const i18n = { locales: ['en', 'fr'], defaultLocale: 'en' }
+  const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
+  expect(ntrData.routesTree).toEqual(routesTree)
+  expect(ntrData.locales).toEqual(i18n.locales)
+  expect(ntrData.defaultLocale).toEqual(i18n.defaultLocale)
+  expect(ntrData.debug).toBe(true)
 })
 
 test('getPageReRoutes.', () => {
