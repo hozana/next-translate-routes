@@ -1,4 +1,4 @@
-import { withTranslateRoutes } from './server/withTranslateRoutes'
+import { withTranslateRoutes } from './withTranslateRoutes'
 
 module.exports = withTranslateRoutes
 

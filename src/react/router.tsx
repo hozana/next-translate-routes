@@ -1,6 +1,6 @@
 import NextSingletonRouter, { useRouter as useNextRouter, withRouter as withNextRouter } from 'next/router'
 
-import { enhanceNextRouter } from './client/enhanceNextRouter'
+import { enhanceNextRouter } from './enhanceNextRouter'
 
 export const SingletonRouter = enhanceNextRouter(NextSingletonRouter)
 
