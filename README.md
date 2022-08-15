@@ -8,7 +8,7 @@ Translated routing and more for Next using Next regular file-base routing system
   - [Basic usage](#basic-usage)
     1. [Wrap you next config with the next-translate-routes plugin](#1-wrap-you-next-config-with-the-next-translate-routes-plugin)
     2. [Define your routes](#2-define-your-routes)
-    3. [Wrap you \_app component with the withTranslateRoutes hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
+    3. [Wrap your \_app component with the withTranslateRoutes hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
     4. [Use next-translate-routes/link instead of next/link](#4-use-next-translate-routeslink-instead-of-nextlink)
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
@@ -16,7 +16,9 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Ignoring a path part](#ignoring-a-path-part)
     - [Complex paths segments](#complex-paths-segments)
     - [Custom route tree](#custom-route-tree)
-- [How does it works](#how-does-it-works)
+    - [Outside Next](#outside-next)
+- [Known issue: middleware with Next >=12.2.0](#known-issue-middleware-with-next-1220)
+- [How does it work](#how-does-it-work)
 
 ## Features
 
@@ -213,21 +215,19 @@ type NTRConfig = {
 <details>
   <summary>See more about TRouteBranch</summary>
 
-If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
-
-```ts
-/** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
-type TRouteBranchEnFr = {
-  name: string
-  en: string
-  fr: string
-  children: TRouteBranchEnFr[]
-}
-```
+  > If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
+  >
+  > ```ts
+  > /** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
+  > type TRouteBranchEnFr = {
+  >   name: string
+  >   en: string
+  >   fr: string
+  >   children: TRouteBranchEnFr[]
+  > }
+  > ```
 
 </details>
-
-&nbsp;
 
 ```js
   translateRoutes: {
@@ -236,8 +236,10 @@ type TRouteBranchEnFr = {
   }
 ```
 
-When `debug` is set to true, you will get some logs, both in the server terminal and in the browser console.
+When `debug` is set to true, you will get some logs, both in the server terminal and in the browser console. By default, you will get some logs for each `router.push` and `router.replace`, but not `router.prefetch`. To enable logs for `router.prefetch` too, you can set debug to `withPrefetch`.
+
 If `routesDataFileName` is defined, to `'routesData'` for example, next-translate-routes will look in the `pages` folder for files named `routesData.json` or `routesData.yaml` instead of the default `_routes.json` or `_routes.yaml`.
+
 If `routesTree` is defined, next-translate-routes won't parse the `pages` folder and will use the given object as the routes tree. If you uses it, beware of building correctly the routes tree to avoid bugs.
 
 #### Constrained dynamic paths segments
@@ -344,8 +346,21 @@ type TRouteBranch<Locale extends string> = {
 
 #### Outside Next
 
-One might need to mock next-translate-routes outside Next, for example in [Storybook](https://storybook.js.org/).
-It is possible as follow:
+One might need to mock next-translate-routes outside Next, for example for testing or in [Storybook](https://storybook.js.org/).
+
+First, you need to create next-translate-routes data. You can do it using the `createNtrData` helper. It takes the next config as first parameter. The second parameter is optional and allows to use a custom pages folder: if omitted, `createNtrData` will look for you next `pages` folder.
+
+```typescript
+import { createNtrData } from 'next-translate-routes/plugin/createNtrData`
+import nextConfig from '../next.config.js'
+
+const ntrData = createNtrData(
+  nextConfig,
+  path.resolve(process.cwd(), './fixtures/pages'),
+)
+```
+
+Then, if you want to render you app, you need to inject the router context, then (and only then) inject next-translate-routes.
 
 ```typescript
 import { RouterContext } from 'next/dist/shared/lib/router-context'
@@ -354,18 +369,13 @@ import withTranslateRoutes from 'next-translate-routes'
   //[...]
 
   const TranslateRoutes = withTranslateRoutes(
-    {
-      defaultLocale: 'fr',
-      debug: true,
-      locales: ['fr', 'en', 'es', 'pt'],
-      routesTree: { name: '/', paths: { default: '/' } }, // Mocked routes tree
-    },
+    ntrData,
     ({ children }) => <>{children}</>,
   )
 
-  return (
-    <RouterContext.Provider value={Router.router}>
-      <TranslateRoutes pageProps={{}} router={Router.router}>
+  const TranslatedRoutesProvider = ({ children }) => (
+    <RouterContext.Provider value={routerMock}>
+      <TranslateRoutes router={routerMock}>
         {children}
       </TranslateRoutes>
     </RouterContext.Provider>
@@ -374,9 +384,25 @@ import withTranslateRoutes from 'next-translate-routes'
   // [...]
 ```
 
-For Storybook, this piece of code can be used to create a decorator function.
+For Storybook, this piece of code can be used to create a decorator function:
 
-## How does it works
+```typescript
+export const WithNextRouter: DecoratorFn = (Story, context): JSX.Element => (
+  <TranslatedRoutesProvider routerMock={createRouterFromContext(context)}>
+    <Story />
+  </TranslatedRoutesProvider>
+)
+```
+
+## Known issue: middleware with Next >=12.2.0
+
+Unfortunately, Next new middleware synthax (stable) is not supported yet, because of what seems to be a Next issue.
+You can keep track of this issue:
+
+- [in next-translate-routes repo](https://github.com/hozana/next-translate-routes/issues/19)
+- [in next.js repo](https://github.com/vercel/next.js/issues/39531)
+
+## How does it work
 
 - Next-translate-routes plugin parses the page folder and builds a routes tree object that contains the path tree and the information in the `_routes.json` files.
 - The plugin then uses this information to build optimized redirects and rewrites, then add them to the next config object.
