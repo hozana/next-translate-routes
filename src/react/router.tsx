@@ -4,4 +4,4 @@ import { enhanceNextRouter } from './enhanceNextRouter'
 
 export * from 'next/dist/client/router'
 
-export const SingletonRouter = enhanceNextRouter(NextSingletonRouter)
+export default enhanceNextRouter(NextSingletonRouter)

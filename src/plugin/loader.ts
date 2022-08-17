@@ -1,15 +1,9 @@
 import type { TNtrData } from '../types'
 
-export function loader(this: { query: { pagesPath: string; data: TNtrData }; resourcePath: string }, rawCode: string) {
-  // Normalize slashes in a file path to be posix/unix-like forward slashes
-  const normalizedPagesPath = this.query.pagesPath.replace(/\\/g, '/')
-  const normalizedResourcePath = this.resourcePath.replace(/\\/g, '/')
-
-  // Skip if current resource is not _app file
-  if (!normalizedResourcePath.startsWith(`${normalizedPagesPath}_app.`)) {
-    return rawCode
-  }
-
+export function loader(
+  this: { query: { mustMatch?: boolean; data: TNtrData }; resourcePath: string },
+  rawCode: string,
+) {
   const uncommentedCode = rawCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
 
   const defaultExportHocMatch = uncommentedCode.match(/^\s*import (\w+).* from ["']next-translate-routes["']/m)
@@ -21,7 +15,13 @@ export function loader(this: { query: { pagesPath: string; data: TNtrData }; res
   const namedExportHocName = namedExportHocMatch ? namedExportHocMatch[1] || 'withTranslateRoutes' : null
 
   if (!defaultExportHocName && !namedExportHocName) {
-    throw new Error('[next-translate-routes] - No withTranslateRoutes high order component found in _app.')
+    if (this.query.mustMatch ?? true) {
+      throw new Error(
+        `[next-translate-routes] - No withTranslateRoutes high order component found in ${this.resourcePath}.`,
+      )
+    } else {
+      return rawCode
+    }
   }
 
   let result = rawCode

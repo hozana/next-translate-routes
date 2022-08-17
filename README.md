@@ -8,8 +8,9 @@ Translated routing and more for Next using Next regular file-base routing system
   - [Basic usage](#basic-usage)
     1. [Wrap you next config with the next-translate-routes plugin](#1-wrap-you-next-config-with-the-next-translate-routes-plugin)
     2. [Define your routes](#2-define-your-routes)
-    3. [Wrap your \_app component with the withTranslateRoutes hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
-    4. [Use next-translate-routes/link instead of next/link](#4-use-next-translate-routeslink-instead-of-nextlink)
+    3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
+    4. [Use `next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
+    5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
     - [Constrained dynamic paths segments](#constrained-dynamic-paths-segments)
@@ -142,7 +143,7 @@ for each language or only some language, like "blog" in `pt` here:
 - page1 will in fact be accessible at `/blog/section/article` in `pt`,
 - page2 will in fact be accessible at `/blog/section/definition` in `pt`.
 
-#### 3. Wrap you \_app component with the withTranslateRoutes hoc
+#### 3. Wrap you `\_app` component with the `withTranslateRoutes` hoc
 
 ```js
 // `/pages/_app.js`
@@ -167,7 +168,7 @@ const App = ({ Component, pageProps }) => {
 export default withTranslateRoutes(App)
 ```
 
-#### 4. Use next-translate-routes/link instead of next/link
+#### 4. Use `next-translate-routes/link` instead of `next/link`
 
 next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes/link' instead of 'next/link' and use as you ever did.
 
@@ -195,16 +196,14 @@ const MyLinks = (props) => {
 }
 ```
 
-#### 5. Use next-translate-routes/router instead of next/router for SingletonRouter (default export)
+#### 5. Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)
 
-You can use `next-translate-routes/router` everywhere instead of `next/router` but it is only necessary for the SingletonRouter (which is rarely used).
+You can use `next-translate-routes/router` everywhere instead of `next/router` but it is only necessary for the singleton router (which is rarely used).
 
 ```typescript
-import SingletonRouter from 'next-translate-routes/router'
-// Or:
-import { SingletonRouter } from 'next-translate-routes/router'
+import singletonRouter from 'next-translate-routes/router'
 // Indead of:
-import SingletonRouter from 'next/router'
+import singletonRouter from 'next/router'
 ```
 
 ### Advanced usage
@@ -358,12 +357,12 @@ type TRouteBranch<Locale extends string> = {
 
 #### Outside Next
 
-One might need to mock next-translate-routes outside Next, for example for testing or in [Storybook](https://storybook.js.org/).
+You might need to mock next-translate-routes outside Next, for example for testing or in [Storybook](https://storybook.js.org/).
 
-First, you need to create next-translate-routes data. You can do it using the `createNtrData` helper. It takes the next config as first parameter. The second parameter is optional and allows to use a custom pages folder: if omitted, `createNtrData` will look for you next `pages` folder.
+First, you need to create next-translate-routes data. You can do it using the `createNtrData` helper, but it only works in node environment. It takes the next config as first parameter. The second parameter is optional and allows to use a custom pages folder: if omitted, `createNtrData` will look for you next `pages` folder.
 
 ```typescript
-import { createNtrData } from 'next-translate-routes/plugin/createNtrData`
+import { createNtrData } from 'next-translate-routes/plugin`
 import nextConfig from '../next.config.js'
 
 const ntrData = createNtrData(
@@ -372,24 +371,31 @@ const ntrData = createNtrData(
 )
 ```
 
-Then, if you want to render you app, you need to inject the router context, then (and only then) inject next-translate-routes.
+Then, if you want to render you app, you need to inject the router context, then (and only then) inject next-translate-routes. You can do it manually, or using `next-tranlate-routes/loader` with Webpack.
+
+##### Manually
+
+You will have to execute createNtrData in a node script and store the result somewhere that can be imported.
 
 ```typescript
+// nextRouterMock.ts
+
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 import withTranslateRoutes from 'next-translate-routes'
+import ntrData from 'path/to/your/ntrData'
 
   //[...]
 
-  const TranslateRoutes = withTranslateRoutes(
+  const RouteTranslationsProvider = withTranslateRoutes(
     ntrData,
     ({ children }) => <>{children}</>,
   )
 
   const TranslatedRoutesProvider = ({ children }) => (
     <RouterContext.Provider value={routerMock}>
-      <TranslateRoutes router={routerMock}>
+      <RouteTranslationsProvider router={routerMock}>
         {children}
-      </TranslateRoutes>
+      </RouteTranslationsProvider>
     </RouterContext.Provider>
   )
 
@@ -405,6 +411,51 @@ export const WithNextRouter: DecoratorFn = (Story, context): JSX.Element => (
   </TranslatedRoutesProvider>
 )
 ```
+
+##### With `next-translate-routes/loader` for Webpack
+
+`next-translate-routes/loader` allows to create next-translate-routes data at build time. So you can do exactly the same as described in the [Manually](#manually) paragraph above, but you don't need to create and add `ntrData` as an argument to `withTranslateRoutes`.
+
+```typescript
+// nextRouterMock.ts
+
+import { RouterContext } from 'next/dist/shared/lib/router-context'
+import withTranslateRoutes from 'next-translate-routes'
+
+  //[...]
+
+  const RouteTranslationsProvider = withTranslateRoutes(({ children }) => <>{children}</>)
+
+  // TranslatedRoutesProvider is the same as in the manually paragraph above
+
+  // [...]
+```
+
+Then all you have to do is to add this rule in your webpack config:
+
+```js
+// storybook/config/webpack.config.js for exemple
+
+const { createNtrData } = require('next-translate-routes/plugin')
+const nextConfig = require('../../next.config') // Your project nextConfig
+
+module.exports = ({ config }) => {
+  // [...]
+
+  config.module.rules.push({
+    test: /path\/to\/nextRouterMock/, // /!\ Warning! This test should only match the file where withTranslateRoutes is used! If you cannot, set the mustMatch option to false.
+    use: {
+      loader: 'next-translate-routes/loader',
+      options: { data: createNtrData(nextConfig) },
+    },
+  })
+  
+  return config
+}
+
+```
+
+> ⚠️ Warning! The rule `test` should only match the file where `withTranslateRoutes` is used! If you cannot, then set the `mustMatch` loader option to `false`.
 
 ## Known issue: middleware with Next >=12.2.0
 
