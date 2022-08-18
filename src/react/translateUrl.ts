@@ -157,7 +157,7 @@ export function removeLangPrefix(pathname: string, toArray?: boolean): string | 
  */
 export function translatePath<U extends string | UrlObject, F extends 'string' | 'object'>(
   url: U,
-  locale?: string,
+  locale: string,
   options?: Options<F>,
 ): 'string' | 'object' extends F
   ? U extends string
@@ -169,7 +169,7 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
   ? string
   : UrlObject
 
-export function translatePath(url: Url, locale?: string, { format }: Options = {}): Url {
+export function translatePath(url: Url, locale: string, { format }: Options = {}): Url {
   const { routesTree } = getNtrData()
   const returnFormat = format || typeof url
   const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)

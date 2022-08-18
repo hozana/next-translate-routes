@@ -2,6 +2,7 @@ import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { NextRouter, SingletonRouter } from 'next/router'
 
 import type { Url } from '../types'
+import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
 import { translateUrl } from './translateUrl'
 
@@ -11,37 +12,45 @@ interface Options {
   scroll?: boolean
 }
 
+const logWithTrace = (from: string, details: unknown) => {
+  console.groupCollapsed(`[next-translate-routes] - ${from}.`, details)
+  console.trace('Stringified:\n', JSON.stringify(details, null, 4))
+  console.groupEnd()
+}
+
 const enhancePushReplace =
   <R extends NextRouter | SingletonRouter>(router: R, fnName: 'push' | 'replace') =>
   (url: Url, as?: Url, options?: Options) => {
-    const { debug } = getNtrData()
-    const { locale } = router
-    const translatedUrl =
-      as ||
-      (options?.locale || locale ? translateUrl(url, options?.locale || (locale as string), { format: 'object' }) : url)
+    const locale = getLocale(router, options?.locale)
+    const parsedUrl = typeof url === 'string' ? translateUrl(url, locale, { format: 'object' }) : url
 
-    if (debug) {
-      console.log(`[next-translate-routes] - router.${fnName}.`, { url, as, options, translatedUrl, locale })
+    if (getNtrData().debug) {
+      logWithTrace(`router.${fnName}`, {
+        url,
+        as,
+        options,
+        parsedUrl: Object.entries(parsedUrl).reduce((acc, [key, value]) => ({
+          ...acc,
+          ...(value !== null && { [key]: value }),
+        })),
+        locale,
+      })
     }
 
-    return router[fnName](translatedUrl, as, options)
+    return router[fnName](parsedUrl, undefined, options)
   }
 
 const enhancePrefetch =
-  <R extends NextRouter | SingletonRouter>({ locale, prefetch }: R) =>
+  <R extends NextRouter | SingletonRouter>(router: R) =>
   (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-    const { debug } = getNtrData()
-    const as =
-      asPath ||
-      (options?.locale || locale
-        ? (translateUrl(inputUrl, options?.locale || (locale as string), { format: 'string' }) as string)
-        : inputUrl)
+    const locale = getLocale(router, options?.locale)
+    const parsedInputUrl = asPath || translateUrl(inputUrl, locale, { format: 'string' })
 
-    if (debug === 'withPrefetch') {
-      console.log('[next-translate-routes] - router.prefetch.', { inputUrl, asPath, options, as, locale })
+    if (getNtrData().debug === 'withPrefetch') {
+      logWithTrace('router.prefetch', { inputUrl, asPath, options, parsedInputUrl, locale })
     }
 
-    return prefetch(inputUrl, as, options)
+    return router.prefetch(parsedInputUrl, asPath, options)
   }
 
 export const enhanceNextRouter = <R extends NextRouter | SingletonRouter>(router: R) => {

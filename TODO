@@ -1,16 +1,23 @@
 # Todo
 
-- add exclude options to exclude redirects/rewrites
+- split `translateUrl` into
+  - `translateUrl` from string to string
+  - `parseUrlString` from string to `UrlObject & { locale: string } & [UrlObject, string]`
+  - and maybe `translateUrlObject` from UrlObject to string?
+- check if the prefetch works in all conditions (with `yarn build && yarn start`)
+  =>`href={parseUrlString(url)}` in link?
+- add exclude options to sort and exclude redirects/rewrites
 - fix looping redirect for /fr/bible
 - check pageExtensions before adding a page in the routesTree
 - check basePath compatibility
-- check middlewares compatibility
+- check middleware issue advancement
 - check if and where special characters should be escaped (<https://nextjs.org/docs/api-reference/next.config.js/rewrites#regex-path-matching>)
 - validate custom pagesTree
 - throw if destination is equal to source
 - trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
-- improve comments, documentation
+- improve comments, code documentation: ex. in `getAllCandicates`, why `path === ''` and not `/^\.(\(.+\))?$/.test(path)`???
 - getRouteList: (locale?: string) => (? Record<string, string[]> ? string? string[]?)
+- getAllTranslatedRoutes for canonical
 - create a function `getRouteSegments(filePath: string): TRouteSegment[]`
   - return the whole path as is if not found and not dynamic file path
 - export a routeExist function

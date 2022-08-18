@@ -1,11 +1,14 @@
+# Yarn
 node_modules
-.vscode
 yarn-error.log
 
+# IDE
+.vscode
+
 # Build
-plugin
-react
-shared
-*.js
-*.map
-*.d.ts
+/plugin
+/react
+/shared
+/*.js
+/*.map
+/*.d.ts
