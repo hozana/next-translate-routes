@@ -1,7 +1,7 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import { pathToRegexp } from 'path-to-regexp'
 
-import { ignoreSegmentPathRegex } from '../shared/ignoreSegmentPathRegex'
+import { ignoreSegmentPathRegex } from '../shared/regex'
 import type { TReRoutes, TRouteBranch, TRouteSegment } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
 
@@ -74,10 +74,10 @@ export const getPageReRoutes = <L extends string>({
   const basePath = `/${routeSegments
     .map(({ name, paths: { default: defaultPath } }) => {
       const match = defaultPath.match(ignoreSegmentPathRegex) || []
-      // If a pattern is added to the ignore token "."
+      // If a pattern is added to the ignore token ".", add it behind #ignorePattern
       return fileNameToPath(name) + (match[1] || '')
     })
-    .filter((pathPart) => pathPart)
+    .filter(Boolean) // Filter out falsy values
     .join('/')}`
 
   /**

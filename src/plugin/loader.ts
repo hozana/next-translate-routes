@@ -1,3 +1,4 @@
+import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TNtrData } from '../types'
 
 export function loader(
@@ -16,9 +17,7 @@ export function loader(
 
   if (!defaultExportHocName && !namedExportHocName) {
     if (this.query.mustMatch ?? true) {
-      throw new Error(
-        `[next-translate-routes] - No withTranslateRoutes high order component found in ${this.resourcePath}.`,
-      )
+      throw new Error(ntrMessagePrefix + `No withTranslateRoutes high order component found in ${this.resourcePath}.`)
     } else {
       return rawCode
     }

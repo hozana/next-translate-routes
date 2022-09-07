@@ -19,6 +19,24 @@
       "permanent": false
     },
     {
+      "source": "/en/faq",
+      "destination": "/en/FAQ",
+      "locale": false,
+      "permanent": false
+    },
+    {
+      "source": "/fr/faq",
+      "destination": "/fr/FAQ",
+      "locale": false,
+      "permanent": false
+    },
+    {
+      "source": "/es/FAQ",
+      "destination": "/es/faq",
+      "locale": false,
+      "permanent": false
+    },
+    {
       "source": "/en/(tout|todo)/:path+",
       "destination": "/en/catch-all/:path+",
       "locale": false,
@@ -145,24 +163,6 @@
       "permanent": false
     },
     {
-      "source": "/en/faq",
-      "destination": "/en/FAQ",
-      "locale": false,
-      "permanent": false
-    },
-    {
-      "source": "/fr/faq",
-      "destination": "/fr/FAQ",
-      "locale": false,
-      "permanent": false
-    },
-    {
-      "source": "/es/FAQ",
-      "destination": "/es/faq",
-      "locale": false,
-      "permanent": false
-    },
-    {
       "source": "/en/(mon-compte|mi-cuenta)/(favoris|favorito)",
       "destination": "/en/my-account/favoris",
       "locale": false,
@@ -211,6 +211,10 @@
       "destination": "/about"
     },
     {
+      "source": "/FAQ",
+      "destination": "/faq"
+    },
+    {
       "source": "/(tout|todo)/:path+",
       "destination": "/catch-all/:path+"
     },
@@ -229,10 +233,6 @@
     {
       "source": "/(community|communaute|comunidad)/:communityId(\\d+){-:communitySlug}/(statistics|statistiques|estadisticas)",
       "destination": "/community/:communityId/:communitySlug/statistics"
-    },
-    {
-      "source": "/FAQ",
-      "destination": "/faq"
     },
     {
       "source": "/(my-account|mon-compte|mi-cuenta)/(favoris|favorito)",

@@ -2,6 +2,7 @@ import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
 import { Configuration as WebpackConfiguration } from 'webpack'
 
+import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import { NextConfigWithNTR } from '../types'
 import { createNtrData } from './createNtrData'
 import { getPagesPath } from './getPagesPath'
@@ -32,7 +33,8 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
 
   if (!nextConfig.i18n) {
     throw new Error(
-      '[next-translate-routes] - No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',
+      ntrMessagePrefix +
+        'No i18n config found in next.config.js. i18n config is mandatory to use next-translate-routes.\nSeehttps://nextjs.org/docs/advanced-features/i18n-routing',
     )
   }
 
@@ -47,8 +49,8 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
   const sortedRewrites = sortBySpecificity(rewrites)
 
   if (debug) {
-    console.log('[next-translate-routes] - Redirects:', sortedRedirects)
-    console.log('[next-translate-routes] - Rewrites:', sortedRewrites)
+    console.log(ntrMessagePrefix + 'Redirects:', sortedRedirects)
+    console.log(ntrMessagePrefix + 'Rewrites:', sortedRewrites)
   }
 
   return {

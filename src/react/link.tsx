@@ -1,10 +1,12 @@
 import NextLink, { LinkProps } from 'next/link'
 import { useRouter as useNextRouter } from 'next/router'
 import React from 'react'
-import { getLocale } from './getLocale'
 
+import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
-import { removeLangPrefix, translateUrl } from './translateUrl'
+import { parseUrl } from './parseUrl'
+import { removeLangPrefix } from './removeLangPrefix'
+import { translateUrl } from './translateUrl'
 
 /**
  * Link component that handle route translations
@@ -22,10 +24,12 @@ export const Link: React.FC<React.PropsWithChildren<LinkProps>> = ({ href, as, l
     }
   }
 
+  const parsedUrl = parseUrl(href, locale)
+
   return (
     <NextLink
-      href={unPrefixedHref}
-      as={as || translateUrl(href, locale, { format: 'string' })}
+      href={parsedUrl || href}
+      as={as || translateUrl(parsedUrl || href, locale, { format: 'string' })}
       locale={locale}
       {...props}
     />
