@@ -4,9 +4,13 @@
 import { render } from '@testing-library/react'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 import React from 'react'
+import type { UrlObject } from 'url'
 
 import { Link } from '../src/link'
-import { removeLangPrefix, translatePath, translateUrl } from '../src/react/translateUrl'
+import { parseUrl } from '../src/react/parseUrl'
+import { removeLangPrefix } from '../src/react/removeLangPrefix'
+import { translatePath, translateUrl } from '../src/react/translateUrl'
+import { translateUrlObject } from '../src/react/translateUrlObject'
 import type { TNtrData } from '../src/types'
 import routesTree from './fixtures/routesTree.json'
 
@@ -249,6 +253,271 @@ describe('translate', () => {
   windowSpy.mockRestore()
 })
 
+describe('parseUrl', () => {
+  const windowSpy = jest.spyOn(window, 'window', 'get')
+  windowSpy.mockImplementation(
+    () =>
+      ({
+        location: {
+          host: 'next-translate-routes.com',
+          hostname: 'next-translate-routes.com',
+          href: 'https://next-translate-routes.com/current/path',
+          origin: 'https://next-translate-routes.com',
+          pathname: '/current/path',
+        } as Window['location'],
+      } as Window & typeof globalThis),
+  )
+  const testDataItems: { url: string | URL | UrlObject; urlObject: UrlObject; locale?: string }[] = [
+    {
+      url: {
+        pathname: '/communaute/300-three-hundred/statistiques',
+        query: { baz: 3 },
+        hash: '#section',
+      },
+      urlObject: {
+        pathname: '/community/[communityId]/[communitySlug]/statistics',
+        query: { communityId: '300', communitySlug: 'three-hundred', baz: 3 },
+        hash: '#section',
+      },
+    },
+    {
+      url: {
+        pathname: '/en/root/community/300-three-hundred/statistics',
+        query: { baz: 3 },
+        hash: '#section',
+      },
+      urlObject: {
+        pathname: '/community/[communityId]/[communitySlug]/statistics',
+        query: { communityId: '300', communitySlug: 'three-hundred', baz: 3 },
+        hash: '#section',
+      },
+      locale: 'en',
+    },
+    {
+      url: {
+        pathname: '/communautes',
+        query: { baz: 3 },
+      },
+      urlObject: {
+        pathname: '/communities/[[...tagSlug]]',
+        query: { baz: 3, tagSlug: [] },
+      },
+    },
+    {
+      url: {
+        pathname: '/actualites/a',
+        query: {},
+      },
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a'] },
+      },
+    },
+    {
+      url: {
+        pathname: '/actualites/a/b',
+        query: {},
+      },
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a', 'b'] },
+      },
+    },
+    {
+      url: '/news/a/b',
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a', 'b'] },
+      },
+      locale: 'en',
+    },
+    {
+      url: {
+        pathname: '/actualites/a',
+        query: {},
+      },
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a'] },
+      },
+    },
+    {
+      url: '/?baz=3#section',
+      urlObject: {
+        pathname: '/',
+        query: { baz: '3' },
+        hash: '#section',
+      },
+    },
+    {
+      url: '/en/root/catch-all-or-none?baz=3#section',
+      urlObject: {
+        pathname: '/catch-all-or-none/[[...path]]',
+        query: { path: [], baz: '3' },
+        hash: '#section',
+      },
+      locale: 'en',
+    },
+    {
+      url: '/en/root/catch-all/foo/bar?baz=3#section',
+      locale: 'en',
+      urlObject: {
+        pathname: '/catch-all/[...path]',
+        query: { path: ['foo', 'bar'], baz: '3' },
+        hash: '#section',
+      },
+    },
+    {
+      url: {
+        pathname: '/tout-ou-rien',
+        query: { path: [], baz: 3 },
+        hash: '#section',
+      },
+      locale: 'fr',
+      urlObject: {
+        pathname: '/catch-all-or-none/[[...path]]',
+        query: { baz: 3, path: [] },
+        hash: '#section',
+      },
+    },
+    {
+      url: '/en/root/catch-all-or-none/foo/bar?baz=3#section',
+      locale: 'en',
+      urlObject: {
+        pathname: '/catch-all-or-none/[[...path]]',
+        query: { path: ['foo', 'bar'], baz: '3' },
+        hash: '#section',
+      },
+    },
+    {
+      url: {
+        pathname: '/root/catch-all/foo/bar',
+        query: { baz: 3 },
+        hash: '#section',
+      },
+      urlObject: {
+        pathname: '/catch-all/[...path]',
+        query: { path: ['foo', 'bar'], baz: 3 },
+        hash: '#section',
+      },
+      locale: 'en',
+    },
+    {
+      url: 'https://next-translate-routes.com/en/root/catch-all/foo/bar?baz=3#section',
+      locale: 'en',
+      urlObject: {
+        pathname: '/catch-all/[...path]',
+        query: { baz: '3', path: ['foo', 'bar'] },
+        hash: '#section',
+      },
+    },
+    {
+      url: 'https://hozana.org/communautes',
+      locale: 'fr',
+      urlObject: {
+        pathname: '/communities/[[...tagSlug]]',
+        query: { tagSlug: [] },
+      },
+    },
+  ]
+
+  testDataItems.forEach(({ url, urlObject, locale }) => {
+    test(`parsUrl: ${typeof url === 'string' ? url : JSON.stringify(url)}`, () => {
+      expect(parseUrl(url, locale)).toEqual(urlObject)
+    })
+  })
+
+  windowSpy.mockRestore()
+})
+
+describe('translateUrlObject', () => {
+  const windowSpy = jest.spyOn(window, 'window', 'get')
+  windowSpy.mockImplementation(
+    () =>
+      ({
+        location: {
+          host: 'next-translate-routes.com',
+          hostname: 'next-translate-routes.com',
+          href: 'https://next-translate-routes.com/current/path',
+          origin: 'https://next-translate-routes.com',
+          pathname: '/current/path',
+        } as Window['location'],
+      } as Window & typeof globalThis),
+  )
+  const testDataItems: { urlObject: UrlObject & { pathname: string }; translation: string; locale?: string }[] = [
+    {
+      urlObject: {
+        pathname: '/',
+        query: { baz: 3 },
+        hash: 'section',
+      },
+      translation: '?baz=3#section',
+    },
+    {
+      urlObject: {
+        pathname: '/community/[communityId]/[communitySlug]/statistics',
+        query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
+        hash: 'section',
+      },
+      translation: '/communaute/300-three-hundred/statistiques?baz=3#section',
+    },
+    {
+      urlObject: {
+        pathname: '/communities/[[...tagSlug]]',
+        query: { baz: 3 },
+      },
+      translation: '/communautes?baz=3',
+    },
+    {
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a'] },
+      },
+      translation: '/actualites/a',
+    },
+    {
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a', 'b'] },
+      },
+      translation: '/actualites/a/b',
+    },
+    {
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: 'a' },
+      },
+      translation: '/actualites/a',
+    },
+    {
+      urlObject: {
+        pathname: '/catch-all-or-none/[[...path]]',
+        query: { path: [], baz: 3 },
+        hash: 'section',
+      },
+      locale: 'en',
+      translation: '/root/catch-all-or-none?baz=3#section',
+    },
+    {
+      urlObject: {
+        pathname: '/catch-all/[...path]',
+        query: { path: ['foo', 'bar'], baz: 3 },
+        hash: 'section',
+      },
+      locale: 'en',
+      translation: '/root/catch-all/foo/bar?baz=3#section',
+    },
+  ]
+  testDataItems.forEach(({ urlObject, translation, locale = 'fr' }) => {
+    const titleInput = JSON.stringify(urlObject)
+    test(`translateUrlObject: ${titleInput}`, () => {
+      expect(translateUrlObject(urlObject, locale)).toEqual(translation)
+    })
+  })
+
+  windowSpy.mockRestore()
+})
+
 describe('Link', () => {
   const push = jest.fn(() => Promise.resolve(true))
   beforeEach(() => push.mockClear())
@@ -299,22 +568,14 @@ describe('Link', () => {
           ...({} as any),
         }}
       >
-        <Link
-          href={{
-            pathname: '/en/community/[communityId]/[communitySlug]/statistics',
-            query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
-          }}
-          locale="fr"
-        >
-          Link
-        </Link>
+        <Link href="/fr/communaute/300-three-hundred/statistiques?baz=3">Link</Link>
       </RouterContext.Provider>,
     )
 
     expect(push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
     expect(push).toHaveBeenCalledWith(
-      '/en/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
+      '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
       '/communaute/300-three-hundred/statistiques?baz=3',
       { locale: 'fr', scroll: undefined, shallow: undefined },
     )

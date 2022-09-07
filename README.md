@@ -287,15 +287,19 @@ It can be done for some lang only and not others.
 }
 ```
 
-⚠️ Ignoring a path segment can cause troubles.  
-Ex. Given the `/a/[b]/[c]` and `/a/[b]/[c]/d` file paths. `[b]` is ignored and the `b` param is merged with the `c` param: `:b-:c`.  
-Then `/a/b/c` will be redirected to `/a/b-c` and that is fine.  
-But `/a/b-c/d` will be redirected to `/a/b-c-d` and that is not fine.
+⚠️ Ignoring a path segment can cause troubles with the **redirections**.
 
-To handle this case, you can add a path-to-regex pattern to the default ignore token. Ex: `.(\\\\d+)`, or `.(\\[\\^-\\]+)`.  
-This path-to-regex pattern will be added after the segment name in the redirect.  
-Then `/a/b(\\d+)/c` will be redirected to `/a/b-c`, and `/a/b-c/d` will not be redirected to `/a/b-c-d`.  
-⚠️ This is only handled in default paths (i.e. `"/": ".(\\\\d+)"` or `"/": { "default": ".(\\\\d+)" }`), not in lang-specific paths.
+Ex: given the `/a/[b]/[c]` and `/a/[b]/[c]/d` file paths where `[b]` is ignored and the b param is merged with the c param: `:b-:c`.
+`/a/:b/:c` => `/a/:b-:c` and `/a/:b/:c/d` => `/a/:b-:c/d`
+Then `/a/bb/11` will be redirected to `/a/bb-11` and `/a/bb/11/d` to `/a/bb-11/d` and that is fine.
+But then `/a/bb-11/d` will match `/a/:b-:c` and be redirected to `/a/bb-11-d` and that is not fine!
+
+To handle this case, one can add a path-to-regex pattern to the default ignore token: `.(\\d+)`, or `.(\[\^-\]+)`, or `.(\what|ever\)`.
+This path-to-regex pattern will be added after the segment name in the redirect.
+`/a/:b(\[\^-\]+)/:c` => `/a/:b-:c` and `/a/:b(\[\^-\]+)/:c/d` => `/a/:b-:c/d`
+Then `/a/bb-11/d` will no more match `/a/[b]/[c]` (`/a/:b(\[\^-\]+)/:c`).
+
+⚠️ This is only handled in default paths (i.e. `"/": ".(\\d+)"` or `"/": { "default": ".(\\d+)" }`), not in lang-specific paths.
 
 #### Complex paths segments
 

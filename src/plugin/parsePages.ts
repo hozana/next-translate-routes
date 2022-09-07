@@ -3,13 +3,14 @@ import { findPagesDir } from 'next/dist/lib/find-pages-dir'
 import pathUtils from 'path'
 import YAML from 'yamljs'
 
+import { anyDynamicFilepathPartRegex, spreadFilepathPartRegex } from '../shared/regex'
 import type { TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
 
 /** Keep 'routes.json' for backward compatibility */
 const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
 
-/** Get path and path translations from name and all translations */
+/** Get path and path translations from name and all translations #childrenOrder */
 const getRouteSegment = <L extends string>(
   name: string,
   routeSegmentsData: TRouteSegmentsData<L>,
@@ -26,6 +27,19 @@ const getRouteSegment = <L extends string>(
     name,
     paths,
   }
+}
+
+/** Attribute a weight to a route branch so that they can be sorted: the heaviest must be the last */
+const getOrderWeight = ({ name, children }: TRouteBranch) => {
+  let weight = 0
+  ;[spreadFilepathPartRegex.test(name), anyDynamicFilepathPartRegex.test(name), children?.length].forEach(
+    (condition) => {
+      if (condition) {
+        weight++
+      }
+    },
+  )
+  return weight
 }
 
 export type TParsePageTreeProps = {
@@ -66,30 +80,32 @@ export const parsePages = <L extends string>({
   const directoryPathParts = directoryPath.replace(/[\\/]/, '').split(/[\\/]/)
   const name = isSubBranch ? directoryPathParts[directoryPathParts.length - 1] : ''
 
-  const children = directoryItems.reduce((acc, item) => {
-    const isDirectory = fs.statSync(pathUtils.join(directoryPath, item)).isDirectory()
-    const pageMatch = item.match(new RegExp(`(.+)\\.(${pageExtensions.join('|')})$`))
-    const pageName = (!isDirectory && pageMatch?.[1]) || ''
+  const children = directoryItems
+    .reduce((acc, item) => {
+      const isDirectory = fs.statSync(pathUtils.join(directoryPath, item)).isDirectory()
+      const pageMatch = item.match(new RegExp(`(.+)\\.(${pageExtensions.join('|')})$`))
+      const pageName = (!isDirectory && pageMatch?.[1]) || ''
 
-    if (!isSubBranch && (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')) {
+      if (!isSubBranch && (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')) {
+        return acc
+      }
+
+      if (isDirectory || pageName) {
+        return [
+          ...acc,
+          isDirectory
+            ? parsePages({
+                directoryPath: pathUtils.join(directoryPath, item),
+                isSubBranch: true,
+                pageExtensions,
+                routesDataFileName,
+              })
+            : getRouteSegment(pageName || item, routeSegmentsData),
+        ]
+      }
       return acc
-    }
-
-    if (isDirectory || pageName) {
-      return [
-        ...acc,
-        isDirectory
-          ? parsePages({
-              directoryPath: pathUtils.join(directoryPath, item),
-              isSubBranch: true,
-              pageExtensions,
-              routesDataFileName,
-            })
-          : getRouteSegment(pageName || item, routeSegmentsData),
-      ]
-    }
-    return acc
-  }, [] as TRouteBranch<L>[])
+    }, [] as TRouteBranch<L>[])
+    .sort((childA, childB) => getOrderWeight(childA) - getOrderWeight(childB))
 
   return {
     ...getRouteSegment(name, routeSegmentsData, true),

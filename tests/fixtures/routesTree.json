@@ -14,6 +14,26 @@
       }
     },
     {
+      "name": "contact",
+      "paths": {
+        "default": "contact"
+      }
+    },
+    {
+      "name": "faq",
+      "paths": {
+        "default": "faq",
+        "en": "FAQ",
+        "fr": "FAQ"
+      }
+    },
+    {
+      "name": "index",
+      "paths": {
+        "default": "index"
+      }
+    },
+    {
       "name": "auth",
       "paths": {
         "default": "auth"
@@ -127,26 +147,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "contact",
-      "paths": {
-        "default": "contact"
-      }
-    },
-    {
-      "name": "faq",
-      "paths": {
-        "default": "faq",
-        "en": "FAQ",
-        "fr": "FAQ"
-      }
-    },
-    {
-      "name": "index",
-      "paths": {
-        "default": "index"
-      }
     },
     {
       "children": [

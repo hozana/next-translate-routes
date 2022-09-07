@@ -40,4 +40,8 @@ declare global {
   interface Window {
     __NEXT_TRANSLATE_ROUTES_DATA: TNtrData
   }
+
+  interface ErrorConstructor {
+    new (message?: string, options?: { cause: unknown | string | Error }): Error
+  }
 }

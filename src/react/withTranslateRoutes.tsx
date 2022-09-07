@@ -4,6 +4,7 @@ import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import React, { useMemo } from 'react'
 
+import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TNtrData } from '../types'
 import { enhanceNextRouter } from './enhanceNextRouter'
 import { setNtrData } from './ntrData'
@@ -34,19 +35,20 @@ export const withTranslateRoutes = (...args: (TWrappedAppComponent | TNtrData)[]
   }, {} as { ntrData: TNtrData; AppComponent: TWrappedAppComponent })
 
   if (!AppComponent) {
-    throw new Error('[next-translate-routes] - No wrapped App component in withTranslateRoutes')
+    throw new Error(ntrMessagePrefix + 'No wrapped App component in withTranslateRoutes')
   }
 
   if (!ntrData) {
     throw new Error(
-      '[next-translate-routes] - No translate routes data found. next-translate-routes plugin is probably missing from next.config.js',
+      ntrMessagePrefix +
+        'No translate routes data found. next-translate-routes plugin is probably missing from next.config.js',
     )
   }
 
   setNtrData(ntrData)
 
   if (ntrData.debug && typeof window !== 'undefined') {
-    console.log('[next-translate-routes] - withTranslateRoutes. NTR data:', ntrData)
+    console.log(ntrMessagePrefix + 'withTranslateRoutes. NTR data:', ntrData)
   }
 
   const WithTranslateRoutesApp: TWrappedAppComponent = (props) => {
@@ -60,7 +62,7 @@ export const withTranslateRoutes = (...args: (TWrappedAppComponent | TNtrData)[]
     if (nextRouter && !nextRouter.locale) {
       const fallbackLocale = ntrData.defaultLocale || ntrData.locales[0]
       nextRouter.locale = fallbackLocale
-      console.error(`[next-translate-routes] - No locale prop in Router: fallback to ${fallbackLocale}.`)
+      console.error(ntrMessagePrefix + `No locale prop in Router: fallback to ${fallbackLocale}.`)
     }
 
     return (

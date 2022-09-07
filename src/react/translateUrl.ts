@@ -4,9 +4,10 @@ import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
 import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
 
-import { ignoreSegmentPathRegex } from '../shared/ignoreSegmentPathRegex'
+import { getDynamicPathPartKey, getSpreadFilepathPartKey, ignoreSegmentPathRegex } from '../shared/regex'
 import type { TRouteBranch, Url } from '../types'
 import { getNtrData } from './ntrData'
+import { removeLangPrefix } from './removeLangPrefix'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
   format?: F
@@ -21,12 +22,6 @@ const getAllCandidates = (lang: string, children?: TRouteBranch[]): TRouteBranch
         return [...acc, ...(path === '' ? getAllCandidates(lang, child.children) : [child])]
       }, [] as TRouteBranch[])
     : []
-
-/** Ex: [slug] */
-const getSingleDynamicPathPartName = (pathPartName: string) => /^\[([^/[\].]+)\]$/.exec(pathPartName)?.[1] || null
-/** Ex: [...pathPart] or [[...pathPart]] */
-const getSpreadDynamicPathPartName = (pathPartName: string) =>
-  /^\[\[?\.{3}([^/[\].]+)\]?\]$/.exec(pathPartName)?.[1] || null
 
 /**
  * Recursively translate paths from file path, and extract parameters
@@ -78,7 +73,7 @@ const translatePathParts = ({
   if (!childRouteBranch) {
     // If not defined: pathPart is either a dynamic value either a wrong path.
 
-    childRouteBranch = candidates.find((candidate) => getSingleDynamicPathPartName(candidate.name))
+    childRouteBranch = candidates.find((candidate) => getDynamicPathPartKey(candidate.name))
     if (childRouteBranch) {
       // Single dynamic route segment value => store it in the query
       currentQuery = {
@@ -86,7 +81,7 @@ const translatePathParts = ({
         [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathPart,
       }
     } else {
-      childRouteBranch = candidates.find((candidate) => getSpreadDynamicPathPartName(candidate.name))
+      childRouteBranch = candidates.find((candidate) => getSpreadFilepathPartKey(candidate.name))
       if (childRouteBranch) {
         // Catch all route => store it in the query, then return the current data.
         currentQuery = {
@@ -117,31 +112,6 @@ const translatePathParts = ({
     ],
     augmentedQuery,
   }
-}
-
-export function removeLangPrefix(pathname: string, toArray?: false): string
-export function removeLangPrefix(pathname: string, toArray: true): string[]
-export function removeLangPrefix(pathname: string, toArray?: boolean): string | string[] {
-  const pathParts = pathname.split('/').filter(Boolean)
-  const { routesTree, defaultLocale, locales } = getNtrData()
-
-  const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
-
-  const defaultLocaleRoot = defaultLocale && getLangRoot(defaultLocale)
-  const hasLangPrefix = locales.includes(pathParts[0])
-  const hasDefaultLocalePrefix = !hasLangPrefix && !!defaultLocaleRoot && pathParts[0] === defaultLocaleRoot
-
-  if (!hasLangPrefix && !hasDefaultLocalePrefix) {
-    return toArray ? pathParts : pathname
-  }
-
-  const locale = hasLangPrefix ? pathParts[0] : defaultLocale
-  const localeRootParts = locale && getLangRoot(locale)?.split('/')
-  const nbPathPartsToRemove =
-    (hasLangPrefix ? 1 : 0) +
-    (localeRootParts && (!hasLangPrefix || pathParts[1] === localeRootParts[0]) ? localeRootParts.length : 0)
-
-  return toArray ? pathParts.slice(nbPathPartsToRemove) : `/${pathParts.slice(nbPathPartsToRemove).join('/')}`
 }
 
 /**

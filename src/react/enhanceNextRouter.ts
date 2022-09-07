@@ -1,6 +1,7 @@
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { NextRouter, SingletonRouter } from 'next/router'
 
+import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { Url } from '../types'
 import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
@@ -13,7 +14,7 @@ interface Options {
 }
 
 const logWithTrace = (from: string, details: unknown) => {
-  console.groupCollapsed(`[next-translate-routes] - ${from}.`, details)
+  console.groupCollapsed(ntrMessagePrefix + from, details)
   console.trace('Stringified:\n', JSON.stringify(details, null, 4))
   console.groupEnd()
 }
@@ -23,12 +24,14 @@ const enhancePushReplace =
   (url: Url, as?: Url, options?: Options) => {
     const locale = getLocale(router, options?.locale)
     const parsedUrl = typeof url === 'string' ? translateUrl(url, locale, { format: 'object' }) : url
+    const translatedUrl = as || translateUrl(url, locale, { format: 'string' })
 
     if (getNtrData().debug) {
       logWithTrace(`router.${fnName}`, {
         url,
         as,
         options,
+        translatedUrl,
         parsedUrl: Object.entries(parsedUrl).reduce((acc, [key, value]) => ({
           ...acc,
           ...(value !== null && { [key]: value }),
@@ -37,7 +40,7 @@ const enhancePushReplace =
       })
     }
 
-    return router[fnName](parsedUrl, undefined, options)
+    return router[fnName](parsedUrl, translatedUrl, options)
   }
 
 const enhancePrefetch =
