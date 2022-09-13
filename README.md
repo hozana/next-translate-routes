@@ -13,6 +13,7 @@ Translated routing and more for Next using Next regular file-base routing system
     5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
+    - [Translate/untranslate urls](#translateuntranslate-urls)
     - [Constrained dynamic paths segments](#constrained-dynamic-paths-segments)
     - [Ignoring a path part](#ignoring-a-path-part)
     - [Complex paths segments](#complex-paths-segments)
@@ -252,6 +253,15 @@ When `debug` is set to true, you will get some logs, both in the server terminal
 If `routesDataFileName` is defined, to `'routesData'` for example, next-translate-routes will look in the `pages` folder for files named `routesData.json` or `routesData.yaml` instead of the default `_routes.json` or `_routes.yaml`.
 
 If `routesTree` is defined, next-translate-routes won't parse the `pages` folder and will use the given object as the routes tree. If you uses it, beware of building correctly the routes tree to avoid bugs.
+
+#### Translate/untranslate urls
+
+Two helpers are exposed to translate/untranslate urls:
+
+- fileUrlToUrl transforms a file url into a translated url
+- urlToFileUrl transforms a translated url into a file url
+
+Both of them take 2 arguments: an url and a locale.
 
 #### Constrained dynamic paths segments
 

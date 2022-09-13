@@ -1,11 +1,12 @@
 import { Key as PtrKey, match as ptrMatch, parse as ptrParse } from 'path-to-regexp'
-import { parse as parseQuery, ParsedUrlQuery } from 'querystring'
-import { parse, UrlObject } from 'url'
+import type { ParsedUrlQuery } from 'querystring'
+import type { UrlObject } from 'url'
 
-import { ignoreSegmentPathRegex, anyDynamicPathPatternPartRegex } from '../shared/regex'
+import { ignoreSegmentPathRegex, anyDynamicPathPatternPartRegex, anyDynamicFilepathPartsRegex } from '../shared/regex'
 import type { TRouteBranch } from '../types'
 import { getNtrData } from './ntrData'
 import { removeLangPrefix } from './removeLangPrefix'
+import { urlToUrlObject } from './urlToUrlObject'
 
 enum MATCH_TYPE {
   STATIC = 'static',
@@ -229,25 +230,27 @@ export const parsePathParts = ({
 }
 
 /**
- * parseUrl
+ * Parse a translated url to get the corresponding file url (UrlObject)
  *
- * Parse a translated url (with url path) to the corresponding url object (with file path)
- *
- * Ex: parseUrl('/fr/mon/url/de/france', 'fr') => { pathname: '/my/url/from/[country], query: { country: 'france' } }
+ * Ex: `urlToFileUrl('/fr/mon/url/de/france', 'fr')` => `{ pathname: '/my/url/from/[country], query: { country: 'france' } }`
  *
  * @param url The url to parse: can be a string, an URL or an UrlObject
  * @param locale (optional) The locale corresponding to the url translation.
- * If omitted, parseUrl will look for the locale in the first path part.
- * If it does not match a locale, parseUrl will use the default locale.
+ * If omitted, urlToFileUrl will look for the locale in the first path part.
+ * If it does not match a locale, urlToFileUrl will use the default locale.
  *
  * @returns The file path based, Next.js format, url in UrlObject format
  * if the url successfully matched a file path, and undefined otherwise
  */
-export const parseUrl = (url: string | URL | UrlObject, locale?: string) => {
+export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => {
   const { routesTree, defaultLocale, locales } = getNtrData()
-  const { pathname, query, hash } =
-    typeof url === 'string' ? parse(url) : url instanceof URL ? parse(url.toString()) : url
-  const parsedQuery = typeof query === 'string' ? parseQuery(query) : query || {}
+  const { pathname, query, hash } = urlToUrlObject(url)
+
+  if (pathname && anyDynamicFilepathPartsRegex.exec(pathname)) {
+    // Not sure if we should return undefined instead. Or throw?
+    return { pathname, query, hash }
+  }
+
   const result = parsePathParts({
     locale: locale || defaultLocale || locales[0],
     routeBranch: routesTree,
@@ -257,7 +260,7 @@ export const parseUrl = (url: string | URL | UrlObject, locale?: string) => {
     const { parsedPathParts, additionalQuery } = result
     return {
       pathname: `/${parsedPathParts.join('/')}`,
-      query: { ...parsedQuery, ...additionalQuery },
+      query: { ...query, ...additionalQuery },
       ...(hash && { hash }),
     }
   }

@@ -1,12 +1,12 @@
 import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-slash'
 import { parse as parsePathPattern, compile as compilePath } from 'path-to-regexp'
-import { parse as parseQuery } from 'querystring'
 import { format as formatUrl, UrlObject } from 'url'
 
 import { ignoreSegmentPathRegex } from '../shared/regex'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TRouteBranch } from '../types'
 import { getNtrData } from './ntrData'
+import { urlToUrlObject } from './urlToUrlObject'
 
 const getPatternFromRoutePaths = (routeBranch: TRouteBranch, locale: string) => {
   const pattern = routeBranch.paths[locale] || routeBranch.paths.default
@@ -50,7 +50,7 @@ const getPathPatternPart = ({
  *
  * Ex: `/[dynamic]/path` => `/:dynamic/path`
  */
-export const getPathPattern = ({
+export const getTranslatedPathPattern = ({
   routeBranch,
   pathParts,
   locale,
@@ -80,7 +80,7 @@ export const getPathPattern = ({
     ) {
       return (
         currentPathPatternPart +
-        getPathPattern({
+        getTranslatedPathPattern({
           routeBranch: child,
           pathParts: remainingPathParts,
           locale,
@@ -92,41 +92,40 @@ export const getPathPattern = ({
 }
 
 /**
- * Translate UrlObject into translated string url
+ * Translate Next file url into translated string url
  *
- * @param urlObject UrlObject with a defined pathname
+ * @param url Next default file url
  * @param locale string
  */
-export const translateUrlObject = (urlObject: UrlObject, locale: string) => {
+export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string) => {
   const { routesTree } = getNtrData()
 
-  try {
-    if (!routesTree.children) {
-      throw new Error(
-        'No page found. You probably need to add the pageDirectory option in your translateRoutes config.',
-      )
-    }
+  const { pathname, query, hash } = urlToUrlObject(url)
 
-    const pathParts = (urlObject.pathname || '/')
+  if (!routesTree.children) {
+    throw new Error('No page found. You probably need to add the pageDirectory option in your translateRoutes config.')
+  }
+
+  try {
+    const pathParts = (pathname || '/')
       .replace(/^\/|\/$/g, '')
       .split('/')
       .filter(Boolean)
 
     // Create a new query object that we can mutate
-    const query = { ...(typeof urlObject.query === 'string' ? parseQuery(urlObject.query) : urlObject.query || {}) }
+    const newQuery = { ...query }
 
-    const pathPattern = getPathPattern({ routeBranch: routesTree, pathParts, locale })
-    const pathname = normalizePathTrailingSlash(compilePath(pathPattern)(query))
+    const pathPattern = getTranslatedPathPattern({ routeBranch: routesTree, pathParts, locale })
+    const newPathname = normalizePathTrailingSlash(compilePath(pathPattern)(query))
 
     for (const patterToken of parsePathPattern(pathPattern)) {
       if (typeof patterToken === 'object' && patterToken.name) {
-        delete query[patterToken.name]
+        delete newQuery[patterToken.name]
       }
     }
 
-    return formatUrl({ ...urlObject, pathname, query })
+    return formatUrl({ pathname: newPathname, query: newQuery, hash })
   } catch (error) {
-    // TODO: throw error on dev env
-    console.error(new Error(ntrMessagePrefix + `No page found for pathname ${urlObject.pathname}`), { cause: error })
+    throw new Error(ntrMessagePrefix + `No page found for pathname ${pathname}`, { cause: error })
   }
 }

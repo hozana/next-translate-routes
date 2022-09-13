@@ -1,9 +1,5 @@
 # Todo
 
-- split `translateUrl` into
-  - `translateUrl` from string to string
-  - `parseUrlString` from string to `UrlObject & { locale: string } & [UrlObject, string]`
-  - and maybe `translateUrlObject` from UrlObject to string?
 - check if the prefetch works in all conditions (with `yarn build && yarn start`)
   =>`href={parseUrlString(url)}` in link?
 - add exclude options to sort and exclude redirects/rewrites

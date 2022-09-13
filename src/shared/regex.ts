@@ -26,9 +26,14 @@ export const ignoreSegmentPathRegex = /^\.(\(.+\))?$/
 export const anyDynamicFilepathPartRegex = /^\[\[?(?:\.{3})?([^/[\]?#]+)\]?\]$/
 
 /**
+ * Match all dynamic parts: `[slug]` and `[...pathParts]` and `[[...pathParts]]`
+ */
+export const anyDynamicFilepathPartsRegex = /\[\[?(?:\.{3})?([^/[\]?#]+)\]?\]/g
+
+/**
  * Ex: `:slug` or `:pathParts*` or `:pathParts+` or `foo-:bar`
  */
-export const anyDynamicPathPatternPartRegex = /(?<!\\):[\d\w]+/
+export const anyDynamicPathPatternPartRegex = /(?:^|[^\\]):[\d\w]+/
 
 /**
  * Ex: `[[...pathParts]]`
@@ -36,12 +41,12 @@ export const anyDynamicPathPatternPartRegex = /(?<!\\):[\d\w]+/
 export const optionalMatchAllFilepathPartRegex = /^\[\[\.{3}([^/[\]?#]+)\]\]$/
 
 /**
- * Match all `[[...pathParts]]` parts not `[...pathParts]` parts
+ * Match all `[[...pathParts]]` parts
  */
 export const optionalMatchAllFilepathPartsRegex = /\[\[\.{3}([^/[\]?#]+)\]\]/g
 
 /**
- * Match all `[...pathParts]` parts and not `[[...pathParts]]` parts
+ * Match all `[...pathParts]` parts but not `[[...pathParts]]` parts
  */
 export const matchAllFilepathPartsRegex = /\[\.{3}([^/[\]?#]+)\]/g
 

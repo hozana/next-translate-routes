@@ -187,6 +187,8 @@ export type TTranslateUrl = typeof translatePath
 /**
  * Translate url into locale
  *
+ * Will soon be deprecated in favor of fileUrlToUrl and urlToFileUrl
+ *
  * @param url string url or UrlObject
  * @param locale string
  * @param options (optional)
