@@ -98,7 +98,7 @@ export const getTranslatedPathPattern = ({
  * @param locale string
  */
 export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string) => {
-  const { routesTree } = getNtrData()
+  const { routesTree, defaultLocale } = getNtrData()
 
   const { pathname, query, hash } = urlToUrlObject(url)
 
@@ -124,7 +124,11 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string) => {
       }
     }
 
-    return formatUrl({ pathname: newPathname, query: newQuery, hash })
+    return `${locale !== defaultLocale ? `/${locale}` : ''}${formatUrl({
+      pathname: newPathname,
+      query: newQuery,
+      hash,
+    })}`
   } catch (error) {
     throw new Error(ntrMessagePrefix + `No page found for pathname ${pathname}`, { cause: error })
   }
