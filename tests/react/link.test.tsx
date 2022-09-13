@@ -43,7 +43,7 @@ describe('Link', () => {
     container.querySelector('a')?.click()
     expect(push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
-      '/root/community/300-three-hundred/statistics?baz=3',
+      '/en/root/community/300-three-hundred/statistics?baz=3',
       { locale: 'en', scroll: undefined, shallow: undefined },
     )
   })

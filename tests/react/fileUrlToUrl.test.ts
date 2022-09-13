@@ -77,7 +77,7 @@ describe('fileUrlToUrl', () => {
         hash: 'section',
       },
       locale: 'en',
-      translation: '/root/catch-all-or-none?baz=3#section',
+      translation: '/en/root/catch-all-or-none?baz=3#section',
     },
     {
       urlObject: {
@@ -86,7 +86,7 @@ describe('fileUrlToUrl', () => {
         hash: 'section',
       },
       locale: 'en',
-      translation: '/root/catch-all/foo/bar?baz=3#section',
+      translation: '/en/root/catch-all/foo/bar?baz=3#section',
     },
   ]
   testDataItems.forEach(({ urlObject, translation, locale = 'fr' }) => {
