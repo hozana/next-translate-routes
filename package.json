@@ -18,7 +18,7 @@
     "dynamic"
   ],
   "scripts": {
-    "build:clear": "rm -rf plugin react shared ./*.d.ts ./*.js.map ./*.js",
+    "build:clear": "yon rimraf plugin react shared ./*.d.ts ./*.js.map ./*.js",
     "build": "yon build:clear && yon tsc",
     "format": "yarn prettier -c --write .",
     "lint": "yon eslint --ignore-path .gitignore .",
@@ -63,6 +63,7 @@
     "prettier": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.4",
     "webpack": "^5.65.0",
