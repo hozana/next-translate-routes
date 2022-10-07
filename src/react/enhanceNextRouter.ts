@@ -1,11 +1,13 @@
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { NextRouter, SingletonRouter } from 'next/router'
+import { stringify as stringifyQuery } from 'querystring'
 
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { Url } from '../types'
+import { fileUrlToUrl } from './fileUrlToUrl'
 import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
-import { translateUrl } from './translateUrl'
+import { urlToFileUrl } from './urlToFileUrl'
 
 interface Options {
   shallow?: boolean
@@ -23,37 +25,46 @@ const enhancePushReplace =
   <R extends NextRouter | SingletonRouter>(router: R, fnName: 'push' | 'replace') =>
   (url: Url, as?: Url, options?: Options) => {
     const locale = getLocale(router, options?.locale)
-    const parsedUrl = typeof url === 'string' ? translateUrl(url, locale, { format: 'object' }) : url
-    const translatedUrl = as || translateUrl(url, locale, { format: 'string' })
-
+    const parsedUrl = typeof url === 'string' ? urlToFileUrl(url, locale) : url
+    let translatedUrl = as
+    if (!as && parsedUrl) {
+      try {
+        translatedUrl = fileUrlToUrl(parsedUrl, locale)
+      } catch {
+        // Url is wrong
+      }
+    }
     if (getNtrData().debug) {
       logWithTrace(`router.${fnName}`, {
         url,
         as,
         options,
         translatedUrl,
-        parsedUrl: Object.entries(parsedUrl).reduce((acc, [key, value]) => ({
-          ...acc,
-          ...(value !== null && { [key]: value }),
-        })),
+        parsedUrl,
         locale,
       })
     }
 
-    return router[fnName](parsedUrl, translatedUrl, options)
+    return router[fnName](parsedUrl || url, translatedUrl, options)
   }
 
 const enhancePrefetch =
   <R extends NextRouter | SingletonRouter>(router: R) =>
   (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
     const locale = getLocale(router, options?.locale)
-    const parsedInputUrl = asPath || translateUrl(inputUrl, locale, { format: 'string' })
+    const parsedInputUrl = urlToFileUrl(inputUrl, locale)
 
     if (getNtrData().debug === 'withPrefetch') {
       logWithTrace('router.prefetch', { inputUrl, asPath, options, parsedInputUrl, locale })
     }
 
-    return router.prefetch(parsedInputUrl, asPath, options)
+    return router.prefetch(
+      parsedInputUrl
+        ? parsedInputUrl.pathname + (parsedInputUrl.query && `?${stringifyQuery(parsedInputUrl.query)}`)
+        : inputUrl,
+      asPath,
+      options,
+    )
   }
 
 export const enhanceNextRouter = <R extends NextRouter | SingletonRouter>(router: R) => {

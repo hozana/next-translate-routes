@@ -21,7 +21,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
         <a>Home</a>
       </LinkComponent>
       {' | '}
-      <LinkComponent href={{ pathname: '/about' }}>
+      <LinkComponent href={{ pathname: '/about-us' }}>
         <a>About</a>
       </LinkComponent>
       {' | '}

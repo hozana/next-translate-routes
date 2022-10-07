@@ -88,7 +88,7 @@ export const getTranslatedPathPattern = ({
       )
     }
   }
-  throw new Error(`No "/${pathParts.join('/')}" page found in "${routeBranch.name}" folder.`)
+  throw new Error(`No "/${pathParts.join('/')}" page found in /${routeBranch.name} folder.`)
 }
 
 /**
