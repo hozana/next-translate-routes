@@ -1,12 +1,13 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
-import { Configuration as WebpackConfiguration } from 'webpack'
+import type { Configuration as WebpackConfiguration, FileCacheOptions } from 'webpack'
 
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import { NextConfigWithNTR } from '../types'
 import { createNtrData } from './createNtrData'
 import { getPagesPath } from './getPagesPath'
 import { getRouteBranchReRoutes } from './getRouteBranchReRoutes'
+import { getAllRoutesFiles } from './routesFiles'
 
 /**
  * Sort redirects and rewrites by descending specificity:
@@ -59,6 +60,10 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
     webpack(conf: WebpackConfiguration, context) {
       const config =
         typeof nextConfig.webpack === 'function' ? (nextConfig.webpack(conf, context) as WebpackConfiguration) : conf
+
+      config.cache = typeof config.cache === 'object' ? (config.cache as FileCacheOptions) : { type: 'filesystem' }
+      config.cache.buildDependencies = config.cache.buildDependencies || {}
+      config.cache.buildDependencies.ntrRoutes = getAllRoutesFiles()
 
       if (!config.module) {
         config.module = {}

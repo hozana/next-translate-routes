@@ -6,9 +6,7 @@ import YAML from 'yamljs'
 import { anyDynamicFilepathPartRegex, spreadFilepathPartRegex } from '../shared/regex'
 import type { TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
-
-/** Keep 'routes.json' for backward compatibility */
-const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
+import { isRoutesFileName } from './routesFiles'
 
 /** Get path and path translations from name and all translations #childrenOrder */
 const getRouteSegment = <L extends string>(
@@ -60,15 +58,7 @@ export const parsePages = <L extends string>({
 }: TParsePageTreeProps): TRouteBranch<L> => {
   const directoryPath = propDirectoryPath || findPagesDir(process.cwd()).pages
   const directoryItems = fs.readdirSync(directoryPath)
-  const routesFileName = directoryItems.find((directoryItem) => {
-    const fileNameNoExt = directoryItem.match(/^(.+)\.(json|yaml)$/)?.[1]
-    return (
-      fileNameNoExt &&
-      (routesDataFileName
-        ? fileNameNoExt === routesDataFileName
-        : DEFAULT_ROUTES_DATA_FILE_NAMES.includes(fileNameNoExt))
-    )
-  })
+  const routesFileName = directoryItems.find((directoryItem) => isRoutesFileName(directoryItem, routesDataFileName))
   const routeSegmentsFileContent = routesFileName
     ? fs.readFileSync(pathUtils.join(directoryPath, routesFileName), { encoding: 'utf8' })
     : ''

@@ -19,7 +19,9 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Complex paths segments](#complex-paths-segments)
     - [Custom route tree](#custom-route-tree)
     - [Outside Next](#outside-next)
-- [Known issue: middleware with Next >=12.2.0](#known-issue-middleware-with-next-1220)
+- [Known issue](#known-issues)
+  - [Middleware with Next >=12.2.0](#middleware-with-next-1220)
+  - [Page tree not updated](#page-tree-not-updated)
 - [How does it work](#how-does-it-work)
 
 ## Features
@@ -471,7 +473,9 @@ module.exports = ({ config }) => {
 
 > ⚠️ Warning! The rule `test` should only match the file where `withTranslateRoutes` is used! If you cannot, then set the `mustMatch` loader option to `false`.
 
-## Known issue: middleware with Next >=12.2.0
+## Known issues
+
+### Middleware with Next >=12.2.0
 
 Unfortunately, Next new middleware synthax (stable) is not supported yet, because of what seems to be a Next issue.
 You can keep track of this issue:
