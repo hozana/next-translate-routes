@@ -72,7 +72,9 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
         config.module.rules = []
       }
       config.module.rules.push({
-        test: new RegExp(`${pagesPath}_app\\.(${context.config.pageExtensions.join('|')})$`),
+        test: new RegExp(
+          `${pagesPath.replace(/\\|\//g, '(\\\\|\\/)')}_app\\.(${context.config.pageExtensions.join('|')})$`,
+        ),
         use: {
           loader: 'next-translate-routes/loader',
           options: {
