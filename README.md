@@ -14,6 +14,8 @@ Translated routing and more for Next using Next regular file-base routing system
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
     - [Translate/untranslate urls](#translateuntranslate-urls)
+    - [Alternate pages (SEO)](#alternate-pages-seo)
+    - [Sitemap](#sitemap)
     - [Constrained dynamic paths segments](#constrained-dynamic-paths-segments)
     - [Ignoring a path part](#ignoring-a-path-part)
     - [Complex paths segments](#complex-paths-segments)
@@ -21,7 +23,6 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Outside Next](#outside-next)
 - [Known issue](#known-issues)
   - [Middleware with Next >=12.2.0](#middleware-with-next-1220)
-  - [Page tree not updated](#page-tree-not-updated)
 - [How does it work](#how-does-it-work)
 
 ## Features
@@ -265,6 +266,28 @@ Two helpers are exposed to translate/untranslate urls:
 
 Both of them take 2 arguments: an url and a locale.
 
+#### Alternate pages (SEO)
+
+You will probably want to indicate alternate pages for SEO optimization. Here is how you can do that:
+
+```tsx
+  const { pathname, query, locale, locale } = useRouter()
+
+  return (
+    <Head>
+      {locales.map((l) => l !== locale && <link rel="alternate" hrefLang={l} href={fileUrlToUrl({ pathname, query }, l)} />)}
+    </Head>
+  )
+```
+
+You can do it in the `_app` component if you are sure to do that for all your pages.
+
+See [this article about alternate and canonical pages](https://hreflang.org/use-hreflang-canonical-together/)
+
+#### Sitemap
+
+See [@JacbSoderblom's suggestion](https://github.com/hozana/next-translate-routes/issues/21#issuecomment-1265056041)
+
 #### Constrained dynamic paths segments
 
 ```js
@@ -475,13 +498,19 @@ module.exports = ({ config }) => {
 
 ## Known issues
 
-### Middleware with Next >=12.2.0
+### Middleware with watcher (Next >=12.2.0)
 
-Unfortunately, Next new middleware synthax (stable) is not supported yet, because of what seems to be a Next issue.
+Unfortunately, Next new middleware synthax (stable) has a bug when using a "matcher" and rewrites.
 You can keep track of this issue:
 
 - [in next-translate-routes repo](https://github.com/hozana/next-translate-routes/issues/19)
 - [in next.js repo](https://github.com/vercel/next.js/issues/39531)
+
+So if you want to use a middleware with Next >= 12.2.0, you need to remove any watcher option and filter from within the middleware using [conditional statements](https://nextjs.org/docs/advanced-features/middleware#conditional-statements).
+
+### Domain routing
+
+Domain routing is not supported yet but should be in the future. Any PR to make it work are welcome.
 
 ## How does it work
 

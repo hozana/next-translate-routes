@@ -1,5 +1,9 @@
 # Todo
 
+BUG !
+Il y a un rechargement quand on change de page vers une page qui a getServerSideProps ou getStaticProps !!!
+BUG !
+
 - check if the prefetch works in all conditions (with `yarn build && yarn start`)
   =>`href={parseUrlString(url)}` in link?
 - add exclude options to sort and exclude redirects/rewrites
@@ -13,7 +17,6 @@
 - trow helpful errors (ex: for `compile(path)(augmentedQuery)` in case the query parameters for a dynamic segment is missing)
 - improve comments, code documentation: ex. in `getAllCandicates`, why `path === ''` and not `/^\.(\(.+\))?$/.test(path)`???
 - getRouteList: (locale?: string) => (? Record<string, string[]> ? string? string[]?)
-- getAllTranslatedRoutes for canonical
 - create a function `getRouteSegments(filePath: string): TRouteSegment[]`
   - return the whole path as is if not found and not dynamic file path
 - export a routeExist function
