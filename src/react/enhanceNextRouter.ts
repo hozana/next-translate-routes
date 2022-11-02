@@ -4,9 +4,9 @@ import { stringify as stringifyQuery } from 'querystring'
 
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { Url } from '../types'
-import { fileUrlToUrl } from './fileUrlToUrl'
 import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
+import { translatePushReplaceArgs } from './translatePushReplaceArgs'
 import { urlToFileUrl } from './urlToFileUrl'
 
 interface Options {
@@ -24,28 +24,20 @@ const logWithTrace = (from: string, details: unknown) => {
 const enhancePushReplace =
   <R extends NextRouter | SingletonRouter>(router: R, fnName: 'push' | 'replace') =>
   (url: Url, as?: Url, options?: Options) => {
-    const locale = getLocale(router, options?.locale)
-    const parsedUrl = typeof url === 'string' ? urlToFileUrl(url, locale) : url
-    let translatedUrl = as
-    if (!as && parsedUrl) {
-      try {
-        translatedUrl = fileUrlToUrl(parsedUrl, locale)
-      } catch {
-        // Url is wrong
-      }
-    }
+    const translatedArgs = translatePushReplaceArgs({ router, url, as, locale: options?.locale })
+
     if (getNtrData().debug) {
       logWithTrace(`router.${fnName}`, {
-        url,
-        as,
-        options,
-        translatedUrl,
-        parsedUrl,
-        locale,
+        original: {
+          url,
+          as,
+          options,
+        },
+        translated: translatedArgs,
       })
     }
 
-    return router[fnName](parsedUrl || url, translatedUrl, options)
+    return router[fnName](translatedArgs.url, translatedArgs.as, { ...options, locale: translatedArgs.locale })
   }
 
 const enhancePrefetch =

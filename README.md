@@ -8,7 +8,7 @@ Translated routing and more for Next using Next regular file-base routing system
   - [Basic usage](#basic-usage)
     1. [Wrap you next config with the next-translate-routes plugin](#1-wrap-you-next-config-with-the-next-translate-routes-plugin)
     2. [Define your routes](#2-define-your-routes)
-    3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-app-component-with-the-withtranslateroutes-hoc)
+    3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-_app-component-with-the-withtranslateroutes-hoc)
     4. [Use `next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
     5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
   - [Advanced usage](#advanced-usage)
@@ -22,16 +22,16 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Custom route tree](#custom-route-tree)
     - [Outside Next](#outside-next)
 - [Known issue](#known-issues)
-  - [Middleware with Next >=12.2.0](#middleware-with-next-1220)
+  - [Middleware with Next >=12.2.0](#middleware-with-watcher-next-1220)
 - [How does it work](#how-does-it-work)
 
 ## Features
 
 - **Translated paths segments**  
   Ex: `/contact-us` and `/fr/contactez-nous`.
-- **Complex paths segments** (path-to-regexp synthax)  
+- **Complex paths segments** (path-to-regexp syntax)  
   Ex: `/:id{-:slug}?/`
-- **Constrained dynamic paths segments** (path-to-regexp synthax)  
+- **Constrained dynamic paths segments** (path-to-regexp syntax)  
   Ex: `/:id(\\d+)/`
 - **No duplicated content (SEO)**  
   Simple rewrites would make a page accessible with 2 different urls which is bad for SEO.
@@ -257,6 +257,8 @@ If `routesDataFileName` is defined, to `'routesData'` for example, next-translat
 
 If `routesTree` is defined, next-translate-routes won't parse the `pages` folder and will use the given object as the routes tree. If you uses it, beware of building correctly the routes tree to avoid bugs.
 
+You can see and edit these while your app is running to debug things, using `__NEXT_TRANSLATE_ROUTES_DATA` in the browser console. For exemple, executing `__NEXT_TRANSLATE_ROUTES_DATA.debug = true` will activate the logs on `router.push` and `router.replace`.
+
 #### Translate/untranslate urls
 
 Two helpers are exposed to translate/untranslate urls:
@@ -280,7 +282,7 @@ You will probably want to indicate alternate pages for SEO optimization. Here is
   )
 ```
 
-You can do it in the `_app` component if you are sure to do that for all your pages.
+You can do it in the `_app` component if you are sure to do that for all your pages. You can also use a dedicated package, like [next-seo](https://github.com/garmeeh/next-seo).
 
 See [this article about alternate and canonical pages](https://hreflang.org/use-hreflang-canonical-together/)
 
@@ -500,13 +502,20 @@ module.exports = ({ config }) => {
 
 ### Middleware with watcher (Next >=12.2.0)
 
-Unfortunately, Next new middleware synthax (stable) has a bug when using a "matcher" and rewrites.
+Unfortunately, Next new middleware syntax (stable) has a bug when using a "matcher" and rewrites.
 You can keep track of this issue:
 
 - [in next-translate-routes repo](https://github.com/hozana/next-translate-routes/issues/19)
 - [in next.js repo](https://github.com/vercel/next.js/issues/39531)
 
 So if you want to use a middleware with Next >= 12.2.0, you need to remove any watcher option and filter from within the middleware using [conditional statements](https://nextjs.org/docs/advanced-features/middleware#conditional-statements).
+
+### Optional catch-all with rewrites
+
+Another bug in Next.js mess some optional catch all routes when they are rewritten.
+You can keep track of this issue:
+
+- [in the next.js issue](https://github.com/vercel/next.js/issues/41624)
 
 ### Domain routing
 

@@ -41,11 +41,6 @@ export const anyDynamicPathPatternPartRegex = /(?:^|[^\\]):[\d\w]+/
 export const optionalMatchAllFilepathPartRegex = /^\[\[\.{3}([^/[\]?#]+)\]\]$/
 
 /**
- * Match all `[[...pathParts]]` parts
- */
-export const optionalMatchAllFilepathPartsRegex = /\[\[\.{3}([^/[\]?#]+)\]\]/g
-
-/**
  * Match all `[...pathParts]` parts but not `[[...pathParts]]` parts
  */
 export const matchAllFilepathPartsRegex = /\[\.{3}([^/[\]?#]+)\]/g
