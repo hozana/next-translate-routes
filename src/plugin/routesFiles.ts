@@ -13,10 +13,13 @@ export const isRoutesFileName = (fileName: string, routesDataFileName?: string) 
   )
 }
 
-export const getAllRoutesFiles = (
-  directoryPath = findPagesDir(process.cwd()).pages,
-  routesDataFileName?: string,
-): string[] => {
+/**
+ * Get pages dir, trying both .pages (next < 13) and .pagesDir (next >= 13) syntaxes
+ */
+export const getPagesDir = () =>
+  findPagesDir(process.cwd(), false).pages || (findPagesDir(process.cwd(), false) as Record<string, string>).pagesDir
+
+export const getAllRoutesFiles = (directoryPath = getPagesDir(), routesDataFileName?: string): string[] => {
   const directoryItems = fs.readdirSync(directoryPath)
   return directoryItems.reduce((acc, directoryItem) => {
     const itemPath = pathUtils.join(directoryPath, directoryItem)

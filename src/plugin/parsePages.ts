@@ -1,12 +1,11 @@
 import fs from 'fs'
-import { findPagesDir } from 'next/dist/lib/find-pages-dir'
 import pathUtils from 'path'
 import YAML from 'yamljs'
 
 import { anyDynamicFilepathPartRegex, spreadFilepathPartRegex } from '../shared/regex'
 import type { TRouteBranch, TRouteSegment, TRouteSegmentPaths, TRouteSegmentsData } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
-import { isRoutesFileName } from './routesFiles'
+import { getPagesDir, isRoutesFileName } from './routesFiles'
 
 /** Get path and path translations from name and all translations #childrenOrder */
 const getRouteSegment = <L extends string>(
@@ -56,7 +55,7 @@ export const parsePages = <L extends string>({
   isSubBranch,
   routesDataFileName,
 }: TParsePageTreeProps): TRouteBranch<L> => {
-  const directoryPath = propDirectoryPath || findPagesDir(process.cwd()).pages
+  const directoryPath = propDirectoryPath || getPagesDir()
   const directoryItems = fs.readdirSync(directoryPath)
   const routesFileName = directoryItems.find((directoryItem) => isRoutesFileName(directoryItem, routesDataFileName))
   const routeSegmentsFileContent = routesFileName

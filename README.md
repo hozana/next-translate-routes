@@ -3,6 +3,7 @@
 Translated routing and more for Next using Next regular file-base routing system
 
 - [Features](#features)
+  - [Yet unsupported features](#yet-unsupported-features)
 - [Motivation](#motivation)
 - [How to](#how-to)
   - [Basic usage](#basic-usage)
@@ -23,6 +24,8 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Outside Next](#outside-next)
 - [Known issue](#known-issues)
   - [Middleware with Next >=12.2.0](#middleware-with-watcher-next-1220)
+  - [Optional catch all with rewrites](#optional-catch-all-with-rewrites)
+  - [With @sentry/nextjs](#with-sentrynextjs)
 - [How does it work](#how-does-it-work)
 
 ## Features
@@ -42,7 +45,15 @@ Translated routing and more for Next using Next regular file-base routing system
 
 See it in action: <https://codesandbox.io/s/github/hozana/next-translate-routes/tree/master>
 
-**Note**: Next-translate-routes does not work with Next html static export, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
+### Yet unsupported features
+
+- Html static export is not and will never be supported by next-translate-routes, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
+- Domain routing is not supported yet but should be in the future.
+- Next 13 is not supported yet too. There is two steps here:
+  - supporting next 13 without `app/` directory: it nearly works, but there is some issues. To fix them, we need to figure out what is optimistic navigation. If anyone has a clue, please open an issue to discuss it!
+  - supporting the `app/` directory. And that won't be a piece of cake...
+
+Any PR are welcome!
 
 ## Motivation
 
@@ -512,14 +523,25 @@ So if you want to use a middleware with Next >= 12.2.0, you need to remove any w
 
 ### Optional catch-all with rewrites
 
-Another bug in Next.js mess some optional catch all routes when they are rewritten.
-You can keep track of this issue:
+[Another issue in Next.js](https://github.com/vercel/next.js/issues/41624) messed some optional catch all routes when they are rewritten: it has been fixed starting from 13.0.4.
 
-- [in the next.js issue](https://github.com/vercel/next.js/issues/41624)
+### With @sentry/nextjs
 
-### Domain routing
+@sentry/nextjs inject a webpack loader that replaces all pages content with a proxy, including _app. If it does it before next-translate-routes loader execution, the latter won't be able to do its job.
 
-Domain routing is not supported yet but should be in the future. Any PR to make it work are welcome.
+So the wrapping order in next.config.js is important!
+
+Works:
+
+```js
+module.exports = withTranslateRoutes(withSentryConfig(nextConfig, sentryWebpackPluginOptions))
+```
+
+Does NOT work:
+
+```js
+module.exports = withSentryConfig(withTranslateRoutes(nextConfig), sentryWebpackPluginOptions)
+```
 
 ## How does it work
 
