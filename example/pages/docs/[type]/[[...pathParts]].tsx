@@ -53,18 +53,14 @@ const DocsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ da
         {['a', 'b', 'c'].map((p, i) => (
           <React.Fragment key={p + i}>
             {' '}
-            <Link href={{ pathname, query: { type, pathParts: [...pathPartsArray, p] } }}>
-              <a>`/{p}`</a>
-            </Link>
+            <Link href={{ pathname, query: { type, pathParts: [...pathPartsArray, p] } }}>\`/{p}\`</Link>
             {', '}
           </React.Fragment>
         ))}
         to path.
       </p>
       <p>
-        <Link href="/">
-          <a>Go home</a>
-        </Link>
+        <Link href="/">Go home</Link>
       </p>
     </Layout>
   )

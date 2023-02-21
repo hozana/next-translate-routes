@@ -17,44 +17,28 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
 
   return (
     <nav>
-      <LinkComponent href="/">
-        <a>Home</a>
-      </LinkComponent>
+      <LinkComponent href="/">Home</LinkComponent>
       {' | '}
-      <LinkComponent href={{ pathname: '/about-us' }}>
-        <a>About</a>
-      </LinkComponent>
+      <LinkComponent href={{ pathname: '/about-us' }}>About</LinkComponent>
       {' | '}
-      <LinkComponent href="/news">
-        <a>News</a>
-      </LinkComponent>
+      <LinkComponent href="/news">News</LinkComponent>
       {' | '}
-      <LinkComponent href="/rewrites">
-        <a>Rewrites</a>
-      </LinkComponent>
+      <LinkComponent href="/rewrites">Rewrites</LinkComponent>
       {' | '}
-      <LinkComponent href="/docs/api">
-        <a>Api docs</a>
-      </LinkComponent>
+      <LinkComponent href="/docs/api">Api docs</LinkComponent>
       {' - '}
       <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'client' } }}>
-        <a>Client docs</a>
+        Client docs
       </LinkComponent>
       {' | '}
-      <LinkComponent href={{ pathname: '/users' }}>
-        <a>Users List</a>
-      </LinkComponent>
+      <LinkComponent href={{ pathname: '/users' }}>Users List</LinkComponent>
       {' | '}
-      <LinkComponent href="/random/path">
-        <a>Random</a>
-      </LinkComponent>
+      <LinkComponent href="/random/path">Random</LinkComponent>
       {' | '}
-      <LinkComponent href="https://hozana.org/en">
-        <a>External link</a>
-      </LinkComponent>
+      <LinkComponent href="https://hozana.org/en">External link</LinkComponent>
       {' | '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>
-        <a>{newLocale}</a>
+        {newLocale}
       </LinkComponent>
     </nav>
   )

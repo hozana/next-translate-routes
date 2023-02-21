@@ -38,15 +38,11 @@ const RandomPage: NextPage = () => {
       </ul>
       <p>
         Add this random segment:{' '}
-        <Link href={{ pathname, query: { pathParts: [...pathPartsArray, nextPart] } }}>
-          <a>`/{nextPart}`</a>
-        </Link>
+        <Link href={{ pathname, query: { pathParts: [...pathPartsArray, nextPart] } }}>`/{nextPart}`</Link>
         to path.
       </p>
       <p>
-        <Link href="/">
-          <a>Go home</a>
-        </Link>
+        <Link href="/">Go home</Link>
       </p>
     </Layout>
   )

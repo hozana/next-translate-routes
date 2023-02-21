@@ -7,33 +7,21 @@ const IndexPage = () => (
   <Layout title="Home | Next.js + TypeScript Example">
     <h1>Hello Next.js 👋</h1>
     <p>
-      <Link href="/about">
-        <a>About</a>
-      </Link>
+      <Link href="/about">About</Link>
     </p>
     <p>
-      <Link href="/rewrites">
-        <a>Rewrites</a>
-      </Link>
+      <Link href="/rewrites">Rewrites</Link>
     </p>
     <p>
-      <Link href="/news">
-        <a>News</a>
-      </Link>
+      <Link href="/news">News</Link>
     </p>
     <p>
-      <Link href="/docs/api">
-        <a>Api docs</a>
-      </Link>
+      <Link href="/docs/api">Api docs</Link>
       {' - '}
-      <Link href="/docs/client">
-        <a>Client docs</a>
-      </Link>
+      <Link href="/docs/client">Client docs</Link>
     </p>
     <p>
-      <Link href="/users">
-        <a>Users List</a>
-      </Link>
+      <Link href="/users">Users List</Link>
     </p>
   </Layout>
 )

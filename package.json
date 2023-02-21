@@ -58,7 +58,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "jest": "^27.4.5",
-    "next": "12.3.4",
+    "next": "^13.1.6",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
     "react": "^18.2.0",

@@ -18,9 +18,7 @@ const AboutPage = () => {
       <p>This is the about page</p>
       <p>It will redirect to homepage using router.replace after 5 seconds.</p>
       <p>
-        <Link href="/">
-          <a>Go home</a>
-        </Link>
+        <Link href="/">Go home</Link>
       </p>
     </Layout>
   )
