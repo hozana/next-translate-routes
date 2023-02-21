@@ -5,8 +5,8 @@ import type { UrlObject } from 'url'
 import { ignoreSegmentPathRegex, anyDynamicPathPatternPartRegex, anyDynamicFilepathPartsRegex } from '../shared/regex'
 import type { TRouteBranch } from '../types'
 import { getNtrData } from './ntrData'
+import { parseUrl } from './parseUrl'
 import { removeLangPrefix } from './removeLangPrefix'
-import { urlToUrlObject } from './urlToUrlObject'
 
 enum MATCH_TYPE {
   STATIC = 'static',
@@ -244,9 +244,10 @@ export const parsePathParts = ({
  */
 export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => {
   const { routesTree, defaultLocale, locales } = getNtrData()
-  const { pathname, query, hash } = urlToUrlObject(url)
+  const { pathname, query, hash } = parseUrl(url)
 
   if (pathname && anyDynamicFilepathPartsRegex.exec(pathname)) {
+    // The given url seems to already be a fileUrl, return it as is.
     // Not sure if we should return undefined instead. Or throw?
     return { pathname, query, hash }
   }

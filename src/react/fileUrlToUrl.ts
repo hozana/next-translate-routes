@@ -2,18 +2,11 @@ import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-
 import { parse as parsePathPattern, compile as compilePath } from 'path-to-regexp'
 import { format as formatUrl, UrlObject } from 'url'
 
-import {
-  anyDynamicFilepathPartRegex,
-  dynamicFilepathPartsRegex,
-  getDynamicPathPartKey,
-  ignoreSegmentPathRegex,
-  optionalMatchAllFilepathPartRegex,
-  spreadFilepathPartRegex,
-} from '../shared/regex'
+import { ignoreSegmentPathRegex, optionalMatchAllFilepathPartRegex } from '../shared/regex'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TRouteBranch } from '../types'
+import { fileUrlToFileUrlObject } from './fileUrlToFileUrlObject'
 import { getNtrData } from './ntrData'
-import { urlToUrlObject } from './urlToUrlObject'
 
 /**
  * Get pattern from route branch paths property in the specified locale,
@@ -27,7 +20,8 @@ const getPatternFromRoutePaths = (routeBranch: TRouteBranch, locale: string) => 
 /** Add `/` prefix only if `pattern` is not an empty string and does not already have it */
 const addSlashPrefix = (path: string) => (path === '' || path.startsWith('/') ? path : `/${path}`)
 
-const getPathPatternPart = ({
+/** Get the translated path of a route branch (handling ignored path parts, index, match all, etc.) */
+const getTranslatedPathPart = ({
   routeBranch,
   locale,
   isLastPathPart,
@@ -60,11 +54,14 @@ const getPathPatternPart = ({
 }
 
 /**
- * Recursively get path pattern (path-to-regexp syntax) from file path parts
+ * Recursively get translated path (path-to-regexp syntax) given:
+ * - a route branch
+ * - file path parts
+ * - a locale
  *
- * Ex, given `/[dynamic]/path` is an existing file path:
- * `/[dynamic]/path` => { pattern: `/:dynamic/path`, values: {} }
- * `/value/path` => { pattern: `/:dynamic/path`, values: { dynamic: 'value' } }
+ * Ex: Given `/[dynamic]/path` is an existing file path:
+ *
+ * `/[dynamic]/path` => `/:dynamic/path`
  */
 export const getTranslatedPathPattern = ({
   routeBranch,
@@ -75,114 +72,77 @@ export const getTranslatedPathPattern = ({
   /** Remaining path parts after the `routeBranch` path parts */
   pathParts: string[]
   locale: string
-}): { pattern: string; values: Record<string, string | string[]> } => {
+}): string => {
   const isLastPathPart = pathParts.length === 0
 
   /** Current part path pattern */
-  const currentPathPatternPart = getPathPatternPart({ routeBranch, locale, isLastPathPart })
+  const currentTranslatedPathPart = getTranslatedPathPart({ routeBranch, locale, isLastPathPart })
 
   if (isLastPathPart) {
-    return { pattern: currentPathPatternPart, values: {} }
+    return currentTranslatedPathPart
   }
 
-  const nextPathPart = pathParts[0]
-  const remainingPathParts = pathParts.slice(1)
-  const hasNextPathPartDynamicSyntax = anyDynamicFilepathPartRegex.test(nextPathPart)
+  const [nextFilePathPart, ...remainingFilePathParts] = pathParts
 
   // Next parts path patterns: looking for the child corresponding to nextPathPart:
   // if nextPathPart does not match any child name and a dynamic child is found,
   // we will consider that nextPathPart is a value given to the dynamic child
 
-  let matchingChild: TRouteBranch | undefined = undefined
+  const matchingChild = routeBranch.children?.find((child) => child.name === nextFilePathPart)
 
-  for (const child of routeBranch.children || []) {
-    if (
-      // child.children must be coherent with remaining path parts is case a file and and folder share the same name
-      remainingPathParts.length === 0 ||
-      child.children?.length
-    ) {
-      if (child.name === nextPathPart) {
-        matchingChild = child
-        break
-      } else if (
-        // If nextPathPart already have a dynamic syntax, it must match the name, no need to go further
-        !hasNextPathPartDynamicSyntax &&
-        // If the current child is dynamic and...
-        anyDynamicFilepathPartRegex.test(child.name) &&
-        // ...there is no matching child found for now, or...
-        (!matchingChild ||
-          // ...the matchingChild has a sread syntax and the new one has not (priority)
-          (spreadFilepathPartRegex.test(matchingChild.name) && dynamicFilepathPartsRegex.test(child.name)))
-      ) {
-        matchingChild = child
-      }
-    }
+  if (!matchingChild) {
+    throw new Error(`${nextFilePathPart} not found in ${routeBranch.name || 'pages'}`)
   }
 
-  if (matchingChild) {
-    /** If we found an exact match, no need to add values */
-    const isExactMatch = matchingChild.name === nextPathPart
-    const dynamicPathPartKey = getDynamicPathPartKey(matchingChild.name)
+  const remainingTranslatedPath = getTranslatedPathPattern({
+    routeBranch: matchingChild,
+    pathParts: remainingFilePathParts,
+    locale,
+  })
 
-    const { pattern: nextPattern, values: nextValues } = getTranslatedPathPattern({
-      routeBranch: matchingChild,
-      pathParts: remainingPathParts,
-      locale,
-    })
-
-    const pattern = currentPathPatternPart + nextPattern
-    const values =
-      isExactMatch || !dynamicPathPartKey
-        ? nextValues
-        : {
-            [dynamicPathPartKey]: spreadFilepathPartRegex.test(matchingChild.name) ? pathParts : nextPathPart,
-            ...nextValues,
-          }
-
-    return { pattern, values }
-  }
-
-  throw new Error(`No "/${pathParts.join('/')}" page found in /${routeBranch.name} folder.`)
+  return currentTranslatedPathPart + remainingTranslatedPath
 }
 
 /**
  * Translate Next file url into translated string url
  *
  * @param url Next default file url
- * @param locale string
+ * @param locale The target locale
+ * @param option.throwOnError (Default to true) Throw if the input url does not match any page
+ *
+ * @returns The url string or undefined if no page matched and option.throwOnError is set to false
+ * @throws If and the input url does not match any page and option.throwOnError in not set to false
  */
-export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string) => {
-  const { routesTree, defaultLocale } = getNtrData()
-
-  const { pathname, query, hash } = urlToUrlObject(url)
-
-  if (!routesTree.children) {
-    throw new Error('No page found. You probably need to add the pageDirectory option in your translateRoutes config.')
-  }
-
+export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { throwOnError = true } = {}) => {
   try {
+    const { pathname, query, hash } = fileUrlToFileUrlObject(url)
+
+    const { routesTree, defaultLocale } = getNtrData()
+
     const pathParts = (pathname || '/')
       .replace(/^\/|\/$/g, '')
       .split('/')
       .filter(Boolean)
 
-    const { pattern: pathPattern, values } = getTranslatedPathPattern({ routeBranch: routesTree, pathParts, locale })
+    const pathPattern = getTranslatedPathPattern({ routeBranch: routesTree, pathParts, locale })
 
-    const newQuery = { ...query, ...values }
-    const newPathname = normalizePathTrailingSlash(compilePath(pathPattern)(newQuery))
+    const newPathname = normalizePathTrailingSlash(compilePath(pathPattern)(query))
 
-    for (const patterToken of parsePathPattern(pathPattern)) {
-      if (typeof patterToken === 'object' && patterToken.name) {
-        delete newQuery[patterToken.name]
+    for (const patternToken of parsePathPattern(pathPattern)) {
+      if (typeof patternToken === 'object' && patternToken.name) {
+        delete query[patternToken.name]
       }
     }
 
     return `${locale !== defaultLocale ? `/${locale}` : ''}${formatUrl({
       pathname: newPathname,
-      query: newQuery,
+      query,
       hash,
     })}`
-  } catch (error) {
-    throw new Error(ntrMessagePrefix + `No page found for pathname ${pathname}`, { cause: error })
+  } catch (cause) {
+    if (throwOnError) {
+      throw new Error(ntrMessagePrefix + `No page found for the following file url: ${url.toString()}`, { cause })
+    }
+    return undefined
   }
 }

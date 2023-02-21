@@ -274,10 +274,10 @@ You can see and edit these while your app is running to debug things, using `__N
 
 Two helpers are exposed to translate/untranslate urls:
 
-- fileUrlToUrl transforms a file url into a translated url
-- urlToFileUrl transforms a translated url into a file url
+- `fileUrlToUrl` transforms a file url into a translated url
+- `urlToFileUrl` transforms a translated url into a file url
 
-Both of them take 2 arguments: an url and a locale.
+Both of them take 2 arguments: an url and a locale. `fileUrlToUrl` can take an extra option argument to prevent it to throw and return undefined instead if the file url is not found: `{ throwOnError: false }`.
 
 #### Alternate pages (SEO)
 

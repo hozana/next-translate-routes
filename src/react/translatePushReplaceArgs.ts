@@ -2,6 +2,7 @@ import { NextRouter, SingletonRouter } from 'next/router'
 import type { UrlObject } from 'url'
 
 import type { Url } from '../types'
+import { fileUrlToFileUrlObject } from './fileUrlToFileUrlObject'
 import { fileUrlToUrl } from './fileUrlToUrl'
 import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
@@ -34,34 +35,39 @@ export const translatePushReplaceArgs = ({
     newLocale = urlLocale
   }
 
-  let parsedUrl: UrlObject | URL | string | undefined
-  let translatedUrl: string | undefined
-
   /**
-   * Href can be:
+   * url can be:
    * - an external url
    * - a correct file url
    * - a wrong file url (not matching any page)
    * - a correct translated url
    * - a wrong translated url
    */
-  try {
-    translatedUrl = fileUrlToUrl(unprefixedUrl, newLocale)
-    // Url is a correct file url
-    parsedUrl = unprefixedUrl
-  } catch {
-    parsedUrl = urlToFileUrl(unprefixedUrl, urlLocale || newLocale)
-    if (parsedUrl) {
-      try {
-        translatedUrl = fileUrlToUrl(parsedUrl, newLocale)
-        // Href is a correct translated url
-      } catch {
-        // Href is a wrong file url or an external url
-      }
-    } else {
-      // Href is a wrong url or an external url
-    }
-  }
 
-  return { url: parsedUrl || url, as: translatedUrl, locale: newLocale }
+  try {
+    /**
+     * We need the parsedUrl to be in Next UrlObject synthax, otherwise there is conflicts with the as prop
+     * See: https://github.com/hozana/next-translate-routes/issues/54
+     */
+    let parsedUrl: UrlObject | URL | string | undefined
+    let translatedUrl = fileUrlToUrl(unprefixedUrl, newLocale, { throwOnError: false })
+
+    if (translatedUrl) {
+      // url is a correct file url
+      parsedUrl = fileUrlToFileUrlObject(unprefixedUrl)
+    } else {
+      // url is not a correct file url
+      parsedUrl = urlToFileUrl(unprefixedUrl, urlLocale || newLocale)
+      if (parsedUrl) {
+        translatedUrl = fileUrlToUrl(parsedUrl, newLocale)
+        // If fileUrlToUrl did not throw, url is a correct translated url
+      }
+    }
+
+    return { url: parsedUrl || url, as: translatedUrl, locale: newLocale }
+  } catch (error) {
+    // url seems to be either a wrong file url or an external url:
+    // do not bring changes if no translation is found
+    return { url, locale }
+  }
 }

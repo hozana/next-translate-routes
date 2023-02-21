@@ -19,6 +19,7 @@ describe('Link', () => {
     const { container } = render(
       <RouterContext.Provider
         value={{
+          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
           isLocaleDomain: true,
           locale: 'en',
           locales: ['en', 'fr'],
@@ -52,6 +53,7 @@ describe('Link', () => {
     const { container } = render(
       <RouterContext.Provider
         value={{
+          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
           isLocaleDomain: true,
           locale: 'en',
           locales: ['en', 'fr'],
@@ -86,6 +88,7 @@ describe('Link', () => {
     const { container } = render(
       <RouterContext.Provider
         value={{
+          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
           isLocaleDomain: true,
           locale: 'en',
           locales: ['en', 'fr'],
@@ -112,6 +115,7 @@ describe('Link', () => {
     const { container } = render(
       <RouterContext.Provider
         value={{
+          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
           isLocaleDomain: true,
           locale: 'en',
           locales: ['en', 'fr'],

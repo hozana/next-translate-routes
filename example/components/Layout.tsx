@@ -33,7 +33,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
         <a>Rewrites</a>
       </LinkComponent>
       {' | '}
-      <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'api' } }}>
+      <LinkComponent href="/docs/api">
         <a>Api docs</a>
       </LinkComponent>
       {' - '}
@@ -45,7 +45,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
         <a>Users List</a>
       </LinkComponent>
       {' | '}
-      <LinkComponent href={{ pathname: '/random/[...pathParts]', query: { pathParts: ['path'] } }}>
+      <LinkComponent href="/random/path">
         <a>Random</a>
       </LinkComponent>
       {' | '}

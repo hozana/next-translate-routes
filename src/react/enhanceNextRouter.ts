@@ -52,7 +52,11 @@ const enhancePrefetch =
 
     return router.prefetch(
       parsedInputUrl
-        ? parsedInputUrl.pathname + (parsedInputUrl.query && `?${stringifyQuery(parsedInputUrl.query)}`)
+        ? (parsedInputUrl.pathname || '/') +
+            (parsedInputUrl.query &&
+              `?${
+                typeof parsedInputUrl.query === 'string' ? parsedInputUrl.query : stringifyQuery(parsedInputUrl.query)
+              }`)
         : inputUrl,
       asPath,
       options,

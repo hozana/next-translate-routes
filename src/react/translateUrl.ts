@@ -1,12 +1,13 @@
 import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-slash'
 import type { Key } from 'path-to-regexp'
 import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
-import { parse as parseQuery, stringify as stringifyQuery, ParsedUrlQuery } from 'querystring'
-import { format as formatUrl, parse as parseUrl, UrlObject } from 'url'
+import type { ParsedUrlQuery } from 'querystring'
+import { format as formatUrl, parse, UrlObject } from 'url'
 
 import { getDynamicPathPartKey, getSpreadFilepathPartKey, ignoreSegmentPathRegex } from '../shared/regex'
 import type { TRouteBranch, Url } from '../types'
 import { getNtrData } from './ntrData'
+import { parseUrl } from './parseUrl'
 import { removeLangPrefix } from './removeLangPrefix'
 
 type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
@@ -142,7 +143,7 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
 export function translatePath(url: Url, locale: string, { format }: Options = {}): Url {
   const { routesTree } = getNtrData()
   const returnFormat = format || typeof url
-  const urlObject = typeof url === 'object' ? (url as UrlObject) : parseUrl(url, true)
+  const urlObject = parseUrl(url)
   const { pathname, query, hash } = urlObject
 
   if (!pathname || !locale) {
@@ -154,7 +155,7 @@ export function translatePath(url: Url, locale: string, { format }: Options = {}
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
     locale,
     pathParts,
-    query: parseQuery(typeof query === 'string' ? query : stringifyQuery(query || {})),
+    query,
     routeBranch: routesTree,
   })
   const path = translatedPathParts.join('/')
@@ -201,9 +202,9 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
   const { defaultLocale } = getNtrData()
 
   // Handle external urls
-  const parsedUrl: UrlObject = typeof url === 'string' ? parseUrl(url) : url
+  const parsedUrl: UrlObject = typeof url === 'string' ? parse(url) : url
   if (parsedUrl.host) {
-    if (typeof window === 'undefined' || parsedUrl.host !== parseUrl(window.location.href).host) {
+    if (typeof window === 'undefined' || parsedUrl.host !== parse(window.location.href).host) {
       return url
     }
   }

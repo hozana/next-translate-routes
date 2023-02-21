@@ -12,3 +12,6 @@ yarn-error.log
 /*.js
 /*.map
 /*.d.ts
+
+# Other
+TODO.md

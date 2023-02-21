@@ -9,7 +9,7 @@
     "preinstall": "yon --cwd .. link && yon --cwd .. install && yon --cwd .. build && yon link next-translate-routes"
   },
   "dependencies": {
-    "next": "^12.2.3",
+    "next": "12.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
