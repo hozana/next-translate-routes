@@ -43,7 +43,7 @@ const enhancePushReplace =
 const enhancePrefetch =
   <R extends NextRouter | SingletonRouter>(router: R) =>
   (inputUrl: string, asPath?: string, options?: PrefetchOptions) => {
-    const locale = getLocale(router, options?.locale)
+    const locale = getLocale({ router, locale: options?.locale, url: inputUrl })
     const parsedInputUrl = urlToFileUrl(inputUrl, locale)
 
     if (getNtrData().debug === 'withPrefetch') {

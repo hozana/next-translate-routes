@@ -1,6 +1,8 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import { pathToRegexp } from 'path-to-regexp'
 
+import { getNtrData } from '../react/ntrData'
+import { isDefaultLocale } from '../shared/isDefaultLocale'
 import { ignoreSegmentPathRegex } from '../shared/regex'
 import type { TReRoutes, TRouteBranch, TRouteSegment } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
@@ -49,22 +51,14 @@ const mergeOrRegex = (existingRegex: string, newPossiblity: string) => {
 /**
  * Get redirects and rewrites for a page
  */
-export const getPageReRoutes = <L extends string>({
-  locales,
-  routeSegments,
-  defaultLocale,
-}: {
-  locales: L[]
-  routeSegments: TRouteSegment<L>[]
-  defaultLocale?: L
-}): TReRoutes => {
+export const getPageReRoutes = ({ routeSegments }: { routeSegments: TRouteSegment[] }): TReRoutes => {
   /** If there is only one path possible: it is common to all locales and to files. No redirection nor rewrite is needed. */
   if (!routeSegments.some(({ paths }) => Object.keys(paths).length > 1)) {
     return { rewrites: [], redirects: [] }
   }
 
   /** Get a translated path or base path */
-  const getPath = (locale: L | 'default') =>
+  const getPath = (locale: string) =>
     `/${routeSegments
       .map(({ paths }) => paths[locale] || paths.default)
       .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
@@ -80,6 +74,8 @@ export const getPageReRoutes = <L extends string>({
     .filter(Boolean) // Filter out falsy values
     .join('/')}`
 
+  const { i18n } = getNtrData()
+
   /**
    * ```
    * [
@@ -90,7 +86,7 @@ export const getPageReRoutes = <L extends string>({
    * ```
    * Each locale cannot appear more than once. Item is ignored if its path would be the same as basePath.
    */
-  const sourceList = locales.reduce((acc, locale) => {
+  const sourceList = i18n.locales.reduce((acc, locale) => {
     const source = getPath(locale)
     if (source === basePath) {
       return acc
@@ -100,11 +96,11 @@ export const getPageReRoutes = <L extends string>({
       ...acc.filter((sourceItem) => sourceItem.source !== source),
       { source, sourceLocales: [...sourceLocales, locale] },
     ]
-  }, [] as { sourceLocales: L[]; source: string }[])
+  }, [] as { sourceLocales: string[]; source: string }[])
 
-  const redirects = locales.reduce((acc, locale) => {
+  const redirects = i18n.locales.reduce((acc, locale) => {
     const localePath = getPath(locale)
-    const destination = `${locale === defaultLocale ? '' : `/${locale}`}${sourceToDestination(localePath)}`
+    const destination = `${isDefaultLocale(locale, i18n) ? '' : `/${locale}`}${sourceToDestination(localePath)}`
 
     return [
       ...acc,
@@ -203,16 +199,12 @@ export const getPageReRoutes = <L extends string>({
 /**
  * Generate reroutes in route branch to feed the rewrite section of next.config
  */
-export const getRouteBranchReRoutes = <L extends string>({
-  locales,
+export const getRouteBranchReRoutes = ({
   routeBranch: { children, ...routeSegment },
   previousRouteSegments = [],
-  defaultLocale,
 }: {
-  locales: L[]
-  routeBranch: TRouteBranch<L>
-  previousRouteSegments?: TRouteSegment<L>[]
-  defaultLocale?: L
+  routeBranch: TRouteBranch
+  previousRouteSegments?: TRouteSegment[]
 }): TReRoutes => {
   const routeSegments = [...previousRouteSegments, routeSegment]
 
@@ -221,13 +213,8 @@ export const getRouteBranchReRoutes = <L extends string>({
         (acc, child) => {
           const childReRoutes =
             child.name === 'index'
-              ? getPageReRoutes({ locales, routeSegments, defaultLocale })
-              : getRouteBranchReRoutes({
-                  locales,
-                  routeBranch: child,
-                  previousRouteSegments: routeSegments,
-                  defaultLocale,
-                })
+              ? getPageReRoutes({ routeSegments })
+              : getRouteBranchReRoutes({ routeBranch: child, previousRouteSegments: routeSegments })
           return {
             redirects: [...acc.redirects, ...childReRoutes.redirects],
             rewrites: [...acc.rewrites, ...childReRoutes.rewrites],
@@ -235,5 +222,5 @@ export const getRouteBranchReRoutes = <L extends string>({
         },
         { redirects: [], rewrites: [] } as TReRoutes,
       )
-    : getPageReRoutes({ locales, routeSegments, defaultLocale })
+    : getPageReRoutes({ routeSegments })
 }

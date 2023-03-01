@@ -1,6 +1,8 @@
 {
-  "locales": ["en", "fr"],
-  "defaultLocale": "en",
+  "i18n": {
+    "locales": ["en", "fr"],
+    "defaultLocale": "en"
+  },
   "routeSegments": [
     {
       "name": "first",

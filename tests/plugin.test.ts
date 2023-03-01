@@ -6,6 +6,7 @@ import path from 'path'
 
 import { createNtrData } from '../src/plugin/createNtrData'
 import { getPageReRoutes, getRouteBranchReRoutes } from '../src/plugin/getRouteBranchReRoutes'
+import { setNtrData } from '../src/react/ntrData'
 import allReRoutes from './fixtures/allReRoutes.json'
 import reRoutesData from './fixtures/reRoutesData.json'
 import routesTree from './fixtures/routesTree.json'
@@ -18,26 +19,27 @@ declare global {
     }
   }
 }
+
+const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
+const i18n = { locales: ['en', 'fr'], defaultLocale: 'en' }
+const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
+
 test('createNtrData.', () => {
-  const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const i18n = { locales: ['en', 'fr'], defaultLocale: 'en' }
-  const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
   expect(ntrData.routesTree).toEqual(routesTree)
-  expect(ntrData.locales).toEqual(i18n.locales)
-  expect(ntrData.defaultLocale).toEqual(i18n.defaultLocale)
+  expect(ntrData.i18n.locales).toEqual(i18n.locales)
+  expect(ntrData.i18n.defaultLocale).toEqual(i18n.defaultLocale)
   expect(ntrData.debug).toBe(true)
 })
 
 test('getPageReRoutes.', () => {
+  setNtrData(ntrData)
   const { reRoutes, ...getPageReRoutesProps } = reRoutesData
   const pageReRoutes = getPageReRoutes(getPageReRoutesProps)
   expect(pageReRoutes).toEqual(reRoutes)
 })
 
 test('getRouteBranchReRoutes.', () => {
-  const reRoutes = getRouteBranchReRoutes({
-    locales: ['en', 'fr', 'es'],
-    routeBranch: { ...routesTree, paths: { default: '' } },
-  })
+  setNtrData({ ...ntrData, i18n: { locales: ['en', 'fr', 'es'], defaultLocale: 'fr' } })
+  const reRoutes = getRouteBranchReRoutes({ routeBranch: { ...routesTree, paths: { default: '' } } })
   expect(reRoutes).toEqual(allReRoutes)
 })

@@ -8,7 +8,7 @@
     },
     {
       "source": "/fr/(acerca-de-nosotros|about)",
-      "destination": "/fr/a-propos",
+      "destination": "/a-propos",
       "locale": false,
       "permanent": false
     },
@@ -26,7 +26,7 @@
     },
     {
       "source": "/fr/faq",
-      "destination": "/fr/FAQ",
+      "destination": "/FAQ",
       "locale": false,
       "permanent": false
     },
@@ -44,7 +44,7 @@
     },
     {
       "source": "/fr/(todo|catch-all)/:path+",
-      "destination": "/fr/tout/:path+",
+      "destination": "/tout/:path+",
       "locale": false,
       "permanent": false
     },
@@ -62,7 +62,7 @@
     },
     {
       "source": "/fr/(todo-o-nada|catch-all-or-none)/:path*",
-      "destination": "/fr/tout-ou-rien/:path*",
+      "destination": "/tout-ou-rien/:path*",
       "locale": false,
       "permanent": false
     },
@@ -80,7 +80,7 @@
     },
     {
       "source": "/fr/(comunidades|communities)/:tagSlug*",
-      "destination": "/fr/communautes/:tagSlug*",
+      "destination": "/communautes/:tagSlug*",
       "locale": false,
       "permanent": false
     },
@@ -104,13 +104,13 @@
     },
     {
       "source": "/fr/(community|comunidad)/:communityId(\\d+){-:communitySlug}",
-      "destination": "/fr/communaute/:communityId-:communitySlug",
+      "destination": "/communaute/:communityId-:communitySlug",
       "locale": false,
       "permanent": false
     },
     {
       "source": "/fr/community/:communityId/:communitySlug",
-      "destination": "/fr/communaute/:communityId-:communitySlug",
+      "destination": "/communaute/:communityId-:communitySlug",
       "locale": false,
       "permanent": false
     },
@@ -140,13 +140,13 @@
     },
     {
       "source": "/fr/(community|comunidad)/:communityId(\\d+){-:communitySlug}/(statistics|estadisticas)",
-      "destination": "/fr/communaute/:communityId-:communitySlug/statistiques",
+      "destination": "/communaute/:communityId-:communitySlug/statistiques",
       "locale": false,
       "permanent": false
     },
     {
       "source": "/fr/community/:communityId/:communitySlug/statistics",
-      "destination": "/fr/communaute/:communityId-:communitySlug/statistiques",
+      "destination": "/communaute/:communityId-:communitySlug/statistiques",
       "locale": false,
       "permanent": false
     },
@@ -176,7 +176,7 @@
     },
     {
       "source": "/fr/(my-account|mi-cuenta)/(favoris|favorito|favorites)",
-      "destination": "/fr/mon-compte/favoris",
+      "destination": "/mon-compte/favoris",
       "locale": false,
       "permanent": false
     },
@@ -193,7 +193,7 @@
       "source": "/en/actualites/:newsPathPart+"
     },
     {
-      "destination": "/fr/actualites/:newsPathPart+",
+      "destination": "/actualites/:newsPathPart+",
       "locale": false,
       "permanent": false,
       "source": "/fr/news/:newsPathPart+"
