@@ -8,18 +8,14 @@ import { fileNameToPath } from './fileNameToPaths'
 import { getPagesDir, isRoutesFileName } from './routesFiles'
 
 /** Get path and path translations from name and all translations #childrenOrder */
-const getRouteSegment = <L extends string>(
-  name: string,
-  routeSegmentsData: TRouteSegmentsData<L>,
-  isDirectory?: boolean,
-): TRouteSegment<L> => {
+const getRouteSegment = (name: string, routeSegmentsData: TRouteSegmentsData, isDirectory?: boolean): TRouteSegment => {
   const routeSegmentData = routeSegmentsData?.[isDirectory ? '/' : name]
   const { default: defaultPath = fileNameToPath(name), ...localized } =
     typeof routeSegmentData === 'object' ? routeSegmentData : { default: routeSegmentData }
   const paths = {
     default: defaultPath,
     ...localized,
-  } as TRouteSegmentPaths<L>
+  } as TRouteSegmentPaths
   return {
     name,
     paths,
@@ -49,12 +45,12 @@ export type TParsePageTreeProps = {
 /**
  * Recursively parse pages directory and build a page tree object
  */
-export const parsePages = <L extends string>({
+export const parsePages = ({
   directoryPath: propDirectoryPath,
   pageExtensions,
   isSubBranch,
   routesDataFileName,
-}: TParsePageTreeProps): TRouteBranch<L> => {
+}: TParsePageTreeProps): TRouteBranch => {
   const directoryPath = propDirectoryPath || getPagesDir()
   const directoryItems = fs.readdirSync(directoryPath)
   const routesFileName = directoryItems.find((directoryItem) => isRoutesFileName(directoryItem, routesDataFileName))
@@ -65,7 +61,7 @@ export const parsePages = <L extends string>({
     routeSegmentsFileContent
       ? (/\.yaml$/.test(routesFileName as string) ? YAML : JSON).parse(routeSegmentsFileContent)
       : {}
-  ) as TRouteSegmentsData<L>
+  ) as TRouteSegmentsData
   const directoryPathParts = directoryPath.replace(/[\\/]/, '').split(/[\\/]/)
   const name = isSubBranch ? directoryPathParts[directoryPathParts.length - 1] : ''
 
@@ -93,7 +89,7 @@ export const parsePages = <L extends string>({
         ]
       }
       return acc
-    }, [] as TRouteBranch<L>[])
+    }, [] as TRouteBranch[])
     .sort((childA, childB) => getOrderWeight(childA) - getOrderWeight(childB))
 
   return {

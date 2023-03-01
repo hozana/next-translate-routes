@@ -4,6 +4,7 @@ import type { UrlObject } from 'url'
 
 import { ignoreSegmentPathRegex, anyDynamicPathPatternPartRegex, anyDynamicFilepathPartsRegex } from '../shared/regex'
 import type { TRouteBranch } from '../types'
+import { getLocale } from './getLocale'
 import { getNtrData } from './ntrData'
 import { parseUrl } from './parseUrl'
 import { removeLangPrefix } from './removeLangPrefix'
@@ -243,7 +244,7 @@ export const parsePathParts = ({
  * if the url successfully matched a file path, and undefined otherwise
  */
 export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => {
-  const { routesTree, defaultLocale, locales } = getNtrData()
+  const { routesTree } = getNtrData()
   const { pathname, query, hash } = parseUrl(url)
 
   if (pathname && anyDynamicFilepathPartsRegex.exec(pathname)) {
@@ -252,10 +253,14 @@ export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => 
     return { pathname, query, hash }
   }
 
+  const pathParts = removeLangPrefix(pathname || '/', locale)
+    .split('/')
+    .slice(1)
+
   const result = parsePathParts({
-    locale: locale || defaultLocale || locales[0],
+    locale: getLocale({ locale }),
     routeBranch: routesTree,
-    pathParts: removeLangPrefix(pathname || '/', true, locale),
+    pathParts,
   })
   if (result) {
     const { parsedPathParts, additionalQuery } = result

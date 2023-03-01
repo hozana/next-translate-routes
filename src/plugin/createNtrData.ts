@@ -7,7 +7,7 @@ import { parsePages } from './parsePages'
 export const createNtrData = (nextConfig: NextConfig, customPagesPath?: string): TNtrData => {
   const {
     pageExtensions = ['js', 'ts', 'jsx', 'tsx'],
-    i18n: { defaultLocale, locales = [] },
+    i18n,
     translateRoutes: { debug, routesDataFileName, routesTree: customRoutesTree, pagesDirectory } = {},
   } = nextConfig as NextConfigWithNTR
   const pagesPath = customPagesPath || getPagesPath(pagesDirectory)
@@ -17,8 +17,7 @@ export const createNtrData = (nextConfig: NextConfig, customPagesPath?: string):
 
   return {
     debug,
-    defaultLocale,
-    locales,
+    i18n,
     routesTree,
   }
 }

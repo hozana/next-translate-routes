@@ -2,6 +2,7 @@ import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-
 import { parse as parsePathPattern, compile as compilePath } from 'path-to-regexp'
 import { format as formatUrl, UrlObject } from 'url'
 
+import { isDefaultLocale } from '../shared/isDefaultLocale'
 import { ignoreSegmentPathRegex, optionalMatchAllFilepathPartRegex } from '../shared/regex'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TRouteBranch } from '../types'
@@ -117,7 +118,7 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { th
   try {
     const { pathname, query, hash } = fileUrlToFileUrlObject(url)
 
-    const { routesTree, defaultLocale } = getNtrData()
+    const { routesTree, i18n } = getNtrData()
 
     const pathParts = (pathname || '/')
       .replace(/^\/|\/$/g, '')
@@ -134,7 +135,7 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { th
       }
     }
 
-    return `${locale !== defaultLocale ? `/${locale}` : ''}${formatUrl({
+    return `${!isDefaultLocale(locale, i18n) ? `/${locale}` : ''}${formatUrl({
       pathname: newPathname,
       query,
       hash,

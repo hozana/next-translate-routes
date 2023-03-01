@@ -4,6 +4,7 @@ import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
 import type { ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse, UrlObject } from 'url'
 
+import { isDefaultLocale } from '../shared/isDefaultLocale'
 import { getDynamicPathPartKey, getSpreadFilepathPartKey, ignoreSegmentPathRegex } from '../shared/regex'
 import type { TRouteBranch, Url } from '../types'
 import { getNtrData } from './ntrData'
@@ -150,11 +151,9 @@ export function translatePath(url: Url, locale: string, { format }: Options = {}
     return returnFormat === 'object' ? url : formatUrl(url)
   }
 
-  const pathParts = removeLangPrefix(pathname, true)
-
   const { translatedPathParts, augmentedQuery = {} } = translatePathParts({
     locale,
-    pathParts,
+    pathParts: removeLangPrefix(pathname).split('/'),
     query,
     routeBranch: routesTree,
   })
@@ -199,7 +198,7 @@ export type TTranslateUrl = typeof translatePath
  * same type as url if options.format is not defined
  */
 export const translateUrl: TTranslateUrl = ((url, locale, options) => {
-  const { defaultLocale } = getNtrData()
+  const { i18n } = getNtrData()
 
   // Handle external urls
   const parsedUrl: UrlObject = typeof url === 'string' ? parse(url) : url
@@ -215,7 +214,7 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
     return translatedPath
   }
 
-  const prefix = locale === defaultLocale || options?.withoutLangPrefix ? '' : `/${locale}`
+  const prefix = isDefaultLocale(locale, i18n) || options?.withoutLangPrefix ? '' : `/${locale}`
 
   return normalizePathTrailingSlash(prefix + translatedPath)
 }) as typeof translatePath

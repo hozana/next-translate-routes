@@ -1,27 +1,67 @@
+import { isDefaultLocale } from '../shared/isDefaultLocale'
 import { getNtrData } from './ntrData'
 
-export function removeLangPrefix(pathname: string, toArray?: false, locale?: string): string
-export function removeLangPrefix(pathname: string, toArray: true, locale?: string): string[]
-export function removeLangPrefix(pathname: string, toArray?: boolean, givenLocale?: string): string | string[] {
-  const pathParts = pathname.split('/').filter(Boolean)
-  const { routesTree, defaultLocale, locales } = getNtrData()
+/**
+ * Remove both the lang prefix and the root prefix from a pathname
+ *
+ * (The root prefix is a prefix that can be added for a locale between the locale prefix
+ * and the rest of the pathname. It is defined in the root _routes.json file for the "/" key.)
+ */
+export function removeLangPrefix(
+  pathname: string,
+  /**
+   * If locale is explicitely given, removeLangPrefix will use it,
+   * it it is not, removeLangPrefix will try to deduce the locale from the pathname
+   */
+  locale?: string,
+): string {
+  const {
+    routesTree,
+    i18n,
+    i18n: { locales },
+  } = getNtrData()
+  let lang = locale
+  let root = ''
 
   const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
 
-  const defaultLocaleRoot = defaultLocale && getLangRoot(defaultLocale)
-  const hasLangPrefix = givenLocale ? pathParts[0] === givenLocale : locales.includes(pathParts[0])
-  const hasDefaultLocalePrefix = !hasLangPrefix && !!defaultLocaleRoot && pathParts[0] === defaultLocaleRoot
-  const hasGivenLocalePrefix = givenLocale ? pathParts[hasLangPrefix ? 1 : 0] === getLangRoot(givenLocale) : false
-
-  if (!hasLangPrefix && !hasDefaultLocalePrefix && !hasGivenLocalePrefix) {
-    return toArray ? pathParts : pathname
+  if (locale) {
+    root = getLangRoot(locale)
+  } else {
+    const prefixLocale = locales.find((locale) => new RegExp(`\\/${locale}(\\/|$)`).test(pathname))
+    if (prefixLocale) {
+      lang = prefixLocale
+      root = getLangRoot(prefixLocale)
+    } else {
+      for (const l of locales) {
+        if (isDefaultLocale(l, i18n)) {
+          lang = l
+          root = getLangRoot(l)
+          break
+        }
+      }
+    }
   }
 
-  const locale = givenLocale || hasLangPrefix ? pathParts[0] : defaultLocale
-  const localeRootParts = (locale || hasGivenLocalePrefix) && getLangRoot(locale)?.split('/')
-  const nbPathPartsToRemove =
-    (hasLangPrefix ? 1 : 0) +
-    (localeRootParts && (!hasLangPrefix || pathParts[1] === localeRootParts[0]) ? localeRootParts.length : 0)
+  let remainingPathname: string | undefined = undefined
 
-  return toArray ? pathParts.slice(nbPathPartsToRemove) : `/${pathParts.slice(nbPathPartsToRemove).join('/')}`
+  if (!lang) {
+    return pathname
+  }
+
+  const fullPrefix = `/${lang}/${root}`
+
+  if (root && pathname.startsWith(fullPrefix)) {
+    remainingPathname = pathname.slice(fullPrefix.length)
+  } else if (root && pathname.startsWith(`/${root}`)) {
+    remainingPathname = pathname.slice(root.length + 1)
+  } else if (pathname.startsWith(`/${lang}`)) {
+    remainingPathname = pathname.slice(lang.length + 1)
+  }
+
+  if (typeof remainingPathname === 'string' && /^($|\/)/.test(remainingPathname)) {
+    return remainingPathname
+  }
+
+  return pathname
 }

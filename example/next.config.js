@@ -5,6 +5,19 @@ const nextConfig = withTranslateRoutes({
   i18n: {
     locales: ['en', 'fr'],
     defaultLocale: 'en',
+    localeDetection: false,
+    domains: [
+      {
+        domain: 'localhost:3000',
+        defaultLocale: 'fr',
+        http: true,
+      },
+      {
+        domain: 'localhost:3001',
+        defaultLocale: 'en',
+        http: true,
+      },
+    ],
   },
 
   translateRoutes: {

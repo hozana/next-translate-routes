@@ -60,7 +60,7 @@ export const withTranslateRoutes = (...args: (TWrappedAppComponent | TNtrData)[]
     )
 
     if (nextRouter && !nextRouter.locale) {
-      const fallbackLocale = ntrData.defaultLocale || ntrData.locales[0]
+      const fallbackLocale = ntrData.i18n.defaultLocale || ntrData.i18n.locales[0]
       nextRouter.locale = fallbackLocale
       console.error(ntrMessagePrefix + `No locale prop in Router: fallback to ${fallbackLocale}.`)
     }
