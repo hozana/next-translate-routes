@@ -14,8 +14,6 @@ export const createNtrData = (nextConfig: NTRNextConfig, customPagesPath?: strin
   const routesTree = customRoutesTree || parsePages({ directoryPath: pagesPath, pageExtensions, routesDataFileName })
   // TODO: validateRoutesTree(routesTree)
 
-  // TODO: construct fallbackLng
-
   return {
     debug,
     defaultLocale,

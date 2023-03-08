@@ -16,10 +16,6 @@ export const getPathFromPaths = <L extends string>({
     return paths.default
   }
   const { fallbackLng } = ntrData
-  // const fallbackLng: TFallbackLng = {
-  //   en: ['default'],
-  //   default: [],
-  // }
 
   if (fallbackLng && fallbackLng?.[locale]) {
     for (const l of fallbackLng[locale]) {
