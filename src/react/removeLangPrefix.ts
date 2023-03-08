@@ -1,3 +1,4 @@
+import { getPathFromPaths } from '../plugin/getPathFromPaths'
 import { getNtrData } from './ntrData'
 
 export function removeLangPrefix(pathname: string, toArray?: false, locale?: string): string
@@ -6,7 +7,8 @@ export function removeLangPrefix(pathname: string, toArray?: boolean, givenLocal
   const pathParts = pathname.split('/').filter(Boolean)
   const { routesTree, defaultLocale, locales } = getNtrData()
 
-  const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
+  // const getLangRoot = (lang: string) => routesTree.paths[lang] || routesTree.paths.default
+  const getLangRoot = (lang: string) => getPathFromPaths({ paths: routesTree.paths, locale: lang })
 
   const defaultLocaleRoot = defaultLocale && getLangRoot(defaultLocale)
   const hasLangPrefix = givenLocale ? pathParts[0] === givenLocale : locales.includes(pathParts[0])
