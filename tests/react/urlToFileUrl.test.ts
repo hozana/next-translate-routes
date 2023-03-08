@@ -204,7 +204,7 @@ describe('urlToFileUrl', () => {
   windowSpy.mockRestore()
 })
 
-describe('urlToFileUrl-fallback-lng', () => {
+describe('urlToFileUrlFallbackLng', () => {
   beforeEach(() => {
     setEnvDataFallbackLng()
   })

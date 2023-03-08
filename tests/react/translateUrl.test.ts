@@ -194,7 +194,7 @@ describe('translate', () => {
   windowSpy.mockRestore()
 })
 
-describe('translate-with-fallback-lng', () => {
+describe('translateFallbackLng', () => {
   beforeEach(() => {
     setEnvDataFallbackLng()
   })

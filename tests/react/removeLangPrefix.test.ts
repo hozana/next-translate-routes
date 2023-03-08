@@ -38,7 +38,7 @@ describe('removeLangPrefix', () => {
   })
 })
 
-describe('removeLangPrefix-fallback-lng', () => {
+describe('removeLangPrefixFallbackLng', () => {
   beforeEach(() => {
     setEnvDataFallbackLng()
   })

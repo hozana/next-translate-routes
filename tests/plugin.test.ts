@@ -28,6 +28,16 @@ test('createNtrData.', () => {
   expect(ntrData.debug).toBe(true)
 })
 
+test('createNtrDataFallbackLang.', () => {
+  const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
+  const i18n = { locales: ['en', 'fr', 'fr-FR'], defaultLocale: 'en', fallbackLng: { 'fr-FR': ['fr'] } }
+  const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
+  expect(ntrData.routesTree).toEqual(routesTree)
+  expect(ntrData.locales).toEqual(i18n.locales)
+  expect(ntrData.defaultLocale).toEqual(i18n.defaultLocale)
+  expect(ntrData.debug).toBe(true)
+})
+
 test('getPageReRoutes.', () => {
   const { reRoutes, ...getPageReRoutesProps } = reRoutesData
   const pageReRoutes = getPageReRoutes(getPageReRoutesProps)
