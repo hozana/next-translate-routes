@@ -6,7 +6,7 @@ import { RouterContext } from 'next/dist/shared/lib/router-context'
 import React from 'react'
 
 import { Link } from '../../src/link'
-import { setEnvData, setEnvDataFallbackLng } from './setEnvData'
+import { setEnvData } from './setEnvData'
 
 describe('Link', () => {
   const push = jest.fn(() => Promise.resolve(true))
@@ -144,7 +144,14 @@ describe('Link', () => {
 describe('LinkFallBackLng', () => {
   const push = jest.fn(() => Promise.resolve(true))
   beforeEach(() => {
-    setEnvDataFallbackLng()
+    setEnvData({
+      defaultLocale: 'fr-FR',
+      locales: ['fr', 'fr-FR', 'fr-BE', 'en', 'es', 'pt'],
+      fallbackLng: {
+        'fr-FR': ['fr'],
+        'fr-BE': ['fr'],
+      },
+    })
     push.mockClear()
   })
 

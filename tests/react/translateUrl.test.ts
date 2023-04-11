@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { translatePath, translateUrl } from '../../src/react/translateUrl'
-import { setEnvData, setEnvDataFallbackLng } from './setEnvData'
+import { setEnvData } from './setEnvData'
 
 describe('translate', () => {
   beforeEach(() => {
@@ -196,7 +196,14 @@ describe('translate', () => {
 
 describe('translateFallbackLng', () => {
   beforeEach(() => {
-    setEnvDataFallbackLng()
+    setEnvData({
+      defaultLocale: 'fr-FR',
+      locales: ['fr', 'fr-FR', 'fr-BE', 'en', 'es', 'pt'],
+      fallbackLng: {
+        'fr-FR': ['fr'],
+        'fr-BE': ['fr'],
+      },
+    })
   })
 
   const windowSpy = jest.spyOn(window, 'window', 'get')

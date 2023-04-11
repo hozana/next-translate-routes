@@ -4,7 +4,7 @@
 import type { UrlObject } from 'url'
 
 import { urlToFileUrl } from '../../src/react/urlToFileUrl'
-import { setEnvData, setEnvDataFallbackLng } from './setEnvData'
+import { setEnvData } from './setEnvData'
 
 describe('urlToFileUrl', () => {
   beforeEach(() => {
@@ -206,7 +206,14 @@ describe('urlToFileUrl', () => {
 
 describe('urlToFileUrlFallbackLng', () => {
   beforeEach(() => {
-    setEnvDataFallbackLng()
+    setEnvData({
+      defaultLocale: 'fr-FR',
+      locales: ['fr', 'fr-FR', 'fr-BE', 'en', 'es', 'pt'],
+      fallbackLng: {
+        'fr-FR': ['fr'],
+        'fr-BE': ['fr'],
+      },
+    })
   })
 
   const windowSpy = jest.spyOn(window, 'window', 'get')

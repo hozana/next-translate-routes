@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { removeLangPrefix } from '../../src/react/removeLangPrefix'
-import { setEnvData, setEnvDataFallbackLng } from './setEnvData'
+import { setEnvData } from './setEnvData'
 
 describe('removeLangPrefix', () => {
   beforeEach(() => {
@@ -40,7 +40,14 @@ describe('removeLangPrefix', () => {
 
 describe('removeLangPrefixFallbackLng', () => {
   beforeEach(() => {
-    setEnvDataFallbackLng()
+    setEnvData({
+      defaultLocale: 'fr-FR',
+      locales: ['fr', 'fr-FR', 'fr-BE', 'en', 'es', 'pt'],
+      fallbackLng: {
+        'fr-FR': ['fr'],
+        'fr-BE': ['fr'],
+      },
+    })
   })
 
   test('with non default locale prefix and root prefix to array', () => {
