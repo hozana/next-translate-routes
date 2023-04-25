@@ -15,12 +15,14 @@ export type TRouteSegment<L extends TAnyLocale> = {
 export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
   children?: TRouteBranch<L>[]
 }
+export type TFallbackLng = { [key: string]: string[] }
 
 export type TNtrData = {
   debug?: boolean | 'withPrefetch'
   defaultLocale: string
   locales: string[]
   routesTree: TRouteBranch
+  fallbackLng?: TFallbackLng | undefined
 }
 
 export type NTRConfig = {
@@ -30,8 +32,19 @@ export type NTRConfig = {
   pagesDirectory?: string
 }
 
-export type NextConfigWithNTR = NextConfig & { i18n: I18NConfig; translateRoutes?: NTRConfig }
-export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: I18NConfig; translateRoutes: NTRConfig }
+export type NTRI18NConfig = {
+  fallbackLng?: TFallbackLng
+} & I18NConfig
+
+export type NTRNextConfig = {
+  i18n: NTRI18NConfig
+} & NextConfig
+
+export type NextConfigWithNTR = NextConfig & {
+  i18n: NTRI18NConfig
+  translateRoutes?: NTRConfig
+}
+export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: NTRI18NConfig; translateRoutes: NTRConfig }
 
 declare global {
   // eslint-disable-next-line no-var

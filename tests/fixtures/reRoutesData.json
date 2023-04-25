@@ -1,6 +1,7 @@
 {
   "locales": ["en", "fr"],
   "defaultLocale": "en",
+
   "routeSegments": [
     {
       "name": "first",
