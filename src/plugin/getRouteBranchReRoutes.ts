@@ -4,7 +4,7 @@ import { pathToRegexp } from 'path-to-regexp'
 import { ignoreSegmentPathRegex } from '../shared/regex'
 import type { TReRoutes, TRouteBranch, TRouteSegment } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
-import { getPathFromPaths } from './getPathFromPaths'
+import { getLocalePathFromPaths } from './getPathFromPaths'
 
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
@@ -67,7 +67,7 @@ export const getPageReRoutes = <L extends string>({
   /** Get a translated path or base path */
   const getPath = (locale: L | 'default') =>
     `/${routeSegments
-      .map(({ paths }) => getPathFromPaths({ paths, locale }))
+      .map(({ paths }) => getLocalePathFromPaths({ paths, locale }))
       .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
       .join('/')}`
 

@@ -15,7 +15,7 @@ export type TRouteSegment<L extends TAnyLocale> = {
 export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
   children?: TRouteBranch<L>[]
 }
-export type TFallbackLng = { [key: string]: string[] }
+export type TFallbackLng = string | string[] | { [key: string]: string[] }
 
 export type TNtrData = {
   debug?: boolean | 'withPrefetch'

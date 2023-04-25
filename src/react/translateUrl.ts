@@ -4,7 +4,7 @@ import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
 import type { ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse, UrlObject } from 'url'
 
-import { getPathFromPaths } from '../plugin/getPathFromPaths'
+import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
 import { getDynamicPathPartKey, getSpreadFilepathPartKey, ignoreSegmentPathRegex } from '../shared/regex'
 import type { TRouteBranch, Url } from '../types'
 import { getNtrData } from './ntrData'
@@ -20,7 +20,7 @@ type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
 const getAllCandidates = (lang: string, children?: TRouteBranch[]): TRouteBranch[] =>
   children
     ? children.reduce((acc, child) => {
-        const path = getPathFromPaths({ paths: child.paths, locale: lang })
+        const path = getLocalePathFromPaths({ paths: child.paths, locale: lang })
         return [...acc, ...(path === '' ? getAllCandidates(lang, child.children) : [child])]
       }, [] as TRouteBranch[])
     : []
@@ -91,7 +91,7 @@ const translatePathParts = ({
           [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
         }
         return {
-          translatedPathParts: [getPathFromPaths({ paths: childRouteBranch.paths, locale })],
+          translatedPathParts: [getLocalePathFromPaths({ paths: childRouteBranch.paths, locale })],
           augmentedQuery: currentQuery,
         }
       }
@@ -105,7 +105,7 @@ const translatePathParts = ({
     ? translatePathParts({ locale, pathParts: nextPathParts, routeBranch: childRouteBranch, query: currentQuery })
     : { augmentedQuery: currentQuery, translatedPathParts: [] }
 
-  const translatedPathPart = getPathFromPaths({ paths: childRouteBranch.paths, locale })
+  const translatedPathPart = getLocalePathFromPaths({ paths: childRouteBranch.paths, locale })
 
   return {
     translatedPathParts: [

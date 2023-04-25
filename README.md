@@ -22,6 +22,7 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Complex paths segments](#complex-paths-segments)
     - [Custom route tree](#custom-route-tree)
     - [Outside Next](#outside-next)
+    - [Fallback languages](#fallback-languages)
 - [Known issue](#known-issues)
   - [Middleware with Next >=12.2.0](#middleware-with-watcher-next-1220)
   - [Optional catch all with rewrites](#optional-catch-all-with-rewrites)
@@ -345,7 +346,7 @@ But then `/a/bb-11/d` will match `/a/:b-:c` and be redirected to `/a/bb-11-d` an
 To handle this case, one can add a path-to-regex pattern to the default ignore token: `.(\\d+)`, or `.(\[\^-\]+)`, or `.(\what|ever\)`.
 This path-to-regex pattern will be added after the segment name in the redirect.
 `/a/:b(\[\^-\]+)/:c` => `/a/:b-:c` and `/a/:b(\[\^-\]+)/:c/d` => `/a/:b-:c/d`
-Then `/a/bb-11/d` will no more match `/a/[b]/[c]` (`/a/:b(\[\^-\]+)/:c`).
+Then `/a/bb-11/d` will no more match `/a/[b]/[c]` (`/a/:b(\[\^-\]+)/:c`). `#ignorePattern`
 
 ⚠️ This is only handled in default paths (i.e. `"/": ".(\\d+)"` or `"/": { "default": ".(\\d+)" }`), not in lang-specific paths.
 
@@ -508,6 +509,47 @@ module.exports = ({ config }) => {
 ```
 
 > ⚠️ Warning! The rule `test` should only match the file where `withTranslateRoutes` is used! If you cannot, then set the `mustMatch` loader option to `false`.
+
+### Fallback languages
+
+You can define fallback languages in next-translate-routes config [as you would in i18next](https://www.i18next.com/principles/fallback#fallback-to-different-languages), using `fallbackLng`, that can take either a string (ex: `'fr'`), an array (ex: `['fr', 'en']`), or an object (ex: `{ default: ['en'], 'de-CH': ['fr'] }`), but unlike i18next, `fallbackLng` cannot be a function.
+
+```javascript
+// next.config.js
+const withTranslateRoutes = require('next-translate-routes')
+
+module.exports = withTranslateRoutes({
+  // Next i18n config (mandatory): https://nextjs.org/docs/advanced-features/i18n-routing
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'fr', 'de', 'de-AT', 'de-DE', 'de-CH'],
+  },
+
+  translateRoutes: {
+    fallbackLng: {
+      default: ['en'],
+      'de-AT': ['de'],
+      'de-DE': ['de'],
+      'de-CH': ['de', 'fr'],
+    },
+  },
+
+  // ...Remaining next config
+})
+```
+
+It can avoid having `routes.json` files looking like:
+
+```json
+{
+  "/": {
+    "de": "produkt",
+    "de-AT": "produkt",
+    "de-DE": "produkt",
+    "de-CH": "produkt",
+    }
+}
+```
 
 ## Known issues
 
