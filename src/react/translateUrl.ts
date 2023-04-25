@@ -20,7 +20,6 @@ type Options<F extends 'string' | 'object' = 'string' | 'object'> = {
 const getAllCandidates = (lang: string, children?: TRouteBranch[]): TRouteBranch[] =>
   children
     ? children.reduce((acc, child) => {
-        // const path = child.paths[lang] || child.paths.default
         const path = getPathFromPaths({ paths: child.paths, locale: lang })
         return [...acc, ...(path === '' ? getAllCandidates(lang, child.children) : [child])]
       }, [] as TRouteBranch[])
@@ -92,7 +91,6 @@ const translatePathParts = ({
           [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
         }
         return {
-          // translatedPathParts: [childRouteBranch.paths[locale] || childRouteBranch.paths.default],
           translatedPathParts: [getPathFromPaths({ paths: childRouteBranch.paths, locale })],
           augmentedQuery: currentQuery,
         }
@@ -107,7 +105,6 @@ const translatePathParts = ({
     ? translatePathParts({ locale, pathParts: nextPathParts, routeBranch: childRouteBranch, query: currentQuery })
     : { augmentedQuery: currentQuery, translatedPathParts: [] }
 
-  // const translatedPathPart = childRouteBranch.paths[locale] || childRouteBranch.paths.default
   const translatedPathPart = getPathFromPaths({ paths: childRouteBranch.paths, locale })
 
   return {

@@ -1,5 +1,5 @@
 import { getNtrData } from '../react/ntrData'
-import { TFallbackLng, TRouteSegmentPaths } from '../types'
+import type { TRouteSegmentPaths } from '../types'
 
 export const getPathFromPaths = <L extends string>({
   paths,

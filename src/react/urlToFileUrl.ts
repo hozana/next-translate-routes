@@ -19,7 +19,6 @@ type TParsedPathParts = { additionalQuery: ParsedUrlQuery; parsedPathParts: stri
 
 const getEndFilepathParts = ({ children = [] }: TRouteBranch, locale: string): TParsedPathParts | undefined => {
   for (const child of children) {
-    // const path = child.paths[locale] || child.paths.default
     const path = getPathFromPaths({ paths: child.paths, locale })
     if (path === 'index') {
       return { parsedPathParts: [], additionalQuery: {}, firstMatchType: MATCH_TYPE.STATIC }
@@ -103,7 +102,6 @@ export const parsePathParts = ({
   let matchAllCandidate: TRouteBranch | undefined = undefined
 
   for (const candidate of children) {
-    // const path = candidate.paths[locale] || candidate.paths.default
     const path = getPathFromPaths({ paths: candidate.paths, locale })
     // Does the candidate statically match?
     if (path === currentPathPart) {
@@ -184,7 +182,6 @@ export const parsePathParts = ({
     } else {
       // 3. If we are here, it means that we did not find any static match, even among path-ignored candidates descendants,
       // because we sorted the candidates in the delayedCandidates array: first the path-ignored candidates, then the dynamic ones.
-      // const path = candidate.paths[locale] || candidate.
       const path = getPathFromPaths({ paths: candidate.paths, locale })
       const match = ptrMatch<ParsedUrlQuery>(path)(currentPathPart)
       if (match) {
@@ -211,7 +208,6 @@ export const parsePathParts = ({
   // 5. Do we have a matchAllCandidate stored?
   if (matchAllCandidate) {
     // Yes.
-    // const path = matchAllCandidate.paths[locale] || matchAllCandidate.paths.default
     const path = getPathFromPaths({ paths: matchAllCandidate.paths, locale })
     const match = ptrMatch<ParsedUrlQuery>('/' + path)('/' + pathParts.join('/'))
     if (match) {

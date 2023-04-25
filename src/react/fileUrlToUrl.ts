@@ -14,7 +14,6 @@ import { getNtrData } from './ntrData'
  * or, if it does not exist, the default path.
  */
 const getPatternFromRoutePaths = (routeBranch: TRouteBranch, locale: string) => {
-  // const pattern = routeBranch.paths[locale] || routeBranch.paths.default
   const pattern = getPathFromPaths({ paths: routeBranch.paths, locale })
   return ignoreSegmentPathRegex.test(pattern) ? '' : pattern
 }

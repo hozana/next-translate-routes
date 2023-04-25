@@ -2,7 +2,7 @@ import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import { pathToRegexp } from 'path-to-regexp'
 
 import { ignoreSegmentPathRegex } from '../shared/regex'
-import type { TFallbackLng, TReRoutes, TRouteBranch, TRouteSegment } from '../types'
+import type { TReRoutes, TRouteBranch, TRouteSegment } from '../types'
 import { fileNameToPath } from './fileNameToPaths'
 import { getPathFromPaths } from './getPathFromPaths'
 
@@ -67,7 +67,6 @@ export const getPageReRoutes = <L extends string>({
   /** Get a translated path or base path */
   const getPath = (locale: L | 'default') =>
     `/${routeSegments
-      // .map(({ paths }) => paths[locale] || paths.default)
       .map(({ paths }) => getPathFromPaths({ paths, locale }))
       .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
       .join('/')}`
@@ -97,7 +96,7 @@ export const getPageReRoutes = <L extends string>({
     if (source === basePath) {
       return acc
     }
-    const { sourceLocales = [] } = acc.find((sourceItem) => sourceItem.source === source) || {}
+    const { sourceLocales = [] as L[] } = acc.find((sourceItem) => sourceItem.source === source) || {}
     return [
       ...acc.filter((sourceItem) => sourceItem.source !== source),
       { source, sourceLocales: [...sourceLocales, locale] },
@@ -157,7 +156,7 @@ export const getPageReRoutes = <L extends string>({
                   key: 'x-nextjs-data',
                 },
               ],
-            },
+            } as Redirect,
           ]
         }, [] as Redirect[])
         .filter(({ source, destination }) => sourceToDestination(source) !== destination),
