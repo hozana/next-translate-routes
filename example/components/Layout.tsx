@@ -37,7 +37,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
       {' | '}
       <LinkComponent href="https://hozana.org/en">External link</LinkComponent>
       {' | '}
-      <LinkComponent href="#footer">Hash link</LinkComponent>
+      <LinkComponent href={{ pathname, query, hash: 'footer' }}>Hash link</LinkComponent>
       {' | '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>
         {newLocale}
