@@ -37,6 +37,8 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
       {' | '}
       <LinkComponent href="https://hozana.org/en">External link</LinkComponent>
       {' | '}
+      <LinkComponent href="#footer">Hash link</LinkComponent>
+      {' | '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>
         {newLocale}
       </LinkComponent>
@@ -60,7 +62,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
         <Nav LinkComponent={NextLink} />
       </header>
       {children}
-      <footer>
+      <footer id="footer">
         <hr />
         <blockquote>{`locale: ${locale}, pathname: ${pathname}, query: ${JSON.stringify(query)}`}</blockquote>
       </footer>

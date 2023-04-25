@@ -150,6 +150,13 @@ export const getPageReRoutes = <L extends string>({
               destination,
               locale: false as const,
               permanent: false,
+              // Prevent prefetches redirection. See #49 and https://github.com/vercel/next.js/issues/39531
+              missing: [
+                {
+                  type: 'header',
+                  key: 'x-nextjs-data',
+                },
+              ],
             },
           ]
         }, [] as Redirect[])
