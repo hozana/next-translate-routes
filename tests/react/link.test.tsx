@@ -9,26 +9,25 @@ import { Link } from '../../src/link'
 import { setEnvData } from './setEnvData'
 
 describe('Link', () => {
-  const push = jest.fn(() => Promise.resolve(true))
+  const routerContext = {
+    beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
+    isLocaleDomain: true,
+    locale: 'en',
+    locales: ['en', 'fr'],
+    defaultLocale: 'en',
+    push: jest.fn(() => Promise.resolve(true)),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...({} as any),
+  }
+
   beforeEach(() => {
     setEnvData()
-    push.mockClear()
+    routerContext.push.mockClear()
   })
 
   test('unprefixed url, no locale', () => {
     const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr'],
-          defaultLocale: 'en',
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
+      <RouterContext.Provider value={routerContext}>
         <Link
           href={{
             pathname: '/community/[communityId]/[communitySlug]/statistics',
@@ -40,9 +39,9 @@ describe('Link', () => {
       </RouterContext.Provider>,
     )
 
-    expect(push).not.toHaveBeenCalled()
+    expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
+    expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
       '/en/root/community/300-three-hundred/statistics?baz=3',
       { locale: 'en', scroll: undefined, shallow: undefined },
@@ -51,18 +50,7 @@ describe('Link', () => {
 
   test('unprefixed url, locale changed', () => {
     const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr'],
-          defaultLocale: 'en',
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
+      <RouterContext.Provider value={routerContext}>
         <Link
           href={{
             pathname: '/community/[communityId]/[communitySlug]/statistics',
@@ -75,9 +63,9 @@ describe('Link', () => {
       </RouterContext.Provider>,
     )
 
-    expect(push).not.toHaveBeenCalled()
+    expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
+    expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
       '/communaute/300-three-hundred/statistiques?baz=3',
       { locale: 'fr', scroll: undefined, shallow: undefined },
@@ -86,25 +74,14 @@ describe('Link', () => {
 
   test('prefixed url, no locale', () => {
     const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr'],
-          defaultLocale: 'en',
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
+      <RouterContext.Provider value={routerContext}>
         <Link href="/fr/communaute/300-three-hundred/statistiques?baz=3">Link</Link>
       </RouterContext.Provider>,
     )
 
-    expect(push).not.toHaveBeenCalled()
+    expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
+    expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
       '/en/root/community/300-three-hundred/statistics?baz=3',
       { locale: 'en', scroll: undefined, shallow: undefined },
@@ -113,63 +90,32 @@ describe('Link', () => {
 
   test('prefixed url, locale to false', () => {
     const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr'],
-          defaultLocale: 'en',
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
+      <RouterContext.Provider value={routerContext}>
         <Link href="/fr/communaute/300-three-hundred/statistiques?baz=3" locale={false}>
           Link
         </Link>
       </RouterContext.Provider>,
     )
 
-    expect(push).not.toHaveBeenCalled()
+    expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
+    expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
       '/communaute/300-three-hundred/statistiques?baz=3',
       { locale: 'fr', scroll: undefined, shallow: undefined },
     )
   })
-})
 
-describe('LinkFallBackLng', () => {
-  const push = jest.fn(() => Promise.resolve(true))
-  beforeEach(() => {
-    setEnvData({
-      defaultLocale: 'fr-FR',
-      locales: ['fr', 'fr-FR', 'fr-BE', 'en', 'es', 'pt'],
-      fallbackLng: {
-        'fr-FR': ['fr'],
-        'fr-BE': ['fr'],
-      },
-    })
-    push.mockClear()
-  })
-
-  test('unprefixed url, locale changed', () => {
+  test('unprefixed url, locale changed, fallback lng', () => {
     const { container } = render(
       <RouterContext.Provider
         value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr', 'fr-FR'],
-          defaultLocale: 'en',
+          ...routerContext,
+          defaultLocale: 'fr',
+          locales: ['fr', 'fr-BE', 'en'],
           fallbackLng: {
-            fr: ['fr-FR'],
+            'fr-BE': ['fr'],
           },
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
         }}
       >
         <Link
@@ -177,81 +123,19 @@ describe('LinkFallBackLng', () => {
             pathname: '/community/[communityId]/[communitySlug]/statistics',
             query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
           }}
-          locale="fr-FR"
+          locale="fr-BE"
         >
           Link
         </Link>
       </RouterContext.Provider>,
     )
 
-    expect(push).not.toHaveBeenCalled()
+    expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
+    expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
-      '/communaute/300-three-hundred/statistiques?baz=3',
-      { locale: 'fr-FR', scroll: undefined, shallow: undefined },
-    )
-  })
-
-  test('prefixed url, no locale', () => {
-    const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr', 'fr-FR'],
-          defaultLocale: 'en',
-          fallbackLng: {
-            fr: ['fr-FR'],
-          },
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
-        <Link href="/fr-FR/communaute/300-three-hundred/statistiques?baz=3">Link</Link>
-      </RouterContext.Provider>,
-    )
-
-    expect(push).not.toHaveBeenCalled()
-    container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
-      '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
-      '/en/root/community/300-three-hundred/statistics?baz=3',
-      { locale: 'en', scroll: undefined, shallow: undefined },
-    )
-  })
-
-  test('prefixed url, locale to false', () => {
-    const { container } = render(
-      <RouterContext.Provider
-        value={{
-          beforePopState: true, // If the router is an NextRouter instance it will have `beforePopState`
-          isLocaleDomain: true,
-          locale: 'en',
-          locales: ['en', 'fr', 'fr-FR'],
-          defaultLocale: 'en',
-          fallbackLng: {
-            fr: ['fr-FR'],
-          },
-          push,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...({} as any),
-        }}
-      >
-        <Link href="/fr-FR/communaute/300-three-hundred/statistiques?baz=3" locale={false}>
-          Link
-        </Link>
-      </RouterContext.Provider>,
-    )
-
-    expect(push).not.toHaveBeenCalled()
-    container.querySelector('a')?.click()
-    expect(push).toHaveBeenCalledWith(
-      '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
-      '/communaute/300-three-hundred/statistiques?baz=3',
-      { locale: 'fr-FR', scroll: undefined, shallow: undefined },
+      '/fr-BE/communaute/300-three-hundred/statistiques?baz=3',
+      { locale: 'fr-BE' },
     )
   })
 })

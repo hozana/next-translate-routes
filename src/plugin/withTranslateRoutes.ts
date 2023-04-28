@@ -2,6 +2,7 @@ import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
 import type { Configuration as WebpackConfiguration, FileCacheOptions } from 'webpack'
 
+import { setNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import { NextConfigWithNTR } from '../types'
 import { createNtrData } from './createNtrData'
@@ -42,10 +43,9 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
   const pagesPath = getPagesPath(pagesDirectory)
 
   const ntrData = createNtrData(userNextConfig, pagesPath)
+  setNtrData(ntrData)
 
-  const { routesTree, locales, defaultLocale } = ntrData
-
-  const { redirects, rewrites } = getRouteBranchReRoutes({ locales, routeBranch: routesTree, defaultLocale })
+  const { redirects, rewrites } = getRouteBranchReRoutes()
   const sortedRedirects = sortBySpecificity(redirects)
   const sortedRewrites = sortBySpecificity(rewrites)
 

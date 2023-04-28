@@ -59,6 +59,14 @@ describe('fileUrlToUrl', () => {
     {
       urlObject: {
         pathname: '/news/[...newsPathPart]',
+        query: { newsPathPart: ['a'] },
+      },
+      locale: 'fr-BE',
+      translation: '/fr-BE/actualites/a',
+    },
+    {
+      urlObject: {
+        pathname: '/news/[...newsPathPart]',
         query: { newsPathPart: ['a', 'b'] },
       },
       translation: '/actualites/a/b',

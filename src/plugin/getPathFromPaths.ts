@@ -1,4 +1,4 @@
-import { getNtrData } from '../react/ntrData'
+import { getNtrData } from '../shared/ntrData'
 import type { TRouteSegmentPaths } from '../types'
 
 const getFallbackLngs = (lng: string): string[] | undefined => {
@@ -18,12 +18,12 @@ const getFallbackLngs = (lng: string): string[] | undefined => {
  *
  * Ex:
  * ```
- * getPathFromPaths({ default: '/here', fr: '/ici', es: '/aqui' }, 'fr') // '/ici'
+ * getPathFromPaths({ default: 'here', fr: 'ici', es: 'aqui' }, 'fr') // 'ici'
  *
  * // If no fallbackLng is defined:
- * getPathFromPaths({ default: '/here', fr: '/ici', es: '/aqui' }, 'pt') // '/here'
+ * getPathFromPaths({ default: 'here', fr: 'ici', es: 'aqui' }, 'pt') // 'here'
  * // If ntrData.fallbackLng.pt === ['es', 'fr'], then:
- * getPathFromPaths({ default: '/here', fr: '/ici', es: '/aqui' }, 'pt') // '/aqui'
+ * getPathFromPaths({ default: 'here', fr: 'ici', es: 'aqui' }, 'pt') // 'aqui'
  * ```
  */
 export const getLocalePathFromPaths = <L extends string>({

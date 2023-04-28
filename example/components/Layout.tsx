@@ -25,7 +25,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
       {' | '}
       <LinkComponent href="/rewrites">Rewrites</LinkComponent>
       {' | '}
-      <LinkComponent href="/docs/api">Api docs</LinkComponent>
+      <LinkComponent href="/docs/server">Server docs</LinkComponent>
       {' - '}
       <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'client' } }}>
         Client docs

@@ -3,7 +3,7 @@ import type { I18NConfig, NextConfig, NextConfigComplete } from 'next/dist/serve
 import type { UrlObject } from 'url'
 
 export type Url = UrlObject | string
-type TAnyLocale = Exclude<string, 'default'>
+export type TAnyLocale = Exclude<string, 'default'>
 export type TReRoutes = { redirects: Redirect[]; rewrites: Rewrite[] }
 export type TRouteSegmentPaths<L extends TAnyLocale> = { default: string } & Partial<Record<L, string>>
 export type TRouteSegmentData<L extends TAnyLocale> = string | ({ default?: string } & Partial<Record<L, string>>)
@@ -17,11 +17,11 @@ export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
 }
 export type TFallbackLng = string | string[] | { [key: string]: string[] }
 
-export type TNtrData = {
+export type TNtrData<L extends TAnyLocale = string> = {
   debug?: boolean | 'withPrefetch'
-  defaultLocale: string
-  locales: string[]
-  routesTree: TRouteBranch
+  defaultLocale: L
+  locales: L[]
+  routesTree: TRouteBranch<L>
   fallbackLng?: TFallbackLng | undefined
 }
 

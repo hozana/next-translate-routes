@@ -3,7 +3,8 @@ import routesTree from '../fixtures/routesTree.json'
 
 const defaultNtrData = {
   defaultLocale: 'fr',
-  locales: ['fr', 'en', 'es', 'pt'],
+  locales: ['fr', 'fr-BE', 'en', 'es', 'pt'],
+  fallbackLng: { 'fr-BE': ['fr'] },
   routesTree,
 }
 

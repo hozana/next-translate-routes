@@ -6,8 +6,9 @@ import path from 'path'
 
 import { createNtrData } from '../src/plugin/createNtrData'
 import { getPageReRoutes, getRouteBranchReRoutes } from '../src/plugin/getRouteBranchReRoutes'
-import allReRoutes from './fixtures/allReRoutes.json'
-import reRoutesData from './fixtures/reRoutesData.json'
+import { setNtrData } from '../src/shared/ntrData'
+import allReRoutes from './fixtures/allReRoutes'
+import reRoutesData from './fixtures/reRoutesData'
 import routesTree from './fixtures/routesTree.json'
 
 declare global {
@@ -18,36 +19,29 @@ declare global {
     }
   }
 }
-test('createNtrData.', () => {
-  const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
-  const i18n = { locales: ['en', 'fr'], defaultLocale: 'en' }
-  const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
-  expect(ntrData.routesTree).toEqual(routesTree)
-  expect(ntrData.locales).toEqual(i18n.locales)
-  expect(ntrData.defaultLocale).toEqual(i18n.defaultLocale)
-  expect(ntrData.debug).toBe(true)
-})
 
-test('createNtrDataFallbackLang.', () => {
-  const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
+const pagesPath = path.resolve(process.cwd(), './tests/fixtures/pages')
+const translateRoutes = { debug: true }
+
+test('createNtrData.', () => {
   const i18n = { locales: ['en', 'fr', 'fr-FR'], defaultLocale: 'en', fallbackLng: { 'fr-FR': ['fr'] } }
-  const ntrData = createNtrData({ i18n, translateRoutes: { debug: true } }, pagesPath)
+  const ntrData = createNtrData({ i18n, translateRoutes }, pagesPath)
   expect(ntrData.routesTree).toEqual(routesTree)
   expect(ntrData.locales).toEqual(i18n.locales)
   expect(ntrData.defaultLocale).toEqual(i18n.defaultLocale)
+  expect(ntrData.fallbackLng).toEqual(i18n.fallbackLng)
   expect(ntrData.debug).toBe(true)
 })
 
 test('getPageReRoutes.', () => {
-  const { reRoutes, ...getPageReRoutesProps } = reRoutesData
-  const pageReRoutes = getPageReRoutes(getPageReRoutesProps)
+  const { reRoutes, i18n, routeSegments } = reRoutesData
+  setNtrData(createNtrData({ i18n, translateRoutes }, pagesPath))
+  const pageReRoutes = getPageReRoutes(routeSegments)
   expect(pageReRoutes).toEqual(reRoutes)
 })
 
 test('getRouteBranchReRoutes.', () => {
-  const reRoutes = getRouteBranchReRoutes({
-    locales: ['en', 'fr', 'es'],
-    routeBranch: { ...routesTree, paths: { default: '' } },
-  })
+  setNtrData(createNtrData({ i18n: { locales: ['en', 'fr', 'es'], defaultLocale: 'en' }, translateRoutes }, pagesPath))
+  const reRoutes = getRouteBranchReRoutes()
   expect(reRoutes).toEqual(allReRoutes)
 })

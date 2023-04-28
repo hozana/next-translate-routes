@@ -1,14 +1,15 @@
 import type { ParsedUrlQuery } from 'querystring'
 import type { UrlObject } from 'url'
 
+import { getNtrData } from '../shared/ntrData'
 import {
   anyDynamicFilepathPartRegex,
   dynamicFilepathPartsRegex,
   getDynamicPathPartKey,
+  optionalMatchAllFilepathPartRegex,
   spreadFilepathPartRegex,
 } from '../shared/regex'
 import type { TRouteBranch } from '../types'
-import { getNtrData } from './ntrData'
 import { parseUrl } from './parseUrl'
 
 /**
@@ -23,6 +24,12 @@ const getFileUrlObject = ({
   pathParts: string[]
 }): { pathname: string; query?: ParsedUrlQuery } => {
   if (pathParts.length === 0) {
+    const optionalMatchAllChild = routeBranch.children?.find((child) =>
+      optionalMatchAllFilepathPartRegex.test(child.name),
+    )
+    if (optionalMatchAllChild) {
+      return { pathname: `/${routeBranch.name}/${optionalMatchAllChild.name}`, query: {} }
+    }
     return { pathname: `/${routeBranch.name}`, query: {} }
   }
 

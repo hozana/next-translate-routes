@@ -3,11 +3,11 @@ import { parse as parsePathPattern, compile as compilePath } from 'path-to-regex
 import { format as formatUrl, UrlObject } from 'url'
 
 import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
+import { getNtrData } from '../shared/ntrData'
 import { ignoreSegmentPathRegex, optionalMatchAllFilepathPartRegex } from '../shared/regex'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TRouteBranch } from '../types'
 import { fileUrlToFileUrlObject } from './fileUrlToFileUrlObject'
-import { getNtrData } from './ntrData'
 
 /**
  * Get pattern from route branch paths property in the specified locale,

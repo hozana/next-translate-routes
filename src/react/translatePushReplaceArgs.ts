@@ -1,11 +1,11 @@
 import { NextRouter, SingletonRouter } from 'next/router'
 import type { UrlObject } from 'url'
 
+import { getNtrData } from '../shared/ntrData'
 import type { Url } from '../types'
 import { fileUrlToFileUrlObject } from './fileUrlToFileUrlObject'
 import { fileUrlToUrl } from './fileUrlToUrl'
 import { getLocale } from './getLocale'
-import { getNtrData } from './ntrData'
 import { removeLangPrefix } from './removeLangPrefix'
 import { urlToFileUrl } from './urlToFileUrl'
 

@@ -1,6 +1,6 @@
 import { NextRouter, SingletonRouter } from 'next/router'
 
-import { getNtrData } from './ntrData'
+import { getNtrData } from '../shared/ntrData'
 
 export const getLocale = (
   { locale, defaultLocale, locales }: NextRouter | SingletonRouter,

@@ -5,9 +5,9 @@ import type { ParsedUrlQuery } from 'querystring'
 import { format as formatUrl, parse, UrlObject } from 'url'
 
 import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
+import { getNtrData } from '../shared/ntrData'
 import { getDynamicPathPartKey, getSpreadFilepathPartKey, ignoreSegmentPathRegex } from '../shared/regex'
 import type { TRouteBranch, Url } from '../types'
-import { getNtrData } from './ntrData'
 import { parseUrl } from './parseUrl'
 import { removeLangPrefix } from './removeLangPrefix'
 

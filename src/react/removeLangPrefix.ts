@@ -1,5 +1,5 @@
 import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
-import { getNtrData } from './ntrData'
+import { getNtrData } from '../shared/ntrData'
 
 export function removeLangPrefix(pathname: string, toArray?: false, locale?: string): string
 export function removeLangPrefix(pathname: string, toArray: true, locale?: string): string[]
