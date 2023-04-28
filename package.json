@@ -72,5 +72,8 @@
   "peerDependencies": {
     "next": ">11.0.0",
     "react": ">=16.8.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   }
 }
