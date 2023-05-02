@@ -94,11 +94,13 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
     async rewrites() {
       const existingRewrites = (nextConfig.rewrites && (await nextConfig.rewrites())) || []
       if (Array.isArray(existingRewrites)) {
-        return [...existingRewrites, ...sortedRewrites]
+        // Add .map((rw) => ({ ...rw })) to solve next 13.3 rewrites issue https://github.com/hozana/next-translate-routes/issues/68
+        return [...existingRewrites, ...sortedRewrites].map((rw) => ({ ...rw }))
       }
       return {
         ...existingRewrites,
-        afterFiles: [...(existingRewrites.afterFiles || []), ...sortedRewrites],
+        // Add .map((rw) => ({ ...rw })) to solve next 13.3 rewrites issue https://github.com/hozana/next-translate-routes/issues/68
+        afterFiles: [...(existingRewrites.afterFiles || []), ...sortedRewrites].map((rw) => ({ ...rw })),
       }
     },
   } as NextConfig
