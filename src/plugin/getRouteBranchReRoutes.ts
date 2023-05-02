@@ -4,6 +4,7 @@ import { pathToRegexp } from 'path-to-regexp'
 import { getNtrData } from '../shared/ntrData'
 import { ignoreSegmentPathRegex } from '../shared/regex'
 import type { TAnyLocale, TReRoutes, TRouteBranch, TRouteSegment } from '../types'
+import { checkNextVersion } from './checkNextVersion'
 import { fileNameToPath } from './fileNameToPaths'
 import { getLocalePathFromPaths } from './getPathFromPaths'
 
@@ -166,13 +167,15 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
             permanent: false,
             // Take source locale into account
             locale: false as const,
-            // Prevent prefetches redirection. See #49 and https://github.com/vercel/next.js/issues/39531
-            missing: [
-              {
-                type: 'header',
-                key: 'x-nextjs-data',
-              },
-            ],
+            ...(checkNextVersion('>=13.3') && {
+              // Prevent prefetches redirection. See #49 and https://github.com/vercel/next.js/issues/39531
+              missing: [
+                {
+                  type: 'header',
+                  key: 'x-nextjs-data',
+                },
+              ],
+            }),
           },
         ]
       }, [] as Redirect[]),
