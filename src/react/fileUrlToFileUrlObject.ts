@@ -5,7 +5,9 @@ import { getNtrData } from '../shared/ntrData'
 import {
   anyDynamicFilepathPartRegex,
   dynamicFilepathPartsRegex,
+  getCatchAllPathPartKey,
   getDynamicPathPartKey,
+  matchAllFilepathPartsRegex,
   optionalMatchAllFilepathPartRegex,
   spreadFilepathPartRegex,
 } from '../shared/regex'
@@ -27,9 +29,14 @@ const getFileUrlObject = ({
     const optionalMatchAllChild = routeBranch.children?.find((child) =>
       optionalMatchAllFilepathPartRegex.test(child.name),
     )
+
     if (optionalMatchAllChild) {
-      return { pathname: `/${routeBranch.name}/${optionalMatchAllChild.name}`, query: {} }
+      return {
+        pathname: `/${routeBranch.name}/${optionalMatchAllChild.name}`,
+        query: {},
+      }
     }
+
     return { pathname: `/${routeBranch.name}`, query: {} }
   }
 
@@ -57,18 +64,33 @@ const getFileUrlObject = ({
         anyDynamicFilepathPartRegex.test(child.name) &&
         // ...there is no matching child found for now, or...
         (!matchingChild ||
-          // ...the matchingChild has a sread syntax and the new one has not (priority)
+          // ...the matchingChild has a spread syntax and the new one has not (priority)
           (spreadFilepathPartRegex.test(matchingChild.name) && dynamicFilepathPartsRegex.test(child.name)))
       ) {
         matchingChild = child
       }
+      // Else if the child is a catch all, we will consider it as a match
+    } else if (matchAllFilepathPartsRegex.test(child.name)) {
+      matchingChild = child
+      break
     }
   }
 
   if (matchingChild) {
     /** If we found an exact match, no need to add query */
     const isExactMatch = matchingChild.name === nextPathPart
+
     const dynamicPathPartKey = getDynamicPathPartKey(matchingChild.name)
+    const catchAllPathPartKey = getCatchAllPathPartKey(matchingChild.name)
+
+    if (catchAllPathPartKey) {
+      return {
+        pathname: `/${routeBranch.name}/${matchingChild.name}`,
+        query: {
+          [catchAllPathPartKey]: pathParts,
+        },
+      }
+    }
 
     const { pathname: nextPathname, query: nextQuery } = getFileUrlObject({
       routeBranch: matchingChild,
