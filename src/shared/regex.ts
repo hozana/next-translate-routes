@@ -43,7 +43,7 @@ export const optionalMatchAllFilepathPartRegex = /^\[\[\.{3}([^/[\]?#]+)\]\]$/
 /**
  * Match all `[...pathParts]` parts but not `[[...pathParts]]` parts
  */
-export const matchAllFilepathPartsRegex = /\[\.{3}([^/[\]?#]+)\]/g
+export const matchAllFilepathPartsRegex = /\[\.{3}([^/[\]?#]+)\]/y
 
 /**
  * A "spread path part" is either a match-all path part (`[...pathParts]`),
@@ -61,6 +61,14 @@ export const dynamicFilepathPartRegex = /^\[(?!\.{3})([^/[\]?#]*)\]$/
 
 /** Ex: `'[slug]'` => `'slug'` but `'[...pathParts]'` => `null` and '`pathPart'` => `null` */
 export const getDynamicPathPartKey = (pathPart: string) => dynamicFilepathPartRegex.exec(pathPart)?.[1] || null
+
+/** Ex: `[[...pathParts]]` => `'pathParts'` but `'[slug]'` => null and '`pathPart'` => `null` */
+export const getCatchAllPathPartKey = (pathPart: string) => {
+  // We make sure that regex index is reset so we don't miss any match
+  matchAllFilepathPartsRegex.lastIndex = 0
+
+  return matchAllFilepathPartsRegex.exec(pathPart)?.[1] || null
+}
 
 /**
  * Match all `[slug]` parts but neither `[...pathParts]` parts nor `[[...pathParts]]` parts
