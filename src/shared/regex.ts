@@ -62,7 +62,7 @@ export const dynamicFilepathPartRegex = /^\[(?!\.{3})([^/[\]?#]*)\]$/
 /** Ex: `'[slug]'` => `'slug'` but `'[...pathParts]'` => `null` and '`pathPart'` => `null` */
 export const getDynamicPathPartKey = (pathPart: string) => dynamicFilepathPartRegex.exec(pathPart)?.[1] || null
 
-/** Ex: `[[...pathParts]]` => `'pathParts'` but `'[slug]'` => null and '`pathPart'` => `null` */
+/** Ex: `[...pathParts]` => `'pathParts'` but `'[slug]'` => null and '`pathPart'` => `null` */
 export const getCatchAllPathPartKey = (pathPart: string) => {
   // We make sure that regex index is reset so we don't miss any match
   matchAllFilepathPartsRegex.lastIndex = 0
