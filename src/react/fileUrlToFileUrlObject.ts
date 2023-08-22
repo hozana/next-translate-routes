@@ -49,9 +49,6 @@ const getFileUrlObject = ({
 }): { pathname: string; query?: ParsedUrlQuery } => {
   const routeBranchName = getRouteBranchName(routeBranch, locale)
 
-  // console.log('routeBranch', routeBranch)
-  // console.log('routeBranchName', routeBranchName)
-
   if (pathParts.length === 0) {
     const optionalMatchAllChild = routeBranch.children?.find((child) =>
       optionalMatchAllFilepathPartRegex.test(child.name),
