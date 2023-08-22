@@ -10,12 +10,19 @@ import { translatePushReplaceArgs } from './translatePushReplaceArgs'
 export const Link: typeof NextLink = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ href, as, locale, ...props }, ref) => {
     const router = useNextRouter()
-    const translatedArgs = translatePushReplaceArgs({ router, url: href, as, locale })
+    const translatedArgs = translatePushReplaceArgs({
+      router,
+      url: href,
+      as,
+      locale,
+    })
 
     return (
       <NextLink ref={ref} href={translatedArgs.url} as={translatedArgs.as} locale={translatedArgs.locale} {...props} />
     )
   },
 )
+
+Link.displayName = 'Link'
 
 export default Link

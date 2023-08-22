@@ -47,7 +47,7 @@ describe('fileUrlToUrl', () => {
         pathname: '/communities/[[...tagSlug]]',
         query: { baz: 3 },
       },
-      translation: '/communautes?baz=3',
+      translation: '/communautes/[[...tagSlug]]?baz=3',
     },
     {
       urlObject: {

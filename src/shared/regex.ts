@@ -70,6 +70,14 @@ export const getCatchAllPathPartKey = (pathPart: string) => {
   return matchAllFilepathPartsRegex.exec(pathPart)?.[1] || null
 }
 
+/** Ex: `[[...pathParts]]` => `'pathParts'` but `'[slug]'` => null and '`pathPart'` => `null` */
+export const getOptionalCatchAllPathPartKey = (pathPart: string) => {
+  // We make sure that regex index is reset so we don't miss any match
+  optionalMatchAllFilepathPartRegex.lastIndex = 0
+
+  return optionalMatchAllFilepathPartRegex.exec(pathPart)?.[1] || null
+}
+
 /**
  * Match all `[slug]` parts but neither `[...pathParts]` parts nor `[[...pathParts]]` parts
  */

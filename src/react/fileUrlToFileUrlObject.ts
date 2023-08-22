@@ -7,6 +7,7 @@ import {
   dynamicFilepathPartsRegex,
   getCatchAllPathPartKey,
   getDynamicPathPartKey,
+  getOptionalCatchAllPathPartKey,
   matchAllFilepathPartsRegex,
   optionalMatchAllFilepathPartRegex,
   spreadFilepathPartRegex,
@@ -15,16 +16,42 @@ import type { TRouteBranch } from '../types'
 import { parseUrl } from './parseUrl'
 
 /**
+ * Get the route branch name from a route branch based on the locale or the name if no value for locale is found
+ */
+const getRouteBranchName = (routeBranch: TRouteBranch, locale: string) => {
+  if (!routeBranch?.name && routeBranch?.paths?.[locale]) {
+    return ''
+  }
+
+  if (routeBranch?.paths?.[locale]) {
+    return routeBranch?.paths?.[locale]
+  }
+
+  if (routeBranch?.name) {
+    return routeBranch?.name
+  }
+
+  return ''
+}
+
+/**
  * Recursively get path file UrlObject from a route branch
  */
 const getFileUrlObject = ({
   routeBranch,
   pathParts,
+  locale,
 }: {
   routeBranch: TRouteBranch
   /** Remaining path parts after the `routeBranch` path parts */
   pathParts: string[]
+  locale: string
 }): { pathname: string; query?: ParsedUrlQuery } => {
+  const routeBranchName = getRouteBranchName(routeBranch, locale)
+
+  // console.log('routeBranch', routeBranch)
+  // console.log('routeBranchName', routeBranchName)
+
   if (pathParts.length === 0) {
     const optionalMatchAllChild = routeBranch.children?.find((child) =>
       optionalMatchAllFilepathPartRegex.test(child.name),
@@ -32,12 +59,12 @@ const getFileUrlObject = ({
 
     if (optionalMatchAllChild) {
       return {
-        pathname: `/${routeBranch.name}/${optionalMatchAllChild.name}`,
+        pathname: `/${routeBranchName}/${optionalMatchAllChild.name}`,
         query: {},
       }
     }
 
-    return { pathname: `/${routeBranch.name}`, query: {} }
+    return { pathname: `/${routeBranchName}`, query: {} }
   }
 
   const [nextPathPart, ...remainingPathParts] = pathParts
@@ -54,7 +81,7 @@ const getFileUrlObject = ({
       remainingPathParts.length === 0 ||
       child.children?.length
     ) {
-      if (child.name === nextPathPart) {
+      if (child.name === nextPathPart || child?.paths?.[locale] === nextPathPart) {
         matchingChild = child
         break
       } else if (
@@ -69,8 +96,8 @@ const getFileUrlObject = ({
       ) {
         matchingChild = child
       }
-      // Else if the child is a catch all, we will consider it as a match
-    } else if (matchAllFilepathPartsRegex.test(child.name)) {
+      // Else if the child is a catch all or optional catch all route, we will consider it as a match
+    } else if (matchAllFilepathPartsRegex.test(child.name) || optionalMatchAllFilepathPartRegex.test(child.name)) {
       matchingChild = child
       break
     }
@@ -82,22 +109,28 @@ const getFileUrlObject = ({
 
     const dynamicPathPartKey = getDynamicPathPartKey(matchingChild.name)
     const catchAllPathPartKey = getCatchAllPathPartKey(matchingChild.name)
+    const optionalCatchAllPathPartKey = getOptionalCatchAllPathPartKey(matchingChild.name)
 
-    if (catchAllPathPartKey) {
+    if (catchAllPathPartKey || optionalCatchAllPathPartKey) {
+      const query = {
+        ...(catchAllPathPartKey ? { [catchAllPathPartKey]: pathParts } : {}),
+        ...(optionalCatchAllPathPartKey ? { [optionalCatchAllPathPartKey]: pathParts } : {}),
+      }
+
       return {
-        pathname: `/${routeBranch.name}/${matchingChild.name}`,
-        query: {
-          [catchAllPathPartKey]: pathParts,
-        },
+        pathname: `${routeBranchName ? `/${routeBranchName}` : ''}/${matchingChild.name}`,
+        query,
       }
     }
 
     const { pathname: nextPathname, query: nextQuery } = getFileUrlObject({
       routeBranch: matchingChild,
       pathParts: remainingPathParts,
+      locale,
     })
 
-    const pathname = `${routeBranch.name ? `/${routeBranch.name}` : ''}${nextPathname}`
+    const pathname = `${routeBranchName ? `/${routeBranchName}` : ''}${nextPathname}`
+
     const query =
       isExactMatch || !dynamicPathPartKey
         ? nextQuery
@@ -121,7 +154,7 @@ const getFileUrlObject = ({
  *
  * @throws if the fileUrl input does not match any page
  */
-export const fileUrlToFileUrlObject = (fileUrl: string | UrlObject | URL) => {
+export const fileUrlToFileUrlObject = ({ fileUrl, locale }: { fileUrl: string | UrlObject | URL; locale: string }) => {
   const { pathname: rawPathname, query: initialQuery, ...rest } = parseUrl(fileUrl)
 
   const { routesTree } = getNtrData()
@@ -132,6 +165,7 @@ export const fileUrlToFileUrlObject = (fileUrl: string | UrlObject | URL) => {
   const { pathname, query } = getFileUrlObject({
     pathParts: (rawPathname || '/').split('/').filter(Boolean),
     routeBranch: routesTree,
+    locale,
   })
 
   return { pathname, query: { ...query, ...initialQuery }, ...rest }

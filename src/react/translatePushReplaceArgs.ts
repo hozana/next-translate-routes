@@ -50,11 +50,16 @@ export const translatePushReplaceArgs = ({
      * See: https://github.com/hozana/next-translate-routes/issues/54
      */
     let parsedUrl: UrlObject | URL | string | undefined
-    let translatedUrl = fileUrlToUrl(unprefixedUrl, newLocale, { throwOnError: false })
+    let translatedUrl = fileUrlToUrl(unprefixedUrl, newLocale, {
+      throwOnError: false,
+    })
 
     if (translatedUrl) {
       // url is a correct file url
-      parsedUrl = fileUrlToFileUrlObject(unprefixedUrl)
+      parsedUrl = fileUrlToFileUrlObject({
+        fileUrl: unprefixedUrl,
+        locale: newLocale,
+      })
     } else {
       // url is not a correct file url
       parsedUrl = urlToFileUrl(unprefixedUrl, urlLocale || newLocale)

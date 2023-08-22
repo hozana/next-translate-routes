@@ -66,7 +66,7 @@ describe('Link', () => {
     expect(routerContext.push).not.toHaveBeenCalled()
     container.querySelector('a')?.click()
     expect(routerContext.push).toHaveBeenCalledWith(
-      '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
+      '/communaute/[communityId]/[communitySlug]/statistiques?communityId=300&communitySlug=three-hundred&baz=3',
       '/communaute/300-three-hundred/statistiques?baz=3',
       { locale: 'fr', scroll: undefined, shallow: undefined },
     )

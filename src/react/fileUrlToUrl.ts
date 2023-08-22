@@ -77,7 +77,11 @@ export const getTranslatedPathPattern = ({
   const isLastPathPart = pathParts.length === 0
 
   /** Current part path pattern */
-  const currentTranslatedPathPart = getTranslatedPathPart({ routeBranch, locale, isLastPathPart })
+  const currentTranslatedPathPart = getTranslatedPathPart({
+    routeBranch,
+    locale,
+    isLastPathPart,
+  })
 
   if (isLastPathPart) {
     return currentTranslatedPathPart
@@ -89,7 +93,9 @@ export const getTranslatedPathPattern = ({
   // if nextPathPart does not match any child name and a dynamic child is found,
   // we will consider that nextPathPart is a value given to the dynamic child
 
-  const matchingChild = routeBranch.children?.find((child) => child.name === nextFilePathPart)
+  const matchingChild = routeBranch.children?.find(
+    (child) => child.name === nextFilePathPart || child?.paths?.[locale] === nextFilePathPart,
+  )
 
   if (!matchingChild) {
     throw new Error(`${nextFilePathPart} not found in ${routeBranch.name || 'pages'}`)
@@ -116,7 +122,10 @@ export const getTranslatedPathPattern = ({
  */
 export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { throwOnError = true } = {}) => {
   try {
-    const { pathname, query, hash } = fileUrlToFileUrlObject(url)
+    const { pathname, query, hash } = fileUrlToFileUrlObject({
+      fileUrl: url,
+      locale,
+    })
 
     const { routesTree, defaultLocale } = getNtrData()
 
@@ -125,7 +134,11 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { th
       .split('/')
       .filter(Boolean)
 
-    const pathPattern = getTranslatedPathPattern({ routeBranch: routesTree, pathParts, locale })
+    const pathPattern = getTranslatedPathPattern({
+      routeBranch: routesTree,
+      pathParts,
+      locale,
+    })
 
     const newPathname = normalizePathTrailingSlash(compilePath(pathPattern)(query))
 
