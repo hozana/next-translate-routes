@@ -2,19 +2,11 @@
  * @jest-environment jsdom
  */
 import { render } from '@testing-library/react'
-import { NextRouter } from 'next/router'
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime'
 import React from 'react'
 
 import { Link } from '../../src/link'
 import { setEnvData } from './setEnvData'
-
-// TODO: Remove dynamic import for RouterContext to remove backwards compability
-let RouterContext: React.Context<NextRouter | null>
-try {
-  RouterContext = require('next/dist/shared/lib/router-context.shared-runtime').RouterContext
-} catch (e) {
-  RouterContext = require('next/dist/shared/lib/router-context').RouterContext
-}
 
 describe('Link', () => {
   const routerContext = {
