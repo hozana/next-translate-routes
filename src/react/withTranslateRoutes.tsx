@@ -13,7 +13,6 @@ let RouterContext: React.Context<NextRouter | null>
 try {
   RouterContext = require('next/dist/shared/lib/router-context.shared-runtime').RouterContext
 } catch (e) {
-  console.error(e)
   RouterContext = require('next/dist/shared/lib/router-context').RouterContext
 }
 
