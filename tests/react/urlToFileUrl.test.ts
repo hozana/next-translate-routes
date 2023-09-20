@@ -40,6 +40,19 @@ describe('urlToFileUrl', () => {
     },
     {
       url: {
+        pathname: '/communaute/300-three-hundred/statistiques',
+        query: { baz: 3 },
+        hash: '#section',
+      },
+      urlObject: {
+        pathname: '/community/[communityId]/[communitySlug]/statistics',
+        query: { communityId: '300', communitySlug: 'three-hundred', baz: 3 },
+        hash: '#section',
+      },
+      locale: 'fr-BE',
+    },
+    {
+      url: {
         pathname: '/en/root/community/300-three-hundred/statistics',
         query: { baz: 3 },
         hash: '#section',

@@ -3,7 +3,7 @@ import type { I18NConfig, NextConfig, NextConfigComplete } from 'next/dist/serve
 import type { UrlObject } from 'url'
 
 export type Url = UrlObject | string
-type TAnyLocale = Exclude<string, 'default'>
+export type TAnyLocale = Exclude<string, 'default'>
 export type TReRoutes = { redirects: Redirect[]; rewrites: Rewrite[] }
 export type TRouteSegmentPaths<L extends TAnyLocale> = { default: string } & Partial<Record<L, string>>
 export type TRouteSegmentData<L extends TAnyLocale> = string | ({ default?: string } & Partial<Record<L, string>>)
@@ -15,12 +15,14 @@ export type TRouteSegment<L extends TAnyLocale> = {
 export type TRouteBranch<L extends TAnyLocale = string> = TRouteSegment<L> & {
   children?: TRouteBranch<L>[]
 }
+export type TFallbackLng = string | string[] | { [key: string]: string[] }
 
-export type TNtrData = {
+export type TNtrData<L extends TAnyLocale = string> = {
   debug?: boolean | 'withPrefetch'
-  defaultLocale: string
-  locales: string[]
-  routesTree: TRouteBranch
+  defaultLocale: L
+  locales: L[]
+  routesTree: TRouteBranch<L>
+  fallbackLng?: TFallbackLng | undefined
 }
 
 export type NTRConfig = {
@@ -30,8 +32,19 @@ export type NTRConfig = {
   pagesDirectory?: string
 }
 
-export type NextConfigWithNTR = NextConfig & { i18n: I18NConfig; translateRoutes?: NTRConfig }
-export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: I18NConfig; translateRoutes: NTRConfig }
+export type NTRI18NConfig = {
+  fallbackLng?: TFallbackLng
+} & I18NConfig
+
+export type NTRNextConfig = {
+  i18n: NTRI18NConfig
+} & NextConfig
+
+export type NextConfigWithNTR = NextConfig & {
+  i18n: NTRI18NConfig
+  translateRoutes?: NTRConfig
+}
+export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: NTRI18NConfig; translateRoutes: NTRConfig }
 
 declare global {
   // eslint-disable-next-line no-var

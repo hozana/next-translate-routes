@@ -25,7 +25,7 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
       {' | '}
       <LinkComponent href="/rewrites">Rewrites</LinkComponent>
       {' | '}
-      <LinkComponent href="/docs/api">Api docs</LinkComponent>
+      <LinkComponent href="/docs/server">Server docs</LinkComponent>
       {' - '}
       <LinkComponent href={{ pathname: '/docs/[type]/[[...pathParts]]', query: { type: 'client' } }}>
         Client docs
@@ -36,6 +36,8 @@ const Nav: React.FC<{ LinkComponent: React.ComponentType<React.PropsWithChildren
       <LinkComponent href="/random/path">Random</LinkComponent>
       {' | '}
       <LinkComponent href="https://hozana.org/en">External link</LinkComponent>
+      {' | '}
+      <LinkComponent href={{ pathname, query, hash: 'footer' }}>Hash link</LinkComponent>
       {' | '}
       <LinkComponent href={{ pathname, query }} locale={newLocale}>
         {newLocale}
@@ -60,7 +62,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
         <Nav LinkComponent={NextLink} />
       </header>
       {children}
-      <footer>
+      <footer id="footer">
         <hr />
         <blockquote>{`locale: ${locale}, pathname: ${pathname}, query: ${JSON.stringify(query)}`}</blockquote>
       </footer>

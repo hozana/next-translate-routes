@@ -2,18 +2,19 @@ import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-
 import { parse as parsePathPattern, compile as compilePath } from 'path-to-regexp'
 import { format as formatUrl, UrlObject } from 'url'
 
+import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
+import { getNtrData } from '../shared/ntrData'
 import { ignoreSegmentPathRegex, optionalMatchAllFilepathPartRegex } from '../shared/regex'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TRouteBranch } from '../types'
 import { fileUrlToFileUrlObject } from './fileUrlToFileUrlObject'
-import { getNtrData } from './ntrData'
 
 /**
  * Get pattern from route branch paths property in the specified locale,
  * or, if it does not exist, the default path.
  */
 const getPatternFromRoutePaths = (routeBranch: TRouteBranch, locale: string) => {
-  const pattern = routeBranch.paths[locale] || routeBranch.paths.default
+  const pattern = getLocalePathFromPaths({ paths: routeBranch.paths, locale })
   return ignoreSegmentPathRegex.test(pattern) ? '' : pattern
 }
 

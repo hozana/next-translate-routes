@@ -26,6 +26,9 @@ describe('removeLangPrefix', () => {
   test('with non default locale prefix that has no root prefix', () => {
     expect(removeLangPrefix('/fr/any/path')).toEqual('/any/path')
   })
+  test('with fallback locale prefix that has no root prefix', () => {
+    expect(removeLangPrefix('/fr-BE/any/path')).toEqual('/any/path')
+  })
   test('with default locale prefix that has no root prefix', () => {
     expect(removeLangPrefix('/fr/any/path')).toEqual('/any/path')
   })

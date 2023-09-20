@@ -2,10 +2,10 @@ import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
 import { NextRouter, SingletonRouter } from 'next/router'
 import { stringify as stringifyQuery } from 'querystring'
 
+import { getNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { Url } from '../types'
 import { getLocale } from './getLocale'
-import { getNtrData } from './ntrData'
 import { translatePushReplaceArgs } from './translatePushReplaceArgs'
 import { urlToFileUrl } from './urlToFileUrl'
 

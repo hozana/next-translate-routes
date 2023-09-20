@@ -1,9 +1,12 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import { pathToRegexp } from 'path-to-regexp'
 
+import { getNtrData } from '../shared/ntrData'
 import { ignoreSegmentPathRegex } from '../shared/regex'
-import type { TReRoutes, TRouteBranch, TRouteSegment } from '../types'
+import type { TAnyLocale, TReRoutes, TRouteBranch, TRouteSegment } from '../types'
+import { checkNextVersion } from './checkNextVersion'
 import { fileNameToPath } from './fileNameToPaths'
+import { getLocalePathFromPaths } from './getPathFromPaths'
 
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
@@ -47,28 +50,32 @@ const mergeOrRegex = (existingRegex: string, newPossiblity: string) => {
 }
 
 /**
+ * Check if the redirect won't create a looping redirect toward itself
+ */
+const checkRedirectNotLooping = ({
+  source,
+  destination,
+  defaultLocale,
+}: Pick<Redirect, 'source' | 'destination'> & { defaultLocale?: string }) =>
+  !pathToRegexp(sourceToDestination(source.replace(new RegExp(`/${defaultLocale}(/|$)`), '$1')), undefined, {
+    sensitive: true,
+  }).test(destination)
+
+/** Get a translated path or base path */
+const getFullLocalePath = <L extends TAnyLocale>(locale: L | 'default', routeSegments: TRouteSegment<L>[]) =>
+  `/${routeSegments
+    .map(({ paths }) => getLocalePathFromPaths({ paths, locale }))
+    .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
+    .join('/')}`
+
+/**
  * Get redirects and rewrites for a page
  */
-export const getPageReRoutes = <L extends string>({
-  locales,
-  routeSegments,
-  defaultLocale,
-}: {
-  locales: L[]
-  routeSegments: TRouteSegment<L>[]
-  defaultLocale?: L
-}): TReRoutes => {
+export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegment<L>[]): TReRoutes => {
   /** If there is only one path possible: it is common to all locales and to files. No redirection nor rewrite is needed. */
   if (!routeSegments.some(({ paths }) => Object.keys(paths).length > 1)) {
     return { rewrites: [], redirects: [] }
   }
-
-  /** Get a translated path or base path */
-  const getPath = (locale: L | 'default') =>
-    `/${routeSegments
-      .map(({ paths }) => paths[locale] || paths.default)
-      .filter((pathPart) => pathPart && !ignoreSegmentPathRegex.test(pathPart))
-      .join('/')}`
 
   /** File path in path-to-regexp syntax (cannot be customised in routes data files) */
   const basePath = `/${routeSegments
@@ -80,6 +87,8 @@ export const getPageReRoutes = <L extends string>({
     .filter(Boolean) // Filter out falsy values
     .join('/')}`
 
+  const { locales, defaultLocale } = getNtrData<L>()
+
   /**
    * ```
    * [
@@ -90,73 +99,92 @@ export const getPageReRoutes = <L extends string>({
    * ```
    * Each locale cannot appear more than once. Item is ignored if its path would be the same as basePath.
    */
-  const sourceList = locales.reduce((acc, locale) => {
-    const source = getPath(locale)
-    if (source === basePath) {
-      return acc
-    }
-    const { sourceLocales = [] } = acc.find((sourceItem) => sourceItem.source === source) || {}
-    return [
-      ...acc.filter((sourceItem) => sourceItem.source !== source),
-      { source, sourceLocales: [...sourceLocales, locale] },
-    ]
-  }, [] as { sourceLocales: L[]; source: string }[])
+  const sourceList = locales.reduce(
+    (acc, locale) => {
+      const source = getFullLocalePath(locale, routeSegments)
+      if (source === basePath) {
+        return acc
+      }
+      const { sourceLocales = [] as (L | 'default')[] } = acc.find((sourceItem) => sourceItem.source === source) || {}
+      return [
+        ...acc.filter((sourceItem) => sourceItem.source !== source),
+        { source, sourceLocales: [...sourceLocales, locale] },
+      ]
+    },
+    [{ sourceLocales: ['default'] as (L | 'default')[], source: getFullLocalePath('default', routeSegments) }],
+  )
 
+  /** REDIRECTS */
   const redirects = locales.reduce((acc, locale) => {
-    const localePath = getPath(locale)
+    const localePath = getFullLocalePath(locale, routeSegments)
     const destination = `${locale === defaultLocale ? '' : `/${locale}`}${sourceToDestination(localePath)}`
 
     return [
       ...acc,
-      ...sourceList
-        .filter(({ sourceLocales }) => !sourceLocales.includes(locale))
-        // Redirect from base path so that it does not display the page but only the translated path does
-        .concat(...(localePath === basePath ? [] : [{ sourceLocales: [], source: basePath }]))
-        .reduce((acc, { source: rawSource }) => {
-          const source = `/${locale}${rawSource}`
-          const sourceSegments = source.split('/')
+      ...sourceList.reduce((acc, { sourceLocales, source: rawSource }): Redirect[] => {
+        if (sourceLocales.includes(locale)) {
+          // Do not create a redirect toward the same url
+          return acc
+        }
 
-          // Look for similar redirects
-          const similarIndex = getSimilarIndex(sourceSegments, acc)
+        const source = `/${locale}${rawSource}`
+        const sourceSegments = source.split('/')
 
-          // If similar redirect exist, merge the new one
-          if (similarIndex >= 0) {
-            const similar = acc[similarIndex]
-            const mergedWithSimilar = {
-              ...similar,
-              source: similar.source
-                .split('/')
-                .map((similarSegment, index) =>
-                  sourceSegments[index] === similarSegment
-                    ? similarSegment
-                    : mergeOrRegex(similarSegment, sourceSegments[index]),
-                )
-                .join('/'),
-            }
+        // Look for similar redirects
+        const similarIndex = getSimilarIndex(sourceSegments, acc)
 
-            // Avoid to merge path that would introduce redirect loop
-            if (!pathToRegexp(mergedWithSimilar.source).test(destination)) {
-              return [...acc.slice(0, similarIndex), mergedWithSimilar, ...acc.slice(similarIndex + 1)]
-            }
+        if (!checkRedirectNotLooping({ source, destination, defaultLocale })) {
+          return acc
+        }
+
+        // If similar redirect exist, merge the new one
+        if (similarIndex >= 0) {
+          const similar = acc[similarIndex]
+          const mergedWithSimilar = {
+            ...similar,
+            source: similar.source
+              .split('/')
+              .map((similarSegment, index) =>
+                sourceSegments[index] === similarSegment
+                  ? similarSegment
+                  : mergeOrRegex(similarSegment, sourceSegments[index]),
+              )
+              .join('/'),
           }
 
-          // Else append the new redirect
-          return [
-            ...acc,
-            {
-              source,
-              destination,
-              locale: false as const,
-              permanent: false,
-            },
-          ]
-        }, [] as Redirect[])
-        .filter(({ source, destination }) => sourceToDestination(source) !== destination),
+          if (checkRedirectNotLooping({ source: mergedWithSimilar.source, destination, defaultLocale })) {
+            return [...acc.slice(0, similarIndex), mergedWithSimilar, ...acc.slice(similarIndex + 1)]
+          }
+        }
+
+        // Else append the new redirect
+        return [
+          ...acc,
+          {
+            source,
+            destination,
+            // Avoid errors to become permanent
+            permanent: false,
+            // Take source locale into account
+            locale: false as const,
+            ...(checkNextVersion('>=13.3') && {
+              // Prevent prefetches redirection. See #49 and https://github.com/vercel/next.js/issues/39531
+              missing: [
+                {
+                  type: 'header',
+                  key: 'x-nextjs-data',
+                },
+              ],
+            }),
+          },
+        ]
+      }, [] as Redirect[]),
     ]
   }, [] as Redirect[])
 
   const destination = sourceToDestination(basePath)
 
+  /** REWRITES */
   const rewrites: Rewrite[] = sourceList.reduce((acc, { source }) => {
     if (sourceToDestination(source) === destination) {
       return acc
@@ -203,17 +231,13 @@ export const getPageReRoutes = <L extends string>({
 /**
  * Generate reroutes in route branch to feed the rewrite section of next.config
  */
-export const getRouteBranchReRoutes = <L extends string>({
-  locales,
-  routeBranch: { children, ...routeSegment },
+export const getRouteBranchReRoutes = <L extends TAnyLocale = string>({
+  routeBranch: { children, ...routeSegment } = getNtrData().routesTree,
   previousRouteSegments = [],
-  defaultLocale,
 }: {
-  locales: L[]
-  routeBranch: TRouteBranch<L>
+  routeBranch?: TRouteBranch<L>
   previousRouteSegments?: TRouteSegment<L>[]
-  defaultLocale?: L
-}): TReRoutes => {
+} = {}): TReRoutes => {
   const routeSegments = [...previousRouteSegments, routeSegment]
 
   return children
@@ -221,19 +245,17 @@ export const getRouteBranchReRoutes = <L extends string>({
         (acc, child) => {
           const childReRoutes =
             child.name === 'index'
-              ? getPageReRoutes({ locales, routeSegments, defaultLocale })
+              ? getPageReRoutes(routeSegments)
               : getRouteBranchReRoutes({
-                  locales,
                   routeBranch: child,
                   previousRouteSegments: routeSegments,
-                  defaultLocale,
                 })
           return {
-            redirects: [...acc.redirects, ...childReRoutes.redirects],
-            rewrites: [...acc.rewrites, ...childReRoutes.rewrites],
+            redirects: [...acc.redirects, ...(childReRoutes?.redirects || [])],
+            rewrites: [...acc.rewrites, ...(childReRoutes?.rewrites || [])],
           }
         },
         { redirects: [], rewrites: [] } as TReRoutes,
       )
-    : getPageReRoutes({ locales, routeSegments, defaultLocale })
+    : getPageReRoutes(routeSegments)
 }

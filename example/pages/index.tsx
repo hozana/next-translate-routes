@@ -16,7 +16,7 @@ const IndexPage = () => (
       <Link href="/news">News</Link>
     </p>
     <p>
-      <Link href="/docs/api">Api docs</Link>
+      <Link href="/docs/server">Server docs</Link>
       {' - '}
       <Link href="/docs/client">Client docs</Link>
     </p>

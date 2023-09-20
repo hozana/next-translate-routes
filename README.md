@@ -22,6 +22,7 @@ Translated routing and more for Next using Next regular file-base routing system
     - [Complex paths segments](#complex-paths-segments)
     - [Custom route tree](#custom-route-tree)
     - [Outside Next](#outside-next)
+    - [Fallback languages](#fallback-languages)
 - [Known issue](#known-issues)
   - [Middleware with Next >=12.2.0](#middleware-with-watcher-next-1220)
   - [Optional catch all with rewrites](#optional-catch-all-with-rewrites)
@@ -241,17 +242,17 @@ type NTRConfig = {
 <details>
   <summary>See more about TRouteBranch</summary>
 
-  > If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
-  >
-  > ```ts
-  > /** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
-  > type TRouteBranchEnFr = {
-  >   name: string
-  >   en: string
-  >   fr: string
-  >   children: TRouteBranchEnFr[]
-  > }
-  > ```
+> If `i18n.locales` is set to `['en', 'fr']`, then the `TRouteBranch` generic `L` prop would be `'en' | 'fr'`. A non-generic equivalent of `TRouteBranch<'en' | 'fr'>` would be the following.
+>
+> ```ts
+> /** Non generic version of the TRouteBranch type for better readability, where the generi L prop is set to `'en' | 'fr'` */
+> type TRouteBranchEnFr = {
+>   name: string
+>   en: string
+>   fr: string
+>   children: TRouteBranchEnFr[]
+> }
+> ```
 
 </details>
 
@@ -342,10 +343,10 @@ Ex: given the `/a/[b]/[c]` and `/a/[b]/[c]/d` file paths where `[b]` is ignored 
 Then `/a/bb/11` will be redirected to `/a/bb-11` and `/a/bb/11/d` to `/a/bb-11/d` and that is fine.
 But then `/a/bb-11/d` will match `/a/:b-:c` and be redirected to `/a/bb-11-d` and that is not fine!
 
-To handle this case, one can add a path-to-regex pattern to the default ignore token: `.(\\d+)`, or `.(\[\^-\]+)`, or `.(\what|ever\)`.
+To handle this case, one can add a path-to-regex pattern to the default ignore token: `.(\\d+)`, or `.(\[\^-\]+)`, or `.(what|ever)`.
 This path-to-regex pattern will be added after the segment name in the redirect.
 `/a/:b(\[\^-\]+)/:c` => `/a/:b-:c` and `/a/:b(\[\^-\]+)/:c/d` => `/a/:b-:c/d`
-Then `/a/bb-11/d` will no more match `/a/[b]/[c]` (`/a/:b(\[\^-\]+)/:c`).
+Then `/a/bb-11/d` will no more match `/a/[b]/[c]` (`/a/:b(\[\^-\]+)/:c`). `#ignorePattern`
 
 ⚠️ This is only handled in default paths (i.e. `"/": ".(\\d+)"` or `"/": { "default": ".(\\d+)" }`), not in lang-specific paths.
 
@@ -431,27 +432,21 @@ You will have to execute createNtrData in a node script and store the result som
 
 ```typescript
 // nextRouterMock.ts
-
-import { RouterContext } from 'next/dist/shared/lib/router-context'
 import withTranslateRoutes from 'next-translate-routes'
+import { RouterContext } from 'next/dist/shared/lib/router-context'
 import ntrData from 'path/to/your/ntrData'
 
-  //[...]
+//[...]
 
-  const RouteTranslationsProvider = withTranslateRoutes(
-    ntrData,
-    ({ children }) => <>{children}</>,
-  )
+const RouteTranslationsProvider = withTranslateRoutes(ntrData, ({ children }) => <>{children}</>)
 
-  const TranslatedRoutesProvider = ({ children }) => (
-    <RouterContext.Provider value={routerMock}>
-      <RouteTranslationsProvider router={routerMock}>
-        {children}
-      </RouteTranslationsProvider>
-    </RouterContext.Provider>
-  )
+const TranslatedRoutesProvider = ({ children }) => (
+  <RouterContext.Provider value={routerMock}>
+    <RouteTranslationsProvider router={routerMock}>{children}</RouteTranslationsProvider>
+  </RouterContext.Provider>
+)
 
-  // [...]
+// [...]
 ```
 
 For Storybook, this piece of code can be used to create a decorator function:
@@ -470,17 +465,16 @@ export const WithNextRouter: DecoratorFn = (Story, context): JSX.Element => (
 
 ```typescript
 // nextRouterMock.ts
-
-import { RouterContext } from 'next/dist/shared/lib/router-context'
 import withTranslateRoutes from 'next-translate-routes'
+import { RouterContext } from 'next/dist/shared/lib/router-context'
 
-  //[...]
+//[...]
 
-  const RouteTranslationsProvider = withTranslateRoutes(({ children }) => <>{children}</>)
+const RouteTranslationsProvider = withTranslateRoutes(({ children }) => <>{children}</>)
 
-  // TranslatedRoutesProvider is the same as in the manually paragraph above
+// TranslatedRoutesProvider is the same as in the manually paragraph above
 
-  // [...]
+// [...]
 ```
 
 Then all you have to do is to add this rule in your webpack config:
@@ -501,13 +495,53 @@ module.exports = ({ config }) => {
       options: { data: createNtrData(nextConfig) },
     },
   })
-  
+
   return config
 }
-
 ```
 
 > ⚠️ Warning! The rule `test` should only match the file where `withTranslateRoutes` is used! If you cannot, then set the `mustMatch` loader option to `false`.
+
+### Fallback languages
+
+You can define fallback languages in next-translate-routes config [as you would in i18next](https://www.i18next.com/principles/fallback#fallback-to-different-languages), using `fallbackLng`, that can take either a string (ex: `'fr'`), an array (ex: `['fr', 'en']`), or an object (ex: `{ default: ['en'], 'de-CH': ['fr'] }`), but unlike i18next, `fallbackLng` cannot be a function.
+
+```javascript
+// next.config.js
+const withTranslateRoutes = require('next-translate-routes')
+
+module.exports = withTranslateRoutes({
+  // Next i18n config (mandatory): https://nextjs.org/docs/advanced-features/i18n-routing
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'fr', 'de', 'de-AT', 'de-DE', 'de-CH'],
+  },
+
+  translateRoutes: {
+    fallbackLng: {
+      default: ['en'],
+      'de-AT': ['de'],
+      'de-DE': ['de'],
+      'de-CH': ['de', 'fr'],
+    },
+  },
+
+  // ...Remaining next config
+})
+```
+
+It can avoid having `routes.json` files looking like:
+
+```json
+{
+  "/": {
+    "de": "produkt",
+    "de-AT": "produkt",
+    "de-DE": "produkt",
+    "de-CH": "produkt"
+  }
+}
+```
 
 ## Known issues
 
@@ -527,7 +561,7 @@ So if you want to use a middleware with Next >= 12.2.0, you need to remove any w
 
 ### With @sentry/nextjs
 
-@sentry/nextjs inject a webpack loader that replaces all pages content with a proxy, including _app. If it does it before next-translate-routes loader execution, the latter won't be able to do its job.
+@sentry/nextjs inject a webpack loader that replaces all pages content with a proxy, including \_app. If it does it before next-translate-routes loader execution, the latter won't be able to do its job.
 
 So the wrapping order in next.config.js is important!
 
