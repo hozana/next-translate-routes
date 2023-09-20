@@ -1,5 +1,4 @@
 import type { NextComponentType } from 'next'
-import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime'
 import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import React, { useMemo } from 'react'
@@ -8,6 +7,15 @@ import { setNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TNtrData } from '../types'
 import { enhanceNextRouter } from './enhanceNextRouter'
+
+// TODO: Remove dynamic import for RouterContext to remove backwards compability
+let RouterContext: React.Context<NextRouter | null>
+try {
+  RouterContext = require('next/dist/shared/lib/router-context.shared-runtime').RouterContext
+} catch (e) {
+  console.error(e)
+  RouterContext = require('next/dist/shared/lib/router-context').RouterContext
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TWrappedAppComponent = NextComponentType<AppContextType<NextRouter>, AppInitialProps, any>
