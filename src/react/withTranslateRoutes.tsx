@@ -1,5 +1,5 @@
 import type { NextComponentType } from 'next'
-import { RouterContext } from 'next/dist/shared/lib/router-context'
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime'
 import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import React, { useMemo } from 'react'

@@ -19,7 +19,7 @@ export const isRoutesFileName = (fileName: string, routesDataFileName?: string) 
  * Get pages dir, trying both .pages (next < 13) and .pagesDir (next >= 13) syntaxes
  */
 export const getPagesDir = () => {
-  const pagesDirs = findPagesDir(process.cwd(), false)
+  const pagesDirs = findPagesDir(process.cwd())
   const pagesDir = (pagesDirs as Record<string, string | undefined>).pages || pagesDirs.pagesDir
 
   if (!pagesDir) {

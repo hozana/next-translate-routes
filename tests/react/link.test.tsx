@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { render } from '@testing-library/react'
-import { RouterContext } from 'next/dist/shared/lib/router-context'
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime'
 import React from 'react'
 
 import { Link } from '../../src/link'
@@ -45,7 +45,7 @@ describe('Link', () => {
     expect(push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
       '/en/root/community/300-three-hundred/statistics?baz=3',
-      { locale: 'en', scroll: undefined, shallow: undefined },
+      { locale: 'en', scroll: true, shallow: undefined },
     )
   })
 
@@ -80,7 +80,7 @@ describe('Link', () => {
     expect(push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
       '/communaute/300-three-hundred/statistiques?baz=3',
-      { locale: 'fr', scroll: undefined, shallow: undefined },
+      { locale: 'fr', scroll: true, shallow: undefined },
     )
   })
 
@@ -107,7 +107,7 @@ describe('Link', () => {
     expect(push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
       '/en/root/community/300-three-hundred/statistics?baz=3',
-      { locale: 'en', scroll: undefined, shallow: undefined },
+      { locale: 'en', scroll: true, shallow: undefined },
     )
   })
 
@@ -136,7 +136,7 @@ describe('Link', () => {
     expect(push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
       '/communaute/300-three-hundred/statistiques?baz=3',
-      { locale: 'fr', scroll: undefined, shallow: undefined },
+      { locale: 'fr', scroll: true, shallow: undefined },
     )
   })
 })
