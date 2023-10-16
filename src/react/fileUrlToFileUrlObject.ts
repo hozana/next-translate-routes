@@ -16,38 +16,21 @@ import type { TRouteBranch } from '../types'
 import { parseUrl } from './parseUrl'
 
 /**
- * Get the route branch name from a route branch based on the locale or the name if no value for locale is found
- */
-const getRouteBranchName = (routeBranch: TRouteBranch, locale: string) => {
-  if (!routeBranch?.name && routeBranch?.paths?.[locale]) {
-    return ''
-  }
-
-  if (routeBranch?.paths?.[locale]) {
-    return routeBranch?.paths?.[locale]
-  }
-
-  if (routeBranch?.name) {
-    return routeBranch?.name
-  }
-
-  return ''
-}
-
-/**
  * Recursively get path file UrlObject from a route branch
  */
 const getFileUrlObject = ({
   routeBranch,
   pathParts,
   locale,
+  depth = 0,
 }: {
   routeBranch: TRouteBranch
   /** Remaining path parts after the `routeBranch` path parts */
   pathParts: string[]
   locale: string
+  depth?: number
 }): { pathname: string; query?: ParsedUrlQuery } => {
-  const routeBranchName = getRouteBranchName(routeBranch, locale)
+  const routeBranchName = routeBranch?.paths?.[locale] || routeBranch?.name || ''
 
   if (pathParts.length === 0) {
     const optionalMatchAllChild = routeBranch.children?.find((child) =>
@@ -115,7 +98,10 @@ const getFileUrlObject = ({
       }
 
       return {
-        pathname: `${routeBranchName ? `/${routeBranchName}` : ''}/${matchingChild.name}`,
+        pathname:
+          depth > 0
+            ? `${routeBranchName ? `/${routeBranchName}` : ''}/${matchingChild.name}`
+            : `/${matchingChild.name}`,
         query,
       }
     }
@@ -124,9 +110,10 @@ const getFileUrlObject = ({
       routeBranch: matchingChild,
       pathParts: remainingPathParts,
       locale,
+      depth: depth + 1,
     })
 
-    const pathname = `${routeBranchName ? `/${routeBranchName}` : ''}${nextPathname}`
+    const pathname = depth > 0 ? `${routeBranchName ? `/${routeBranchName}` : ''}${nextPathname}` : `${nextPathname}`
 
     const query =
       isExactMatch || !dynamicPathPartKey
