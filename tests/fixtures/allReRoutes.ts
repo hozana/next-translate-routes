@@ -237,6 +237,14 @@ export default {
       source: '/es/actualites/:newsPathPart+',
       destination: '/es/news/:newsPathPart+',
     },
+    {
+      source: '/fr/root/:anyPathPart+',
+      destination: '/fr/:anyPathPart+',
+    },
+    {
+      source: '/es/root/:anyPathPart+',
+      destination: '/es/:anyPathPart+',
+    },
   ].map((redirect) => ({
     locale: false,
     missing: [
@@ -349,6 +357,10 @@ export default {
     {
       source: '/actualites/:newsPathPart+',
       destination: '/news/:newsPathPart+',
+    },
+    {
+      destination: '/:anyPathPart+',
+      source: '/root/:anyPathPart+',
     },
   ].map((rewrite) => ({
     ...rewrite,

@@ -62,6 +62,9 @@ export const dynamicFilepathPartRegex = /^\[(?!\.{3})([^/[\]?#]*)\]$/
 /** Ex: `'[slug]'` => `'slug'` but `'[...pathParts]'` => `null` and '`pathPart'` => `null` */
 export const getDynamicPathPartKey = (pathPart: string) => dynamicFilepathPartRegex.exec(pathPart)?.[1] || null
 
+/** Ex: `'[slug]'` => `'slug'` and `'[...pathParts]'` => `pathParts` but '`pathPart'` => `null` */
+export const getAnyDynamicPathPartKey = (pathPart: string) => anyDynamicFilepathPartRegex.exec(pathPart)?.[1] || null
+
 /**
  * Match all `[slug]` parts but neither `[...pathParts]` parts nor `[[...pathParts]]` parts
  */
