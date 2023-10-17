@@ -314,5 +314,13 @@ export default {
       source: '/actualites/:newsPathPart+',
       destination: '/news/:newsPathPart+',
     },
-  ],
+  ].map((rewrite) => ({
+    ...rewrite,
+    missing: [
+      {
+        type: 'header',
+        key: 'x-nextjs-data',
+      },
+    ],
+  })),
 }

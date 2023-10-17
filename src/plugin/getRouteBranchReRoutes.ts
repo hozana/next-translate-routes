@@ -9,14 +9,22 @@ import { fileNameToPath } from './fileNameToPaths'
 import { getLocalePathFromPaths } from './getPathFromPaths'
 
 /** Prevent prefetches redirections and rewrites. See #49 and https://github.com/vercel/next.js/issues/39531 */
-const nextjsDataHeaderCheck: Pick<Redirect, 'missing'> | false = checkNextVersion('>=13.3') && {
-  missing: [
-    {
-      type: 'header',
-      key: 'x-nextjs-data',
-    },
-  ],
-}
+const getNextjsDataHeaderCheck = (): Pick<Redirect, 'missing'> | false =>
+  checkNextVersion('>=13.3') && {
+    missing: [
+      {
+        type: 'header',
+        key: 'x-nextjs-data',
+      },
+    ],
+  }
+
+console.log(
+  'From getRouteBranchReRoutes, nextjsDataHeaderCheck:',
+  getNextjsDataHeaderCheck(),
+  'process.env?.npm_package_dependencies_next:',
+  process.env?.npm_package_dependencies_next,
+)
 
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
@@ -127,7 +135,8 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
   /** REDIRECTS */
   const redirects = locales.reduce((acc, locale) => {
     const localePath = getFullLocalePath(locale, routeSegments)
-    const destination = `${locale === defaultLocale ? '' : `/${locale}`}${sourceToDestination(localePath)}`
+    const prefix = locale === defaultLocale ? '' : `/${locale}`
+    const destination = `${prefix}${sourceToDestination(localePath)}`
 
     return [
       ...acc,
@@ -177,7 +186,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
             permanent: false,
             // Take source locale into account
             locale: false as const,
-            ...nextjsDataHeaderCheck,
+            ...getNextjsDataHeaderCheck(),
           },
         ]
       }, [] as Redirect[]),
@@ -223,7 +232,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
       {
         source,
         destination,
-        ...nextjsDataHeaderCheck,
+        ...getNextjsDataHeaderCheck(),
       },
     ]
   }, [] as Rewrite[])

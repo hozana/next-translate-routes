@@ -52,6 +52,12 @@ export default {
       {
         source: '/(firstPart|1st|premier)/:secondPart(\\d+)/(thirdPart|troisieme)',
         destination: '/first/:secondPart/thirdPart',
+        missing: [
+          {
+            type: 'header',
+            key: 'x-nextjs-data',
+          },
+        ],
       },
     ],
   },
