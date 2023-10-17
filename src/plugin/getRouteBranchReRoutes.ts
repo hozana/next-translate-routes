@@ -8,11 +8,21 @@ import { checkNextVersion } from './checkNextVersion'
 import { fileNameToPath } from './fileNameToPaths'
 import { getLocalePathFromPaths } from './getPathFromPaths'
 
+/** Prevent prefetches redirections and rewrites. See #49 and https://github.com/vercel/next.js/issues/39531 */
+const nextjsDataHeaderCheck: Pick<Redirect, 'missing'> | false = checkNextVersion('>=13.3') && {
+  missing: [
+    {
+      type: 'header',
+      key: 'x-nextjs-data',
+    },
+  ],
+}
+
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
   sourcePath.replace(/[{}]|(:\w+)\([^)]+\)/g, (_match, arg) => arg || '')
 
-const staticSegmentRegex = /^[\w-_]+$|^\([\w-_|]+\)$/
+const staticSegmentRegex = /^[\w-]+$|^\([\w|-]+\)$/
 
 /**
  * Find index of a similar redirect/rewrite
@@ -43,7 +53,7 @@ const getSimilarIndex = <R extends Redirect | Rewrite>(sourceSegments: string[],
  * mergeOrRegex('(one|two|tree)', 'tree') => '(one|two|tree)'
  */
 const mergeOrRegex = (existingRegex: string, newPossiblity: string) => {
-  const existingPossibilities = existingRegex.replace(/\(|\)/g, '').split('|')
+  const existingPossibilities = existingRegex.replace(/[()]/g, '').split('|')
   return existingPossibilities.includes(newPossiblity)
     ? existingRegex
     : `(${[...existingPossibilities, newPossiblity].join('|')})`
@@ -80,7 +90,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
   /** File path in path-to-regexp syntax (cannot be customised in routes data files) */
   const basePath = `/${routeSegments
     .map(({ name, paths: { default: defaultPath } }) => {
-      const match = defaultPath.match(ignoreSegmentPathRegex) || []
+      const match = ignoreSegmentPathRegex.exec(defaultPath) || []
       // If a pattern is added to the ignore token ".", add it behind #ignorePattern
       return fileNameToPath(name) + (match[1] || '')
     })
@@ -167,15 +177,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
             permanent: false,
             // Take source locale into account
             locale: false as const,
-            ...(checkNextVersion('>=13.3') && {
-              // Prevent prefetches redirection. See #49 and https://github.com/vercel/next.js/issues/39531
-              missing: [
-                {
-                  type: 'header',
-                  key: 'x-nextjs-data',
-                },
-              ],
-            }),
+            ...nextjsDataHeaderCheck,
           },
         ]
       }, [] as Redirect[]),
@@ -207,7 +209,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
             .map((similarSegment, index) =>
               similarSegment === sourceSegments[index]
                 ? similarSegment
-                : `(${similarSegment.replace(/\(|\)/g, '').split('|').concat(sourceSegments[index]).join('|')})`,
+                : `(${similarSegment.replace(/[()]/g, '').split('|').concat(sourceSegments[index]).join('|')})`,
             )
             .join('/'),
         },
@@ -221,6 +223,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
       {
         source,
         destination,
+        ...nextjsDataHeaderCheck,
       },
     ]
   }, [] as Rewrite[])
