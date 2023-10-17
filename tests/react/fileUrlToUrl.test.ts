@@ -25,9 +25,9 @@ describe('fileUrlToUrl', () => {
       } as Window & typeof globalThis),
   )
 
-  const testDataItems: { urlObject: UrlObject & { pathname: string }; translation: string; locale?: string }[] = [
+  const testDataItems: { url: string | (UrlObject & { pathname: string }); translation: string; locale?: string }[] = [
     {
-      urlObject: {
+      url: {
         pathname: '/',
         query: { baz: 3 },
         hash: 'section',
@@ -35,7 +35,7 @@ describe('fileUrlToUrl', () => {
       translation: '?baz=3#section',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/community/[communityId]/[communitySlug]/statistics',
         query: { communityId: 300, communitySlug: 'three-hundred', baz: 3 },
         hash: 'section',
@@ -43,21 +43,21 @@ describe('fileUrlToUrl', () => {
       translation: '/communaute/300-three-hundred/statistiques?baz=3#section',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/communities/[[...tagSlug]]',
         query: { baz: 3 },
       },
       translation: '/communautes?baz=3',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/news/[...newsPathPart]',
         query: { newsPathPart: ['a'] },
       },
       translation: '/actualites/a',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/news/[...newsPathPart]',
         query: { newsPathPart: ['a'] },
       },
@@ -65,21 +65,21 @@ describe('fileUrlToUrl', () => {
       translation: '/fr-BE/actualites/a',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/news/[...newsPathPart]',
         query: { newsPathPart: ['a', 'b'] },
       },
       translation: '/actualites/a/b',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/news/[...newsPathPart]',
         query: { newsPathPart: 'a' },
       },
       translation: '/actualites/a',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/catch-all-or-none/[[...path]]',
         query: { path: [], baz: 3 },
         hash: 'section',
@@ -88,7 +88,7 @@ describe('fileUrlToUrl', () => {
       translation: '/en/root/catch-all-or-none?baz=3#section',
     },
     {
-      urlObject: {
+      url: {
         pathname: '/catch-all/[...path]',
         query: { path: ['foo', 'bar'], baz: 3 },
         hash: 'section',
@@ -96,8 +96,13 @@ describe('fileUrlToUrl', () => {
       locale: 'en',
       translation: '/en/root/catch-all/foo/bar?baz=3#section',
     },
+    {
+      url: '/catch-all/stuff',
+      locale: 'fr',
+      translation: '/tout/stuff',
+    },
   ]
-  testDataItems.forEach(({ urlObject, translation, locale = 'fr' }) => {
+  testDataItems.forEach(({ url: urlObject, translation, locale = 'fr' }) => {
     const titleInput = JSON.stringify(urlObject)
     test(`fileUrlToUrl: ${titleInput}`, () => {
       expect(fileUrlToUrl(urlObject, locale)).toEqual(translation)

@@ -203,7 +203,7 @@ describe('urlToFileUrl', () => {
     },
     {
       url: '/communaute/300/statistiques',
-      urlObject: undefined,
+      urlObject: { pathname: '/[...anyPathPart]', query: { anyPathPart: ['communaute', '300', 'statistiques'] } },
       locale: 'fr',
     },
   ]

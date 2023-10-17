@@ -181,6 +181,12 @@
           }
         }
       ]
+    },
+    {
+      "name": "[...anyPathPart]",
+      "paths": {
+        "default": ":anyPathPart+"
+      }
     }
   ]
 }

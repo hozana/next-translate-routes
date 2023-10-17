@@ -5,7 +5,7 @@ import { getNtrData } from '../shared/ntrData'
 import {
   anyDynamicFilepathPartRegex,
   dynamicFilepathPartsRegex,
-  getDynamicPathPartKey,
+  getAnyDynamicPathPartKey,
   optionalMatchAllFilepathPartRegex,
   spreadFilepathPartRegex,
 } from '../shared/regex'
@@ -68,7 +68,7 @@ const getFileUrlObject = ({
   if (matchingChild) {
     /** If we found an exact match, no need to add query */
     const isExactMatch = matchingChild.name === nextPathPart
-    const dynamicPathPartKey = getDynamicPathPartKey(matchingChild.name)
+    const dynamicPathPartKey = getAnyDynamicPathPartKey(matchingChild.name)
 
     const { pathname: nextPathname, query: nextQuery } = getFileUrlObject({
       routeBranch: matchingChild,
