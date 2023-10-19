@@ -8,7 +8,7 @@ import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
 
 export const isRoutesFileName = (fileName: string, routesDataFileName?: string) => {
-  const fileNameNoExt = fileName.match(/^(.+)\.(json|yaml)$/)?.[1]
+  const fileNameNoExt = /^(.+)\.(json|yaml)$/.exec(fileName)?.[1]
   return (
     fileNameNoExt &&
     (routesDataFileName ? fileNameNoExt === routesDataFileName : DEFAULT_ROUTES_DATA_FILE_NAMES.includes(fileNameNoExt))
@@ -19,6 +19,7 @@ export const isRoutesFileName = (fileName: string, routesDataFileName?: string) 
  * Get pages dir, trying both .pages (next < 13) and .pagesDir (next >= 13) syntaxes
  */
 export const getPagesDir = () => {
+  // @ts-expect-error: support previous Next versions
   const pagesDirs = findPagesDir(process.cwd(), false)
   const pagesDir = (pagesDirs as Record<string, string | undefined>).pages || pagesDirs.pagesDir
 
