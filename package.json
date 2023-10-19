@@ -18,15 +18,14 @@
     "dynamic"
   ],
   "scripts": {
-    "build:clear": "yon rimraf plugin react shared ./*.d.ts ./*.js.map ./*.js",
+    "build:clear": "yon rimraf 'plugin' 'react' 'shared' './*.d.ts' './*.js.map' './*.js'",
     "build": "yon build:clear && yon tsc",
-    "format": "yarn prettier -c --write .",
+    "format": "yon prettier -c --write .",
     "lint": "yon eslint --ignore-path .gitignore .",
     "test": "jest",
     "prerelease": "yon lint && yon build",
     "release": "npx np",
-    "prestart": "yon --cwd ./example install && yon --cwd ./example build",
-    "start": "yon --cwd ./example start"
+    "start": "yon install && yon build && cd ./example && yon install && yon build && yon start"
   },
   "dependencies": {
     "path-to-regexp": "^6.2.0",

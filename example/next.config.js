@@ -14,6 +14,7 @@ const nextConfig = withTranslateRoutes({
   webpack(config) {
     // Needed to avoid conflicts between example's react and next-translate-routes react
     config.resolve.alias.react = path.resolve('../node_modules/react')
+    config.infrastructureLogging = { level: 'error' }
     return config
   },
 

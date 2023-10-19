@@ -19,13 +19,6 @@ const getNextjsDataHeaderCheck = (): Pick<Redirect, 'missing'> | false =>
     ],
   }
 
-console.log(
-  'From getRouteBranchReRoutes, nextjsDataHeaderCheck:',
-  getNextjsDataHeaderCheck(),
-  'process.env?.npm_package_dependencies_next:',
-  process.env?.npm_package_dependencies_next,
-)
-
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
   sourcePath.replace(/[{}]|(:\w+)\([^)]+\)/g, (_match, arg) => arg || '')

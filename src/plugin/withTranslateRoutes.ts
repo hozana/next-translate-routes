@@ -16,7 +16,7 @@ import { getAllRoutesFiles } from './routesFiles'
  * - then by descending number of path segments
  */
 const sortBySpecificity = <R extends Redirect | Rewrite>(rArray: R[]): R[] =>
-  rArray.sort((a, b) => {
+  [...rArray].sort((a, b) => {
     if (a.source.includes(':') && !b.source.includes(':')) {
       return 1
     }
@@ -73,7 +73,7 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
       }
       config.module.rules.push({
         test: new RegExp(
-          `${pagesPath.replace(/\\|\//g, '(\\\\|\\/)')}_app\\.(${context.config.pageExtensions.join('|')})$`,
+          `${pagesPath.replace(/[/\\]/g, '(\\\\|\\/)')}_app\\.(${context.config.pageExtensions.join('|')})$`,
         ),
         use: {
           loader: 'next-translate-routes/loader',
