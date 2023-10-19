@@ -22,15 +22,13 @@ export type TNtrData<L extends TAnyLocale = string> = {
   defaultLocale: L
   locales: L[]
   routesTree: TRouteBranch<L>
-  fallbackLng?: TFallbackLng | undefined
+  fallbackLng?: TFallbackLng
 }
 
 export type NTRConfig = {
-  debug?: boolean
   routesDataFileName?: string
-  routesTree?: TRouteBranch
   pagesDirectory?: string
-}
+} & Pick<TNtrData, 'debug' | 'routesTree'>
 
 export type NTRI18NConfig = {
   fallbackLng?: TFallbackLng

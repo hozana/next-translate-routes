@@ -10,7 +10,7 @@ import { getLocalePathFromPaths } from './getPathFromPaths'
 
 /** Prevent prefetches redirections and rewrites. See #49 and https://github.com/vercel/next.js/issues/39531 */
 const getNextjsDataHeaderCheck = (): Pick<Redirect, 'missing'> | false =>
-  checkNextVersion('>=13.3') && {
+  checkNextVersion('>=13.3.0') && {
     missing: [
       {
         type: 'header',
