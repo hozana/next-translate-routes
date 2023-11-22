@@ -1,0 +1,9 @@
+{
+  "/": ".",
+  "[side]": {
+    "default": ":side(heads|tails)",
+    "en": ":side(heads|tails)",
+    "es": ":side(cara|cruz)",
+    "fr": ":side(pile|face)"
+  }
+}

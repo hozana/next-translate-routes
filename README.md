@@ -12,6 +12,7 @@ Translated routing and more for Next using Next regular file-base routing system
     3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-_app-component-with-the-withtranslateroutes-hoc)
     4. [Use `next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
     5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
+    6. [Use a middleware to redirect from urls prefixed by default locale]
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
     - [Translate/untranslate urls](#translateuntranslate-urls)
@@ -222,6 +223,16 @@ import singletonRouter from 'next-translate-routes/router'
 import singletonRouter from 'next/router'
 ```
 
+#### 6. Use a middleware to redirect from urls with the default locale prefix
+
+If `en` is the default locale for example, you probably will want to:
+
+- either redirect `/en` to `/` and `/en/anywhere` to `/anywhere`,
+- or redirect from `/` to `/en` and `/anywhere` to `/en/anywhere`.
+
+This is complex: next-translate-routes cannot handle this without creating a looping redirect.
+The only way to do this seems to be using the middleware, as stated [here](https://github.com/vercel/next.js/discussions/18419#discussioncomment-1561577).
+
 ### Advanced usage
 
 Check the example folder to see some advanced techniques in action.
@@ -313,6 +324,28 @@ See [@JacbSoderblom's suggestion](https://github.com/hozana/next-translate-route
 ```
 
 For a catch all route: `"[...path]": ":path*"`.
+
+You can use a constrained dynamic path segment in the root of your application too.
+
+```none
+/pages/
+ ├ [side]/
+ | ├ index.tsx
+ | └ _routes.yml
+ ├ somewhere.tsx
+ └ _app.tsx
+
+```
+
+```yml
+# /pages/[side]/_routes.yml
+---
+"/":
+  default: :side(heads|tails) # Important!
+  en: :side(heads|tails)
+  fr: :side(pile|face)
+  es: :side(cara|cruz)
+```
 
 #### Ignoring a path part
 

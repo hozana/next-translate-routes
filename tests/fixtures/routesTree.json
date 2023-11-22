@@ -151,6 +151,23 @@
     {
       "children": [
         {
+           "name": "[side]",
+           "paths": {
+             "default": ":side(heads|tails)",
+             "en": ":side(heads|tails)",
+             "es": ":side(cara|cruz)",
+             "fr": ":side(pile|face)"
+           }
+         }
+       ],
+       "name": "ignored",
+       "paths": {
+         "default": "."
+       }
+     },
+    {
+      "children": [
+        {
           "name": "favorites",
           "paths": {
             "default": "favorites",

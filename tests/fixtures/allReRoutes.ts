@@ -178,6 +178,26 @@ export default {
       destination: '/es/comunidad/:communityId-:communitySlug/estadisticas',
     },
     {
+      destination: '/root/:side',
+      source: '/en/:side(heads|tails)',
+    },
+    {
+      destination: '/root/:side',
+      source: '/en/:side(pile|face)',
+    },
+    {
+      destination: '/root/:side',
+      source: '/en/:side(cara|cruz)',
+    },
+    {
+      destination: '/fr/:side',
+      source: '/fr/root/:side(heads|tails)',
+    },
+    {
+      destination: '/es/:side',
+      source: '/es/root/:side(heads|tails)',
+    },
+    {
       source: '/en/(my-account|mon-compte|mi-cuenta)/(favorites|favoris|favorito)',
       destination: '/root/my-account/favoris',
     },
@@ -297,6 +317,22 @@ export default {
     {
       source: '/root/community/:communityId(\\d+){-:communitySlug}/statistics',
       destination: '/community/:communityId/:communitySlug/statistics',
+    },
+    {
+      destination: '/ignored/:side',
+      source: '/:side(heads|tails)',
+    },
+    {
+      destination: '/ignored/:side',
+      source: '/root/:side(heads|tails)',
+    },
+    {
+      destination: '/ignored/:side',
+      source: '/:side(pile|face)',
+    },
+    {
+      destination: '/ignored/:side',
+      source: '/:side(cara|cruz)',
     },
     {
       source: '/root/my-account/favoris',
