@@ -10,6 +10,12 @@ import { translatePushReplaceArgs } from './translatePushReplaceArgs'
 export const Link: typeof NextLink = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ href, as, locale, ...props }, ref) => {
     const router = useNextRouter()
+
+    if (typeof href === 'string' && /^\w+:/.test(href) && !href.startsWith('http')) {
+      // mailto:..., tel:..., etc.
+      return <NextLink {...{ href, as, locale, ref, ...props }} />
+    }
+
     const translatedArgs = translatePushReplaceArgs({ router, url: href, as, locale })
 
     return (

@@ -65,6 +65,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
       <footer id="footer">
         <hr />
         <blockquote>{`locale: ${locale}, pathname: ${pathname}, query: ${JSON.stringify(query)}`}</blockquote>
+        Mail: <Link href="mailto:toto@acme.org">toto@acme.org</Link>
       </footer>
     </div>
   )

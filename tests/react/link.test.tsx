@@ -138,4 +138,16 @@ describe('Link', () => {
       { locale: 'fr-BE', scroll: true, shallow: undefined },
     )
   })
+
+  test('mailo link', () => {
+    const { container } = render(
+      <RouterContext.Provider value={routerContext}>
+        <Link href="mailto:toto@acme.org">toto@acme.org</Link>
+      </RouterContext.Provider>,
+    )
+
+    expect(routerContext.push).not.toHaveBeenCalled()
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('mailto:toto@acme.org')
+    expect(routerContext.push).not.toHaveBeenCalled()
+  })
 })
