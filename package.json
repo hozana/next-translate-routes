@@ -24,7 +24,7 @@
     "lint": "yon eslint --ignore-path .gitignore .",
     "test": "jest",
     "prerelease": "yon lint && yon build",
-    "release": "npx np",
+    "release": "npx release-it",
     "start": "yon install && yon build && cd ./example && yon install && yon build && yon start"
   },
   "dependencies": {
@@ -61,7 +61,6 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "jest": "^27.4.5",
     "next": "^13.5.5",
-    "np": "^7.7.0",
     "prettier": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
