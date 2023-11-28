@@ -75,7 +75,7 @@ const getFileUrlObject = ({
       pathParts: remainingPathParts,
     })
 
-    const pathname = `${routeBranch.name ? `/${routeBranch.name}` : ''}${nextPathname}`
+    const pathname = (routeBranch.name ? `/${routeBranch.name}` : '') + nextPathname
     const query =
       isExactMatch || !dynamicPathPartKey
         ? nextQuery

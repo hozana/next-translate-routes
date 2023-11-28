@@ -1,6 +1,6 @@
 import type { PrefetchOptions } from 'next/dist/shared/lib/router/router'
+import { formatUrl } from 'next/dist/shared/lib/router/utils/format-url'
 import { NextRouter, SingletonRouter } from 'next/router'
-import { stringify as stringifyQuery } from 'querystring'
 
 import { getNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
@@ -50,17 +50,7 @@ const enhancePrefetch =
       logWithTrace('router.prefetch', { inputUrl, asPath, options, parsedInputUrl, locale })
     }
 
-    return router.prefetch(
-      parsedInputUrl
-        ? (parsedInputUrl.pathname || '/') +
-            (parsedInputUrl.query &&
-              `?${
-                typeof parsedInputUrl.query === 'string' ? parsedInputUrl.query : stringifyQuery(parsedInputUrl.query)
-              }`)
-        : inputUrl,
-      asPath,
-      options,
-    )
+    return router.prefetch(parsedInputUrl ? formatUrl(parsedInputUrl) : inputUrl, asPath, options)
   }
 
 export const enhanceNextRouter = <R extends NextRouter | SingletonRouter>(router: R) => {
