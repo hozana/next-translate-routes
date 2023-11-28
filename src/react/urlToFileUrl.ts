@@ -1,3 +1,4 @@
+import { ParsedUrl } from 'next/dist/shared/lib/router/utils/parse-url'
 import { Key as PtrKey, match as ptrMatch, parse as ptrParse } from 'path-to-regexp'
 import type { ParsedUrlQuery } from 'querystring'
 import type { UrlObject } from 'url'
@@ -15,7 +16,11 @@ enum MATCH_TYPE {
   MATCHALL = 'match-all',
 }
 
-type TParsedPathParts = { additionalQuery: ParsedUrlQuery; parsedPathParts: string[]; firstMatchType: MATCH_TYPE }
+type TParsedPathParts = {
+  additionalQuery: ParsedUrlQuery
+  parsedPathParts: string[]
+  firstMatchType: MATCH_TYPE
+}
 
 const getEndFilepathParts = ({ children = [] }: TRouteBranch, locale: string): TParsedPathParts | undefined => {
   for (const child of children) {
@@ -35,7 +40,7 @@ const getEndFilepathParts = ({ children = [] }: TRouteBranch, locale: string): T
     if (optionalMatchAllToken) {
       return {
         parsedPathParts: [child.name],
-        additionalQuery: { [optionalMatchAllToken.name]: [] },
+        additionalQuery: {},
         firstMatchType: MATCH_TYPE.MATCHALL,
       }
     }
@@ -133,7 +138,6 @@ export const parsePathParts = ({
     if (isIgnorePathPattern) {
       // It is path-ignored, let's unshift (hight priority) it among the delayedCandidates
       delayedCandidates.unshift({ candidate, isPathIgnored: true })
-      continue
     } else if (
       ptrParse(path).some((ptrToken) => typeof ptrToken === 'object' && ['+', '*'].includes(ptrToken.modifier))
     ) {
@@ -183,7 +187,7 @@ export const parsePathParts = ({
       // 3. If we are here, it means that we did not find any static match, even among path-ignored candidates descendants,
       // because we sorted the candidates in the delayedCandidates array: first the path-ignored candidates, then the dynamic ones.
       const path = getLocalePathFromPaths({ paths: candidate.paths, locale })
-      const match = ptrMatch<ParsedUrlQuery>(path)(currentPathPart)
+      const match = ptrMatch<Record<string, string>>(path)(currentPathPart)
       if (match) {
         // It matches! But does its children match too?
         const childrenParsedPathParts = parsePathParts({ locale, pathParts: nextPathParts, routeBranch: candidate })
@@ -209,7 +213,7 @@ export const parsePathParts = ({
   if (matchAllCandidate) {
     // Yes.
     const path = getLocalePathFromPaths({ paths: matchAllCandidate.paths, locale })
-    const match = ptrMatch<ParsedUrlQuery>('/' + path)('/' + pathParts.join('/'))
+    const match = ptrMatch<Record<string, string>>('/' + path)('/' + pathParts.join('/'))
     if (match) {
       // It matches! And it does not have children (or should not).
       return {
@@ -243,14 +247,15 @@ export const parsePathParts = ({
  * @returns The file path based, Next.js format, url in UrlObject format
  * if the url successfully matched a file path, and undefined otherwise
  */
-export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => {
+export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string): ParsedUrl | undefined => {
   const { routesTree, defaultLocale, locales } = getNtrData()
+  const parsedUrl = parseUrl(url)
   const { pathname, query, hash } = parseUrl(url)
 
   if (pathname && anyDynamicFilepathPartsRegex.exec(pathname)) {
     // The given url seems to already be a fileUrl, return it as is.
     // Not sure if we should return undefined instead. Or throw?
-    return { pathname, query, hash }
+    return parsedUrl
   }
 
   const result = parsePathParts({
@@ -261,6 +266,7 @@ export const urlToFileUrl = (url: string | URL | UrlObject, locale?: string) => 
   if (result) {
     const { parsedPathParts, additionalQuery } = result
     return {
+      ...parsedUrl,
       pathname: `/${parsedPathParts.join('/')}`,
       query: { ...query, ...additionalQuery },
       ...(hash && { hash }),

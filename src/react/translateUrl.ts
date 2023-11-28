@@ -1,8 +1,10 @@
 import { normalizePathTrailingSlash } from 'next/dist/client/normalize-trailing-slash'
+import { formatUrl } from 'next/dist/shared/lib/router/utils/format-url'
+import { ParsedUrl } from 'next/dist/shared/lib/router/utils/parse-url'
 import type { Key } from 'path-to-regexp'
 import { compile as compilePath, parse as parsePath } from 'path-to-regexp'
 import type { ParsedUrlQuery } from 'querystring'
-import { format as formatUrl, parse, UrlObject } from 'url'
+import { UrlObject } from 'url'
 
 import { getLocalePathFromPaths } from '../plugin/getPathFromPaths'
 import { getNtrData } from '../shared/ntrData'
@@ -80,7 +82,7 @@ const translatePathParts = ({
       // Single dynamic route segment value => store it in the query
       currentQuery = {
         ...currentQuery,
-        [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathPart,
+        [childRouteBranch.name.replace(/[[\].]/g, '')]: pathPart,
       }
     } else {
       childRouteBranch = candidates.find((candidate) => getSpreadFilepathPartKey(candidate.name))
@@ -88,7 +90,7 @@ const translatePathParts = ({
         // Catch all route => store it in the query, then return the current data.
         currentQuery = {
           ...currentQuery,
-          [childRouteBranch.name.replace(/\[|\]|\./g, '')]: pathParts,
+          [childRouteBranch.name.replace(/[[\].]/g, '')]: pathParts,
         }
         return {
           translatedPathParts: [getLocalePathFromPaths({ paths: childRouteBranch.paths, locale })],
@@ -144,11 +146,14 @@ export function translatePath<U extends string | UrlObject, F extends 'string' |
 export function translatePath(url: Url, locale: string, { format }: Options = {}): Url {
   const { routesTree } = getNtrData()
   const returnFormat = format || typeof url
-  const urlObject = parseUrl(url)
-  const { pathname, query, hash } = urlObject
+  const parsedUrl = parseUrl(url)
+  const { pathname, query, hash } = parsedUrl
 
   if (!pathname || !locale) {
-    return returnFormat === 'object' ? url : formatUrl(url)
+    if (returnFormat === 'object') {
+      return typeof url === 'object' ? url : parseUrl(url)
+    }
+    return typeof url === 'object' ? formatUrl(url) : url
   }
 
   const pathParts = removeLangPrefix(pathname, true)
@@ -172,10 +177,10 @@ export function translatePath(url: Url, locale: string, { format }: Options = {}
     {},
   )
 
-  const translatedPathname = `${routesTree.paths[locale] ? `/${routesTree.paths[locale]}` : ''}/${compiledPath}`
+  const translatedPathname = (routesTree.paths[locale] ? `/${routesTree.paths[locale]}` : '') + `/${compiledPath}`
 
   const translatedUrlObject = {
-    ...urlObject,
+    ...parsedUrl,
     hash,
     pathname: translatedPathname,
     query: remainingQuery,
@@ -203,9 +208,9 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
   const { defaultLocale } = getNtrData()
 
   // Handle external urls
-  const parsedUrl: UrlObject = typeof url === 'string' ? parse(url) : url
-  if (parsedUrl.host) {
-    if (typeof window === 'undefined' || parsedUrl.host !== parse(window.location.href).host) {
+  const parsedUrl: ParsedUrl | UrlObject = typeof url === 'string' ? parseUrl(url) : url
+  if (parsedUrl.hostname) {
+    if (typeof window === 'undefined' || parsedUrl.hostname !== parseUrl(window.location.href).hostname) {
       return url
     }
   }
@@ -218,5 +223,5 @@ export const translateUrl: TTranslateUrl = ((url, locale, options) => {
 
   const prefix = locale === defaultLocale || options?.withoutLangPrefix ? '' : `/${locale}`
 
-  return normalizePathTrailingSlash(prefix + translatedPath)
+  return normalizePathTrailingSlash(prefix + (translatedPath as string))
 }) as typeof translatePath
