@@ -1,9 +1,9 @@
 # Next-translate-routes
 
-Translated routing and more for Next using Next regular file-base routing system
+Translated routing and more for Next `/pages` router using Next regular file-base routing system
 
 - [Features](#features)
-  - [Yet unsupported features](#yet-unsupported-features)
+  - [Unsupported features](#unsupported-features)
 - [Motivation](#motivation)
 - [How to](#how-to)
   - [Basic usage](#basic-usage)
@@ -12,7 +12,7 @@ Translated routing and more for Next using Next regular file-base routing system
     3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-_app-component-with-the-withtranslateroutes-hoc)
     4. [Use `next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
     5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
-    6. [Use a middleware to redirect from urls prefixed by default locale]
+    6. [Use a middleware to redirect from urls prefixed by default locale](#6-use-a-middleware-to-redirect-from-urls-with-the-default-locale-prefix)
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
     - [Translate/untranslate urls](#translateuntranslate-urls)
@@ -47,15 +47,11 @@ Translated routing and more for Next using Next regular file-base routing system
 
 See it in action: <https://codesandbox.io/s/github/hozana/next-translate-routes/tree/master>
 
-### Yet unsupported features
+### Unsupported features
 
+- **`/app` router is not supported**: with `/app` router, you can use [next-roots](https://www.npmjs.com/package/next-roots).
 - Html static export is not and will never be supported by next-translate-routes, since internationalized routing is among [static html export unsupported features](https://nextjs.org/docs/advanced-features/static-html-export#unsupported-features).
-- Domain routing is not supported yet but should be in the future.
-- Next 13 is not supported yet too. There is two steps here:
-  - supporting next 13 without `app/` directory: it nearly works, but there is some issues. To fix them, we need to figure out what is optimistic navigation. If anyone has a clue, please open an issue to discuss it!
-  - supporting the `app/` directory. And that won't be a piece of cake...
-
-Any PR are welcome!
+- Domain routing is not supported yet but could be in the future. Any help would be appreciated, see [here](https://github.com/hozana/next-translate-routes/issues/20#issuecomment-1571882827).
 
 ## Motivation
 
