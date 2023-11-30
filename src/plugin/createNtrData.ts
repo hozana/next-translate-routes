@@ -21,5 +21,3 @@ export const createNtrData = (nextConfig: NTRNextConfig, customPagesPath?: strin
     fallbackLng,
   }
 }
-
-export default createNtrData

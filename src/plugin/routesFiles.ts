@@ -8,7 +8,7 @@ import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 const DEFAULT_ROUTES_DATA_FILE_NAMES = ['_routes', 'routes']
 
 export const isRoutesFileName = (fileName: string, routesDataFileName?: string) => {
-  const fileNameNoExt = /^(.+)\.(json|yaml)$/.exec(fileName)?.[1]
+  const fileNameNoExt = /^(.+)\.(json|ya?ml)$/.exec(fileName)?.[1]
   return (
     fileNameNoExt &&
     (routesDataFileName ? fileNameNoExt === routesDataFileName : DEFAULT_ROUTES_DATA_FILE_NAMES.includes(fileNameNoExt))

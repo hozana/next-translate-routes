@@ -26,12 +26,13 @@ export const checkNextVersion = (
   let comparison = 0
 
   for (let i = 0; i < referenceVersion.length; i++) {
-    if (nextVersion[i] > referenceVersion[i]) {
-      comparison = 1
-    } else if (nextVersion[i] < referenceVersion[i]) {
-      comparison = -1
+    if (nextVersion[i] !== referenceVersion[i]) {
+      comparison = nextVersion[i] > referenceVersion[i] ? 1 : -1
+      break
     }
   }
+
+  console.log('From checkNextVersion.', { referenceVersion, nextVersion, comparison })
 
   if (
     (version.includes('!=') && comparison !== 0) ||

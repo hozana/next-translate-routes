@@ -63,7 +63,7 @@ export const parsePages = <L extends string>({
     : ''
   const routeSegmentsData = (
     routeSegmentsFileContent
-      ? (/\.yaml$/.test(routesFileName as string) ? YAML : JSON).parse(routeSegmentsFileContent)
+      ? (/\.ya?ml$/.test(routesFileName as string) ? YAML : JSON).parse(routeSegmentsFileContent)
       : {}
   ) as TRouteSegmentsData<L>
   const directoryPathParts = directoryPath.replace(/[\\/]/, '').split(/[\\/]/)
@@ -72,7 +72,7 @@ export const parsePages = <L extends string>({
   const children = directoryItems
     .reduce((acc, item) => {
       const isDirectory = fs.statSync(pathUtils.join(directoryPath, item)).isDirectory()
-      const pageMatch = item.match(new RegExp(`(.+)\\.(${pageExtensions.join('|')})$`))
+      const pageMatch = new RegExp(`(.+)\\.(${pageExtensions.join('|')})$`).exec(item)
       const pageName = (!isDirectory && pageMatch?.[1]) || ''
 
       if (!isSubBranch && (['_app', '_document', '_error', '404', '500'].includes(pageName) || item === 'api')) {
