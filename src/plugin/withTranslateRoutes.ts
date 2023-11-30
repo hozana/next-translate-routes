@@ -1,6 +1,6 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
-import type { Configuration as WebpackConfiguration, FileCacheOptions } from 'webpack'
+import { type Configuration as WebpackConfiguration, type FileCacheOptions, DefinePlugin } from 'webpack'
 
 import { setNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
@@ -66,6 +66,14 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
       config.cache.buildDependencies = config.cache.buildDependencies || {}
       config.cache.buildDependencies.ntrRoutes = getAllRoutesFiles()
 
+      if (!config.plugins) {
+        config.plugins = []
+      }
+      const ROUTER_CONTEXT_PATH = checkNextVersion('<13.5.0')
+        ? "'next/dist/shared/lib/router-context'"
+        : "'next/dist/shared/lib/router-context.shared-runtime'"
+      config.plugins.push(new DefinePlugin({ ROUTER_CONTEXT_PATH }))
+
       if (!config.module) {
         config.module = {}
       }
@@ -83,22 +91,6 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
           },
         },
       })
-
-      if (!config.resolve) {
-        config.resolve = {}
-      }
-      if (!config.resolve.alias) {
-        config.resolve.alias = {}
-      }
-      const alias = 'next-router-context'
-      const name = checkNextVersion('<13.5.0')
-        ? 'next/dist/shared/lib/router-context'
-        : 'next/dist/shared/lib/router-context.shared-runtime'
-      if (Array.isArray(config.resolve.alias)) {
-        config.resolve.alias.push({ alias, name })
-      } else {
-        config.resolve.alias[alias] = name
-      }
 
       return config
     },

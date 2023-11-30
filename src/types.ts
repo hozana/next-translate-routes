@@ -47,6 +47,8 @@ export type NextConfigCompleteWithNTR = NextConfigComplete & { i18n: NTRI18NConf
 declare global {
   // eslint-disable-next-line no-var
   var __NEXT_TRANSLATE_ROUTES_DATA: TNtrData
+  // eslint-disable-next-line no-var
+  var ROUTER_CONTEXT_PATH: string
 
   interface Window {
     __NEXT_TRANSLATE_ROUTES_DATA: TNtrData

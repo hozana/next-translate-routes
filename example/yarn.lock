@@ -2063,7 +2063,6 @@ __metadata:
   dependencies:
     path-to-regexp: ^6.2.0
     querystring: ^0.2.1
-    typescript: ^4.7.3
     url: ^0.11.0
     yamljs: ^0.3.0
   peerDependencies:
