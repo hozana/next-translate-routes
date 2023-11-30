@@ -32,8 +32,6 @@ export const checkNextVersion = (
     }
   }
 
-  console.log('From checkNextVersion.', { referenceVersion, nextVersion, comparison })
-
   if (
     (version.includes('!=') && comparison !== 0) ||
     (version.includes('=') && !version.includes('!=') && comparison === 0) ||
