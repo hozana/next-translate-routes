@@ -55,8 +55,14 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
     console.log(ntrMessagePrefix + 'Rewrites:', sortedRewrites)
   }
 
+  const hasOldRouterContextPath = checkNextVersion('<13.5.0')
+
   return {
     ...nextConfig,
+
+    transpilePackages: hasOldRouterContextPath
+      ? nextConfig.transpilePackages
+      : [...(nextConfig.transpilePackages || []), 'next-translate-routes'],
 
     webpack(conf: WebpackConfiguration, context) {
       const config =
@@ -69,7 +75,7 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
       if (!config.plugins) {
         config.plugins = []
       }
-      const ROUTER_CONTEXT_PATH = checkNextVersion('<13.5.0')
+      const ROUTER_CONTEXT_PATH = hasOldRouterContextPath
         ? "'next/dist/shared/lib/router-context'"
         : "'next/dist/shared/lib/router-context.shared-runtime'"
       config.plugins.push(new DefinePlugin({ ROUTER_CONTEXT_PATH }))
