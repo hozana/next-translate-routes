@@ -8,7 +8,7 @@ const parseVersion = (version?: string) =>
     ?.map(Number)
 
 type TMinorPatch = `.${number}`
-type TVersion = `${number}` | `${number}${TMinorPatch}` | `${number}${TMinorPatch}${TMinorPatch}`
+type TVersion = `${number}` | `${number}${TMinorPatch}` | `${number}${TMinorPatch}${TMinorPatch}` | 'latest'
 
 export const checkNextVersion = (
   /** Ex: '>=13.3.1', '!=12.2.4' */

@@ -56,6 +56,7 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
   }
 
   const hasOldRouterContextPath = checkNextVersion('<13.5.0')
+  const isLatestNextVersion = checkNextVersion('=latest')
 
   return {
     ...nextConfig,
@@ -75,7 +76,7 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
       if (!config.plugins) {
         config.plugins = []
       }
-      const ROUTER_CONTEXT_PATH = hasOldRouterContextPath
+      const ROUTER_CONTEXT_PATH = (hasOldRouterContextPath && !isLatestNextVersion)
         ? "'next/dist/shared/lib/router-context'"
         : "'next/dist/shared/lib/router-context.shared-runtime'"
       config.plugins.push(new DefinePlugin({ ROUTER_CONTEXT_PATH }))
