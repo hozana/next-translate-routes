@@ -1,0 +1,22 @@
+name: QA Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '45 7 * * *' # every day at 7:45
+
+jobs:
+  qa-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn run test
