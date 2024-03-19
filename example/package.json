@@ -8,8 +8,8 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@almacareer/edu-next-translate-routes": "portal:../symlink-used-by-example",
     "next": "^14.0.4",
-    "next-translate-routes": "portal:../symlink-used-by-example",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

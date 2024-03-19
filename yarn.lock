@@ -12,6 +12,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@almacareer/edu-next-translate-routes@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@almacareer/edu-next-translate-routes@workspace:."
+  dependencies:
+    "@babel/core": ^7.8.0
+    "@ianvs/prettier-plugin-sort-imports": ^3.4.2
+    "@testing-library/react": ^13.3.0
+    "@types/jest": ^27.0.0
+    "@types/react": ^18.2.0
+    "@types/react-dom": ^18.2.0
+    "@types/yamljs": ^0.2.31
+    "@typescript-eslint/eslint-plugin": ^4.28.0
+    "@typescript-eslint/parser": ^4.28.0
+    babel-jest: ^27.4.5
+    eslint: ^7.29.0
+    eslint-config-prettier: ^8.3.0
+    eslint-plugin-prettier: ^3.4.0
+    eslint-plugin-react: ^7.24.0
+    eslint-plugin-react-hooks: ^4.2.0
+    jest: ^27.4.5
+    next: ^14.0.4
+    path-to-regexp: ^6.2.0
+    prettier: ^2.3.2
+    querystring: ^0.2.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    rimraf: ^3.0.2
+    ts-jest: ^27.0.3
+    typescript: 4.9.5
+    url: ^0.11.0
+    webpack: ^5.65.0
+    yamljs: ^0.3.0
+    yarn-or-npm: ^3.0.1
+  peerDependencies:
+    next: ">11.0.0"
+    react: ">=16.8.0"
+  languageName: unknown
+  linkType: soft
+
 "@ampproject/remapping@npm:^2.2.0":
   version: 2.2.1
   resolution: "@ampproject/remapping@npm:2.2.1"
@@ -4924,45 +4963,6 @@ __metadata:
   checksum: deac9f8d00eda7b2e5cd1b2549e26e10a0faa70adaa6fdadca701cc55f49ee9018e427f424bac0c790b7c7e2d3068db97f3093f1093975f2acb8f8818b936ed9
   languageName: node
   linkType: hard
-
-"next-translate-routes@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "next-translate-routes@workspace:."
-  dependencies:
-    "@babel/core": ^7.8.0
-    "@ianvs/prettier-plugin-sort-imports": ^3.4.2
-    "@testing-library/react": ^13.3.0
-    "@types/jest": ^27.0.0
-    "@types/react": ^18.2.0
-    "@types/react-dom": ^18.2.0
-    "@types/yamljs": ^0.2.31
-    "@typescript-eslint/eslint-plugin": ^4.28.0
-    "@typescript-eslint/parser": ^4.28.0
-    babel-jest: ^27.4.5
-    eslint: ^7.29.0
-    eslint-config-prettier: ^8.3.0
-    eslint-plugin-prettier: ^3.4.0
-    eslint-plugin-react: ^7.24.0
-    eslint-plugin-react-hooks: ^4.2.0
-    jest: ^27.4.5
-    next: ^14.0.4
-    path-to-regexp: ^6.2.0
-    prettier: ^2.3.2
-    querystring: ^0.2.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    rimraf: ^3.0.2
-    ts-jest: ^27.0.3
-    typescript: 4.9.5
-    url: ^0.11.0
-    webpack: ^5.65.0
-    yamljs: ^0.3.0
-    yarn-or-npm: ^3.0.1
-  peerDependencies:
-    next: ">11.0.0"
-    react: ">=16.8.0"
-  languageName: unknown
-  linkType: soft
 
 "next@npm:^14.0.4":
   version: 14.0.4

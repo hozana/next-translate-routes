@@ -12,6 +12,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@almacareer/edu-next-translate-routes@portal:../symlink-used-by-example::locator=with-typescript%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@almacareer/edu-next-translate-routes@portal:../symlink-used-by-example::locator=with-typescript%40workspace%3A."
+  dependencies:
+    path-to-regexp: ^6.2.0
+    querystring: ^0.2.1
+    url: ^0.11.0
+    yamljs: ^0.3.0
+  peerDependencies:
+    next: ">11.0.0"
+    react: ">=16.8.0"
+  languageName: node
+  linkType: soft
+
 "@babel/code-frame@npm:7.12.11":
   version: 7.12.11
   resolution: "@babel/code-frame@npm:7.12.11"
@@ -2057,20 +2071,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-translate-routes@portal:../symlink-used-by-example::locator=with-typescript%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "next-translate-routes@portal:../symlink-used-by-example::locator=with-typescript%40workspace%3A."
-  dependencies:
-    path-to-regexp: ^6.2.0
-    querystring: ^0.2.1
-    url: ^0.11.0
-    yamljs: ^0.3.0
-  peerDependencies:
-    next: ">11.0.0"
-    react: ">=16.8.0"
-  languageName: node
-  linkType: soft
-
 "next@npm:^14.0.4":
   version: 14.0.4
   resolution: "next@npm:14.0.4"
@@ -3144,6 +3144,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "with-typescript@workspace:."
   dependencies:
+    "@almacareer/edu-next-translate-routes": "portal:../symlink-used-by-example"
     "@next/eslint-plugin-next": ^12.2.3
     "@types/node": ^12.12.21
     "@types/react": ^18.2.0
@@ -3151,7 +3152,6 @@ __metadata:
     eslint: ^7.29.0
     eslint-config-next: ^12.2.3
     next: ^14.0.4
-    next-translate-routes: "portal:../symlink-used-by-example"
     react: ^18.2.0
     react-dom: ^18.2.0
     typescript: ^4.7.3

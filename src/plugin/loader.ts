@@ -7,9 +7,11 @@ export function loader(
 ) {
   const uncommentedCode = rawCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
 
-  const defaultExportHocMatch = uncommentedCode.match(/^\s*import (\w+).* from ["']next-translate-routes["']/m)
+  const defaultExportHocMatch = uncommentedCode.match(
+    /^\s*import (\w+).* from ["']@almacareer\/edu-next-translate-routes["']/m,
+  )
   const namedExportHocMatch = uncommentedCode.match(
-    /^\s*import .*\{.*withTranslateRoutes(?: as (\w+))?\W?.*\} from ["']next-translate-routes["']/m,
+    /^\s*import .*\{.*withTranslateRoutes(?: as (\w+))?\W?.*\} from ["']@almacareer\/edu-next-translate-routes["']/m,
   )
 
   const defaultExportHocName = defaultExportHocMatch?.[1]

@@ -1,5 +1,5 @@
 const path = require('path')
-const withTranslateRoutes = require('next-translate-routes/plugin')
+const withTranslateRoutes = require('@almacareer/edu-next-translate-routes/plugin')
 
 const nextConfig = withTranslateRoutes({
   i18n: {

@@ -1,5 +1,5 @@
 import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import Link from 'next-translate-routes/link'
+import Link from '@almacareer/edu-next-translate-routes/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 

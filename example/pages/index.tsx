@@ -1,4 +1,4 @@
-import Link from 'next-translate-routes/link'
+import Link from '@almacareer/edu-next-translate-routes/link'
 import React from 'react'
 
 import Layout from '../components/Layout'

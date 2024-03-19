@@ -1,4 +1,4 @@
-# Next-translate-routes
+# @almacareer/edu-next-translate-routes
 
 Translated routing and more for Next `/pages` router using Next regular file-base routing system
 
@@ -10,8 +10,8 @@ Translated routing and more for Next `/pages` router using Next regular file-bas
     1. [Wrap you next config with the next-translate-routes plugin](#1-wrap-you-next-config-with-the-next-translate-routes-plugin)
     2. [Define your routes](#2-define-your-routes)
     3. [Wrap your `\_app` component with the `withTranslateRoutes` hoc](#3-wrap-you-_app-component-with-the-withtranslateroutes-hoc)
-    4. [Use `next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
-    5. [Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
+    4. [Use `edu-next-translate-routes/link` instead of `next/link`](#4-use-next-translate-routeslink-instead-of-nextlink)
+    5. [Use `edu-next-translate-routes/router instead` of `next/router` for singleton router (default export)](#5-use-next-translate-routesrouter-instead-of-nextrouter-for-singleton-router-default-export)
     6. [Use a middleware to redirect from urls prefixed by default locale](#6-use-a-middleware-to-redirect-from-urls-with-the-default-locale-prefix)
   - [Advanced usage](#advanced-usage)
     - [Configuration](#configuration)
@@ -45,8 +45,6 @@ Translated routing and more for Next `/pages` router using Next regular file-bas
 - **No custom server needed!**  
   Next automatic static optimization remains available.
 
-See it in action: <https://codesandbox.io/s/github/hozana/next-translate-routes/tree/master>
-
 ### Unsupported features
 
 - **`/app` router is not supported**: with `/app` router, you can use [next-roots](https://www.npmjs.com/package/next-roots).
@@ -72,11 +70,11 @@ Check the example folder to see next-translate-routes in action. Some advanced t
 
 #### 1. Wrap you next config with the next-translate-routes plugin
 
-Import the `withTranslateRoutes` from `next-translate-routes/plugin`.
+Import the `withTranslateRoutes` from `@almacareer/edu-next-translate-routes/plugin`.
 
 ```javascript
 // next.config.js
-const withTranslateRoutes = require('next-translate-routes/plugin')
+const withTranslateRoutes = require('@almacareer/edu-next-translate-routes/plugin')
 
 module.exports = withTranslateRoutes({
   // Next i18n config (mandatory): https://nextjs.org/docs/advanced-features/i18n-routing
@@ -160,7 +158,7 @@ for each language or only some language, like "blog" in `pt` here:
 
 ```js
 // `/pages/_app.js`
-import { withTranslateRoutes } from 'next-translate-routes'
+import { withTranslateRoutes } from '@almacareer/edu-next-translate-routes'
 import { App } from 'next/app'
 
 export default withTranslateRoutes(App)
@@ -170,7 +168,7 @@ Or:
 
 ```js
 // `/pages/_app.js`
-import { withTranslateRoutes } from 'next-translate-routes'
+import { withTranslateRoutes } from '@almacareer/edu-next-translate-routes'
 
 const App = ({ Component, pageProps }) => {
   // Custom code...
@@ -181,12 +179,12 @@ const App = ({ Component, pageProps }) => {
 export default withTranslateRoutes(App)
 ```
 
-#### 4. Use `next-translate-routes/link` instead of `next/link`
+#### 4. Use `@almacareer/edu-next-translate-routes/link` instead of `next/link`
 
-next-translate-routes extends Next Link to translate routes automatically: import it from 'next-translate-routes/link' instead of 'next/link' and use as you ever did.
+next-translate-routes extends Next Link to translate routes automatically: import it from '@almacareer/edu-next-translate-routes/link' instead of 'next/link' and use as you ever did.
 
 ```jsx
-import Link from 'next-translate-routes/link'
+import Link from '@almacareer/edu-next-translate-routes/link'
 import React, { useEffect, useState } from 'react'
 
 const MyLinks = (props) => {
@@ -209,12 +207,12 @@ const MyLinks = (props) => {
 }
 ```
 
-#### 5. Use `next-translate-routes/router instead` of `next/router` for singleton router (default export)
+#### 5. Use `@almacareer/edu-next-translate-routes/router instead` of `next/router` for singleton router (default export)
 
-You can use `next-translate-routes/router` everywhere instead of `next/router` but it is only necessary for the singleton router (which is rarely used).
+You can use `@almacareer/edu-next-translate-routes/router` everywhere instead of `next/router` but it is only necessary for the singleton router (which is rarely used).
 
 ```typescript
-import singletonRouter from 'next-translate-routes/router'
+import singletonRouter from '@almacareer/edu-next-translate-routes/router'
 // Indead of:
 import singletonRouter from 'next/router'
 ```
@@ -336,7 +334,7 @@ You can use a constrained dynamic path segment in the root of your application t
 ```yml
 # /pages/[side]/_routes.yml
 ---
-"/":
+'/':
   default: :side(heads|tails) # Important!
   en: :side(heads|tails)
   fr: :side(pile|face)
@@ -444,7 +442,7 @@ You might need to mock next-translate-routes outside Next, for example for testi
 First, you need to create next-translate-routes data. You can do it using the `createNtrData` helper, but it only works in node environment. It takes the next config as first parameter. The second parameter is optional and allows to use a custom pages folder: if omitted, `createNtrData` will look for you next `pages` folder.
 
 ```typescript
-import { createNtrData } from 'next-translate-routes/plugin`
+import { createNtrData } from '@almacareer/edu-next-translate-routes/plugin`
 import nextConfig from '../next.config.js'
 
 const ntrData = createNtrData(
@@ -453,7 +451,7 @@ const ntrData = createNtrData(
 )
 ```
 
-Then, if you want to render you app, you need to inject the router context, then (and only then) inject next-translate-routes. You can do it manually, or using `next-tranlate-routes/loader` with Webpack.
+Then, if you want to render you app, you need to inject the router context, then (and only then) inject next-translate-routes. You can do it manually, or using `@almacareer/edu-next-translate-routes/loader` with Webpack.
 
 ##### Manually
 
@@ -461,7 +459,7 @@ You will have to execute createNtrData in a node script and store the result som
 
 ```typescript
 // nextRouterMock.ts
-import withTranslateRoutes from 'next-translate-routes'
+import withTranslateRoutes from '@almacareer/edu-next-translate-routes'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 import ntrData from 'path/to/your/ntrData'
 
@@ -488,13 +486,13 @@ export const WithNextRouter: DecoratorFn = (Story, context): JSX.Element => (
 )
 ```
 
-##### With `next-translate-routes/loader` for Webpack
+##### With `@almacareer/edu-next-translate-routes/loader` for Webpack
 
-`next-translate-routes/loader` allows to create next-translate-routes data at build time. So you can do exactly the same as described in the [Manually](#manually) paragraph above, but you don't need to create and add `ntrData` as an argument to `withTranslateRoutes`.
+`@almacareer/edu-next-translate-routes/loader` allows to create next-translate-routes data at build time. So you can do exactly the same as described in the [Manually](#manually) paragraph above, but you don't need to create and add `ntrData` as an argument to `withTranslateRoutes`.
 
 ```typescript
 // nextRouterMock.ts
-import withTranslateRoutes from 'next-translate-routes'
+import withTranslateRoutes from '@almacareer/edu-next-translate-routes'
 import { RouterContext } from 'next/dist/shared/lib/router-context'
 
 //[...]
@@ -511,7 +509,7 @@ Then all you have to do is to add this rule in your webpack config:
 ```js
 // storybook/config/webpack.config.js for exemple
 
-const { createNtrData } = require('next-translate-routes/plugin')
+const { createNtrData } = require('@almacareer/edu-next-translate-routes/plugin')
 const nextConfig = require('../../next.config') // Your project nextConfig
 
 module.exports = ({ config }) => {
@@ -520,7 +518,7 @@ module.exports = ({ config }) => {
   config.module.rules.push({
     test: /path\/to\/nextRouterMock/, // ⚠️ Warning! This test should only match the file where withTranslateRoutes is used! If you cannot, set the mustMatch option to false.
     use: {
-      loader: 'next-translate-routes/loader',
+      loader: '@almacareer/edu-next-translate-routes/loader',
       options: { data: createNtrData(nextConfig) },
     },
   })
@@ -537,7 +535,7 @@ You can define fallback languages in next-translate-routes config [as you would 
 
 ```javascript
 // next.config.js
-const withTranslateRoutes = require('next-translate-routes')
+const withTranslateRoutes = require('@almacareer/edu-next-translate-routes')
 
 module.exports = withTranslateRoutes({
   // Next i18n config (mandatory): https://nextjs.org/docs/advanced-features/i18n-routing
@@ -614,5 +612,5 @@ module.exports = withSentryConfig(withTranslateRoutes(nextConfig), sentryWebpack
 - The plugin adds a webpack loader for the pages/\_app file. This loader adds a data object (containing the routes tree object along with other config) as first argument of the `withTranslateRoutes` high order component that wrap the app.
 - `withTranslateRoutes` makes this data available as a global variable, `__NEXT_TRANSLATE_ROUTES_DATA`.
 - The `translateUrl` function uses this data to translate routes.
-- The `next-translate-routes/link` leverages the `translateUrl` function to set the `as` prop of `next/link` to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
+- The `@almacareer/edu-next-translate-routes/link` leverages the `translateUrl` function to set the `as` prop of `next/link` to the translated url so that the link is aware of the true url destination (which is then available on hover, or on right-click - copy link for example).
 - The `withTranslateRoutes` enhance the router by overriding the router context, to give translation skills to the router.push (which is used on click on a `next/link`), router.replace, and router.prefetch functions, using the `translateUrl` function too.

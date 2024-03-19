@@ -1,4 +1,4 @@
-import Link from 'next-translate-routes/link'
+import Link from '@almacareer/edu-next-translate-routes/link'
 import Head from 'next/head'
 import NextLink, { LinkProps } from 'next/link'
 import { useRouter } from 'next/router'
@@ -56,7 +56,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <header>
-        <h3>With next-translate-routes/link</h3>
+        <h3>With @almacareer/edu-next-translate-routes/link</h3>
         <Nav LinkComponent={Link} />
         <h3>With next/link</h3>
         <Nav LinkComponent={NextLink} />

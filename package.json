@@ -1,10 +1,13 @@
 {
-  "name": "next-translate-routes",
-  "version": "1.11.0-4",
+  "name": "@almacareer/edu-next-translate-routes",
+  "version": "1.0.0",
   "description": "Flexible and translated routes for Next.js without custom server",
   "main": "index.js",
-  "repository": "https://github.com/hozana/next-translate-routes",
-  "author": "cvolant",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/almacareer/edu-next-translate-routes.git"
+  },
+  "author": "rhrebecek",
   "license": "MIT",
   "keywords": [
     "next",
@@ -74,7 +77,7 @@
     "react": ">=16.8.0"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://npm.pkg.github.com"
   },
   "packageManager": "yarn@3.6.4"
 }

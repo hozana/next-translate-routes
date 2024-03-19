@@ -1,5 +1,5 @@
-import withTranslateRoutes, { translateUrl, urlToFileUrl, fileUrlToUrl } from 'next-translate-routes'
-import singletonRouter from 'next-translate-routes/router'
+import withTranslateRoutes, { translateUrl, urlToFileUrl, fileUrlToUrl } from '@almacareer/edu-next-translate-routes'
+import singletonRouter from '@almacareer/edu-next-translate-routes/router'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import * as pathToRegexp from 'path-to-regexp'
