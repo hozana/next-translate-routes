@@ -118,7 +118,7 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { th
   try {
     const { pathname, query, hash } = fileUrlToFileUrlObject(url)
 
-    const { routesTree, defaultLocale } = getNtrData()
+    const { routesTree } = getNtrData()
 
     const pathParts = (pathname || '/')
       .replace(/^\/|\/$/g, '')
@@ -135,11 +135,11 @@ export const fileUrlToUrl = (url: UrlObject | URL | string, locale: string, { th
       }
     }
 
-    return `${locale !== defaultLocale ? `/${locale}` : ''}${formatUrl({
+    return formatUrl({
       pathname: newPathname,
       query,
       hash,
-    })}`
+    })
   } catch (cause) {
     if (throwOnError) {
       throw new Error(ntrMessagePrefix + `No page found for the following file url: ${url.toString()}`, { cause })

@@ -30,12 +30,12 @@ export default {
   reRoutes: {
     redirects: [
       {
-        source: '/en/(firstPart|premier)/:secondPart(\\d+)/(thirdPart|troisieme)',
+        source: '/(firstPart|premier)/:secondPart(\\d+)/(thirdPart|troisieme)',
         destination: '/1st/:secondPart/thirdPart',
       },
       {
-        source: '/fr/(firstPart|1st)/:secondPart(\\d+)/thirdPart',
-        destination: '/fr/premier/:secondPart/troisieme',
+        source: '/(firstPart|1st)/:secondPart(\\d+)/thirdPart',
+        destination: '/premier/:secondPart/troisieme',
       },
     ].map((redirect) => ({
       locale: false,

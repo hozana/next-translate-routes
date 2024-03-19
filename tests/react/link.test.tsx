@@ -43,7 +43,7 @@ describe('Link', () => {
     container.querySelector('a')?.click()
     expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
-      '/en/root/community/300-three-hundred/statistics?baz=3',
+      '/root/community/300-three-hundred/statistics?baz=3',
       { locale: 'en', scroll: true, shallow: undefined },
     )
   })
@@ -83,7 +83,7 @@ describe('Link', () => {
     container.querySelector('a')?.click()
     expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?baz=3&communityId=300&communitySlug=three-hundred',
-      '/en/root/community/300-three-hundred/statistics?baz=3',
+      '/root/community/300-three-hundred/statistics?baz=3',
       { locale: 'en', scroll: true, shallow: undefined },
     )
   })
@@ -134,7 +134,7 @@ describe('Link', () => {
     container.querySelector('a')?.click()
     expect(routerContext.push).toHaveBeenCalledWith(
       '/community/[communityId]/[communitySlug]/statistics?communityId=300&communitySlug=three-hundred&baz=3',
-      '/fr-BE/communaute/300-three-hundred/statistiques?baz=3',
+      '/communaute/300-three-hundred/statistiques?baz=3',
       { locale: 'fr-BE', scroll: true, shallow: undefined },
     )
   })

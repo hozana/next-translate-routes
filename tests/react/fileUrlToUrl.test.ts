@@ -62,7 +62,7 @@ describe('fileUrlToUrl', () => {
         query: { newsPathPart: ['a'] },
       },
       locale: 'fr-BE',
-      translation: '/fr-BE/actualites/a',
+      translation: '/actualites/a',
     },
     {
       url: {
@@ -85,7 +85,7 @@ describe('fileUrlToUrl', () => {
         hash: 'section',
       },
       locale: 'en',
-      translation: '/en/root/catch-all-or-none?baz=3#section',
+      translation: '/root/catch-all-or-none?baz=3#section',
     },
     {
       url: {
@@ -94,7 +94,7 @@ describe('fileUrlToUrl', () => {
         hash: 'section',
       },
       locale: 'en',
-      translation: '/en/root/catch-all/foo/bar?baz=3#section',
+      translation: '/root/catch-all/foo/bar?baz=3#section',
     },
     {
       url: '/catch-all/stuff',
