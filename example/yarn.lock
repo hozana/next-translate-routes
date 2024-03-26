@@ -2066,7 +2066,7 @@ __metadata:
     url: ^0.11.0
     yamljs: ^0.3.0
   peerDependencies:
-    next: ">11.0.0"
+    next: ">=13.5.0"
     react: ">=16.8.0"
   languageName: node
   linkType: soft

@@ -1,11 +1,10 @@
 import type { Redirect, Rewrite } from 'next/dist/lib/load-custom-routes'
 import type { NextConfig } from 'next/dist/server/config-shared'
-import { type Configuration as WebpackConfiguration, type FileCacheOptions, DefinePlugin } from 'webpack'
+import { type Configuration as WebpackConfiguration, type FileCacheOptions } from 'webpack'
 
 import { setNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import { NextConfigWithNTR } from '../types'
-import { checkNextVersion } from './checkNextVersion'
 import { createNtrData } from './createNtrData'
 import { getPagesPath } from './getPagesPath'
 import { getRouteBranchReRoutes } from './getRouteBranchReRoutes'
@@ -55,14 +54,10 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
     console.log(ntrMessagePrefix + 'Rewrites:', sortedRewrites)
   }
 
-  const hasOldRouterContextPath = checkNextVersion('<13.5.0')
-
   return {
     ...nextConfig,
 
-    transpilePackages: hasOldRouterContextPath
-      ? nextConfig.transpilePackages
-      : [...(nextConfig.transpilePackages || []), 'next-translate-routes'],
+    transpilePackages: [...(nextConfig.transpilePackages || []), 'next-translate-routes'],
 
     webpack(conf: WebpackConfiguration, context) {
       const config =
@@ -71,14 +66,6 @@ export const withTranslateRoutes = (userNextConfig: NextConfigWithNTR): NextConf
       config.cache = typeof config.cache === 'object' ? (config.cache as FileCacheOptions) : { type: 'filesystem' }
       config.cache.buildDependencies = config.cache.buildDependencies || {}
       config.cache.buildDependencies.ntrRoutes = getAllRoutesFiles()
-
-      if (!config.plugins) {
-        config.plugins = []
-      }
-      const ROUTER_CONTEXT_PATH = hasOldRouterContextPath
-        ? "'next/dist/shared/lib/router-context'"
-        : "'next/dist/shared/lib/router-context.shared-runtime'"
-      config.plugins.push(new DefinePlugin({ ROUTER_CONTEXT_PATH }))
 
       if (!config.module) {
         config.module = {}

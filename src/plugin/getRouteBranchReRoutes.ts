@@ -4,20 +4,18 @@ import { pathToRegexp } from 'path-to-regexp'
 import { getNtrData } from '../shared/ntrData'
 import { ignoreSegmentPathRegex } from '../shared/regex'
 import type { TAnyLocale, TReRoutes, TRouteBranch, TRouteSegment } from '../types'
-import { checkNextVersion } from './checkNextVersion'
 import { fileNameToPath } from './fileNameToPaths'
 import { getLocalePathFromPaths } from './getPathFromPaths'
 
 /** Prevent prefetches redirections and rewrites. See #49 and https://github.com/vercel/next.js/issues/39531 */
-const getNextjsDataHeaderCheck = (): Pick<Redirect, 'missing'> | false =>
-  checkNextVersion('>=13.3.0') && {
-    missing: [
-      {
-        type: 'header',
-        key: 'x-nextjs-data',
-      },
-    ],
-  }
+const nextjsDataHeaderCheck: Pick<Redirect, 'missing'> = {
+  missing: [
+    {
+      type: 'header',
+      key: 'x-nextjs-data',
+    },
+  ],
+}
 
 /** Remove brackets and custom regexp from source to get valid destination */
 const sourceToDestination = (sourcePath: string) =>
@@ -179,7 +177,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
             permanent: false,
             // Take source locale into account
             locale: false as const,
-            ...getNextjsDataHeaderCheck(),
+            ...nextjsDataHeaderCheck,
           },
         ]
       }, [] as Redirect[]),
@@ -225,7 +223,7 @@ export const getPageReRoutes = <L extends TAnyLocale>(routeSegments: TRouteSegme
       {
         source,
         destination,
-        ...getNextjsDataHeaderCheck(),
+        ...nextjsDataHeaderCheck,
       },
     ]
   }, [] as Rewrite[])

@@ -4959,7 +4959,7 @@ __metadata:
     yamljs: ^0.3.0
     yarn-or-npm: ^3.0.1
   peerDependencies:
-    next: ">11.0.0"
+    next: ">=13.5.0"
     react: ">=16.8.0"
   languageName: unknown
   linkType: soft

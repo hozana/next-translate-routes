@@ -1,4 +1,5 @@
 import type { NextComponentType } from 'next'
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime'
 import { AppContextType, AppInitialProps } from 'next/dist/shared/lib/utils'
 import { NextRouter, useRouter as useNextRouter } from 'next/router'
 import React, { useMemo } from 'react'
@@ -7,8 +8,6 @@ import { setNtrData } from '../shared/ntrData'
 import { ntrMessagePrefix } from '../shared/withNtrPrefix'
 import type { TNtrData } from '../types'
 import { enhanceNextRouter } from './enhanceNextRouter'
-
-const { RouterContext } = require(ROUTER_CONTEXT_PATH)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TWrappedAppComponent = NextComponentType<AppContextType<NextRouter>, AppInitialProps, any>

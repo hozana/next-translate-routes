@@ -21,13 +21,16 @@ export const isRoutesFileName = (fileName: string, routesDataFileName?: string) 
 export const getPagesDir = () => {
   // @ts-expect-error: support previous Next versions
   const pagesDirs = findPagesDir(process.cwd(), false)
-  const pagesDir = (pagesDirs as Record<string, string | undefined>).pages || pagesDirs.pagesDir
+  const pagesDir =
+    typeof pagesDirs === 'object'
+      ? (pagesDirs as Record<string, string | undefined>).pages || pagesDirs.pagesDir
+      : pagesDirs
 
   if (!pagesDir) {
     throw new Error(
-      ntrMessagePrefix + '`/pages` directory not found.' + pagesDirs.appDir
-        ? ' next-translate-routes does not support `/app` directory yet.'
-        : '',
+      ntrMessagePrefix +
+        '`/pages` directory not found.' +
+        (pagesDirs.appDir ? ' next-translate-routes does not support `/app` directory yet.' : ''),
     )
   }
 
